@@ -32,15 +32,15 @@ const FlashSale: React.FC = () => {
                <div className="bg-[#F5F5F5] rounded-3xl p-12 flex flex-col justify-center relative overflow-hidden h-full">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-3xl"></div>
                 
-                <h2 className="text-4xl font-bold text-primary mb-2">Book <span className="text-secondary">Fair!</span></h2>
-                <p className="text-gray-500 mb-8">Get 25% off all Hardcovers - Limited Time Offer!</p>
+                <h2 className="text-4xl font-bold text-primary mb-2">Pameran <span className="text-secondary">Buku!</span></h2>
+                <p className="text-gray-500 mb-8">Diskon 25% semua Hardcover - Penawaran Terbatas!</p>
                 
                 <div className="flex items-center gap-4 mb-8">
                    {[
-                      { label: 'Days', val: time.days },
-                      { label: 'Hours', val: time.hours },
-                      { label: 'Minutes', val: time.minutes },
-                      { label: 'Seconds', val: time.seconds },
+                      { label: 'Hari', val: time.days },
+                      { label: 'Jam', val: time.hours },
+                      { label: 'Menit', val: time.minutes },
+                      { label: 'Detik', val: time.seconds },
                    ].map((t, i) => (
                       <div key={i} className="flex items-center">
                          <div className="text-center">
@@ -53,7 +53,7 @@ const FlashSale: React.FC = () => {
                 </div>
 
                 <button className="bg-primary text-white px-8 py-3 rounded-full font-bold self-start flex items-center gap-2 hover:bg-secondary hover:text-primary transition-all">
-                   Shop Books <ArrowRight size={16} />
+                   Belanja Buku <ArrowRight size={16} />
                 </button>
              </div>
              </SlideIn>

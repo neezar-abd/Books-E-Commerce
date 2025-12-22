@@ -28,6 +28,8 @@ const Checkout: React.FC = () => {
   const [deliveryOption, setDeliveryOption] = useState<'same' | 'different'>('same');
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -118,8 +120,40 @@ const Checkout: React.FC = () => {
     return sum + (price * item.quantity);
   }, 0);
   const taxes = Math.round(subtotal * TAX_RATE);
-  const discount = 100000; // hardcoded for now
+  const discount = appliedCoupon?.discount || 0;
   const total = subtotal + SHIPPING_COST + taxes - discount;
+
+  // Sample coupon codes (dapat diganti dengan API call ke backend)
+  const validCoupons: { [key: string]: number } = {
+    'WELCOME20': 50000,
+    'BOOKLOVERS': 75000,
+    'SAVE10': 100000,
+    'LUMINA2024': 150000
+  };
+
+  const handleApplyCoupon = () => {
+    if (!couponCode.trim()) {
+      alert('Mohon masukkan kode kupon');
+      return;
+    }
+
+    const upperCode = couponCode.toUpperCase();
+    if (validCoupons[upperCode]) {
+      setAppliedCoupon({
+        code: upperCode,
+        discount: validCoupons[upperCode]
+      });
+      alert(`Kupon "${upperCode}" berhasil diterapkan! Diskon: Rp ${validCoupons[upperCode].toLocaleString('id-ID')}`);
+    } else {
+      alert('Kode kupon tidak valid');
+      setAppliedCoupon(null);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponCode('');
+  };
 
   const handleCheckout = async () => {
     try {
@@ -429,6 +463,39 @@ const Checkout: React.FC = () => {
               <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 sticky top-24">
                 <h2 className="text-2xl font-bold text-primary mb-6">Ringkasan Pesanan</h2>
                 
+                {/* Coupon Section */}
+                <div className="mb-6 p-4 bg-gray-50 rounded-xl">
+                  <label className="block text-sm font-bold text-primary mb-2">Kode Kupon (Opsional)</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Masukkan kode kupon"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      disabled={appliedCoupon !== null}
+                      className="flex-1 px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary disabled:bg-gray-100"
+                    />
+                    {!appliedCoupon ? (
+                      <button
+                        onClick={handleApplyCoupon}
+                        className="px-4 py-2 bg-primary text-white rounded-lg font-bold hover:bg-opacity-90 transition-colors"
+                      >
+                        Terapkan
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleRemoveCoupon}
+                        className="px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors"
+                      >
+                        Hapus
+                      </button>
+                    )}
+                  </div>
+                  {appliedCoupon && (
+                    <p className="text-xs text-green-600 mt-2">✓ Kupon "{appliedCoupon.code}" diterapkan</p>
+                  )}
+                </div>
+                
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Items</span>
@@ -446,10 +513,12 @@ const Checkout: React.FC = () => {
                     <span className="text-gray-600">Pajak</span>
                     <span className="font-bold text-primary">{formatRupiah(taxes)}</span>
                   </div>
-                  <div className="flex justify-between items-center text-green-600">
-                    <span>Diskon Kupon</span>
-                    <span className="font-bold">-{formatRupiah(discount)}</span>
-                  </div>
+                  {discount > 0 && (
+                    <div className="flex justify-between items-center text-green-600">
+                      <span>Diskon Kupon</span>
+                      <span className="font-bold">-{formatRupiah(discount)}</span>
+                    </div>
+                  )}
                   <div className="border-t-2 border-gray-200 pt-4">
                     <div className="flex justify-between items-center">
                       <span className="text-lg font-bold text-primary">Total</span>

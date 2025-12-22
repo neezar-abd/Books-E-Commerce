@@ -19,9 +19,15 @@ const InstagramFeed: React.FC = () => {
 
          <StaggerContainer staggerDelay={0.1}>
            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {[1,2,3,4,5].map(i => (
+              {[
+                'https://images.unsplash.com/photo-1507842217343-583f7270bfba?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', // Koleksi buku rak
+                'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', // Open book
+                'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', // Buku warna-warni
+                'https://images.unsplash.com/photo-1543002588-d4d28bde5205?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80', // Membaca di tempat nyaman
+                'https://images.unsplash.com/photo-1507842217343-583f7270bfba?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80'  // Library view
+              ].map((imgUrl, i) => (
                  <motion.div key={i} variants={staggerItem} className="relative group overflow-hidden rounded-2xl aspect-square">
-                  <img src={`https://images.unsplash.com/photo-1555041469-a586c61ea9bc?random=${i}&w=400&q=80`} className="w-full h-full object-cover" alt="Instagram" />
+                  <img src={imgUrl} className="w-full h-full object-cover" alt={`Instagram post ${i + 1}`} loading="lazy" />
                   <div className="absolute inset-0 bg-primary/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                      <Instagram className="text-white" size={32} />
                   </div>

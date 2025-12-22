@@ -16,8 +16,8 @@ const Features: React.FC = () => {
                   <Truck size={28} />
                </div>
                <div>
-                  <h3 className="font-bold text-lg text-primary">Free Shipping</h3>
-                  <p className="text-sm text-gray-500">Free shipping for order above $180</p>
+                  <h3 className="font-bold text-lg text-primary">Gratis Ongkir</h3>
+                  <p className="text-sm text-gray-500">Gratis ongkir untuk pembelian di atas Rp 500.000</p>
                </div>
             </motion.div>
             <motion.div variants={staggerItem} className="flex items-center gap-4 p-4 rounded-xl hover:shadow-soft transition-shadow">
@@ -25,8 +25,8 @@ const Features: React.FC = () => {
                   <CreditCard size={28} />
                </div>
                <div>
-                  <h3 className="font-bold text-lg text-primary">Flexible Payment</h3>
-                  <p className="text-sm text-gray-500">Multiple secure payment options</p>
+                  <h3 className="font-bold text-lg text-primary">Pembayaran Fleksibel</h3>
+                  <p className="text-sm text-gray-500">Berbagai opsi pembayaran yang aman</p>
                </div>
             </motion.div>
             <motion.div variants={staggerItem} className="flex items-center gap-4 p-4 rounded-xl hover:shadow-soft transition-shadow">
@@ -34,8 +34,8 @@ const Features: React.FC = () => {
                   <HeadphonesIcon size={28} />
                </div>
                <div>
-                  <h3 className="font-bold text-lg text-primary">24x7 Support</h3>
-                  <p className="text-sm text-gray-500">We support online all days.</p>
+                  <h3 className="font-bold text-lg text-primary">Dukungan 24x7</h3>
+                  <p className="text-sm text-gray-500">Kami siap membantu Anda kapan saja.</p>
                </div>
             </motion.div>
          </div>

@@ -15,12 +15,12 @@ const BlogSection: React.FC = () => {
              <div>
                 <div className="flex items-center gap-2 mb-2">
                    <div className="w-8 h-1 bg-secondary rounded"></div>
-                   <span className="text-secondary font-medium uppercase tracking-wide">News & Blogs</span>
+                   <span className="text-secondary font-medium uppercase tracking-wide">Berita & Blog</span>
                 </div>
-                <h2 className="text-3xl font-bold text-primary">Our Latest <br/> News & Blogs</h2>
+                <h2 className="text-3xl font-bold text-primary">Berita & Blog <br/> Terbaru Kami</h2>
              </div>
              <button className="bg-primary text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-secondary hover:text-primary transition-colors">
-                View All Blogs
+                Lihat Semua Blog
              </button>
           </div>
         </FadeIn>
@@ -37,7 +37,7 @@ const BlogSection: React.FC = () => {
                  </div>
                  <h3 className="text-xl font-bold text-primary mb-2 leading-tight group-hover:text-secondary transition-colors">{blog.title}</h3>
                  <p className="text-gray-500 text-sm mb-4 line-clamp-2">{blog.description}</p>
-                 <a href="#" className="text-primary font-bold underline decoration-2 underline-offset-4 hover:text-secondary">Read More</a>
+                 <a href="#" className="text-primary font-bold underline decoration-2 underline-offset-4 hover:text-secondary">Baca Selengkapnya</a>
               </motion.div>
            ))}
           </div>

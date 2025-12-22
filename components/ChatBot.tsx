@@ -31,7 +31,12 @@ const ChatBot: React.FC = () => {
 
   const initializeChat = () => {
     if (!chatSessionRef.current) {
-      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const apiKey = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+      if (!apiKey) {
+        console.error('Gemini API Key is not configured');
+        return;
+      }
+      const ai = new GoogleGenAI({ apiKey });
       chatSessionRef.current = ai.chats.create({
         model: 'gemini-3-pro-preview',
         config: {

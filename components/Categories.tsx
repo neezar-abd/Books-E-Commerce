@@ -18,18 +18,18 @@ const Categories: React.FC = () => {
             className="lg:col-span-5 bg-white p-8 rounded-3xl relative overflow-hidden group hover:shadow-card transition-all h-full"
           >
              <div className="relative z-10">
-                <span className="text-secondary font-medium mb-1 block">1500+ Titles</span>
-                <h2 className="text-4xl font-bold text-primary mb-4">Fiction</h2>
+                <span className="text-secondary font-medium mb-1 block">1500+ Judul</span>
+                <h2 className="text-4xl font-bold text-primary mb-4">Fiksi</h2>
                 <div className="space-y-1 text-gray-500 text-sm">
-                   <p>Discover worlds beyond imagination,</p>
-                   <p>from classics to contemporary hits.</p>
+                   <p>Temukan dunia melampaui imajinasi,</p>
+                   <p>dari klasik hingga kontemporer.</p>
                 </div>
                 
                 <div className="mt-8 space-y-2 text-sm text-gray-600">
-                   <p className="cursor-pointer hover:text-secondary">Literary Fiction</p>
-                   <p className="cursor-pointer hover:text-secondary">Sci-Fi & Fantasy</p>
-                   <p className="cursor-pointer hover:text-secondary">Mystery & Thriller</p>
-                   <p className="cursor-pointer hover:text-secondary">Romance</p>
+                   <p className="cursor-pointer hover:text-secondary">Fiksi Sastra</p>
+                   <p className="cursor-pointer hover:text-secondary">Sci-Fi & Fantasi</p>
+                   <p className="cursor-pointer hover:text-secondary">Misteri & Thriller</p>
+                   <p className="cursor-pointer hover:text-secondary">Romansa</p>
                 </div>
              </div>
              <img 
@@ -51,12 +51,12 @@ const Categories: React.FC = () => {
                className="bg-white p-8 rounded-3xl relative overflow-hidden group hover:shadow-card transition-all flex items-center justify-between h-full"
              >
                 <div className="relative z-10 max-w-[45%]">
-                   <span className="text-secondary font-medium mb-1 block">750+ Titles</span>
-                   <h2 className="text-3xl font-bold text-primary mb-4">Non-Fiction</h2>
+                   <span className="text-secondary font-medium mb-1 block">750+ Judul</span>
+                   <h2 className="text-3xl font-bold text-primary mb-4">Non-Fiksi</h2>
                    <div className="space-y-2 text-sm text-gray-600">
-                      <p className="cursor-pointer hover:text-secondary">Biographies</p>
-                      <p className="cursor-pointer hover:text-secondary">History</p>
-                      <p className="cursor-pointer hover:text-secondary">Self-Help</p>
+                      <p className="cursor-pointer hover:text-secondary">Biografi</p>
+                      <p className="cursor-pointer hover:text-secondary">Sejarah</p>
+                      <p className="cursor-pointer hover:text-secondary">Pengembangan Diri</p>
                    </div>
                 </div>
                 <img 
@@ -75,12 +75,12 @@ const Categories: React.FC = () => {
                className="bg-white p-8 rounded-3xl relative overflow-hidden group hover:shadow-card transition-all flex items-center justify-between h-full"
              >
                 <div className="relative z-10 max-w-[45%]">
-                   <span className="text-secondary font-medium mb-1 block">450+ Titles</span>
-                   <h2 className="text-3xl font-bold text-primary mb-4">Art & Design</h2>
+                   <span className="text-secondary font-medium mb-1 block">450+ Judul</span>
+                   <h2 className="text-3xl font-bold text-primary mb-4">Seni & Desain</h2>
                    <div className="space-y-2 text-sm text-gray-600">
-                      <p className="cursor-pointer hover:text-secondary">Photography</p>
-                      <p className="cursor-pointer hover:text-secondary">Architecture</p>
-                      <p className="cursor-pointer hover:text-secondary">Graphic Design</p>
+                      <p className="cursor-pointer hover:text-secondary">Fotografi</p>
+                      <p className="cursor-pointer hover:text-secondary">Arsitektur</p>
+                      <p className="cursor-pointer hover:text-secondary">Desain Grafis</p>
                    </div>
                 </div>
                 <img 

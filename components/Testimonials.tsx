@@ -14,8 +14,8 @@ const Testimonials: React.FC = () => {
         <FadeIn delay={0.1}>
           <div className="text-center mb-12">
              <div className="w-12 h-1 bg-secondary mx-auto mb-4 rounded-full"></div>
-             <span className="text-secondary font-medium uppercase tracking-wide">Testimonial</span>
-             <h2 className="text-3xl font-bold text-primary mt-2">What Our Clients Say</h2>
+             <span className="text-secondary font-medium uppercase tracking-wide">Testimoni</span>
+             <h2 className="text-3xl font-bold text-primary mt-2">Kata Pelanggan Kami</h2>
           </div>
         </FadeIn>
 

@@ -63,9 +63,9 @@ const Hero: React.FC = () => {
               </div>
               <div>
                 <div className="flex items-center gap-1 font-bold text-primary">
-                   4.9/5 Ratings
+                   4.9/5 Rating
                 </div>
-                <div className="text-xs text-gray-500">Trusted by 200K+ Readers</div>
+                <div className="text-xs text-gray-500">Dipercaya 200K+ Pembaca</div>
               </div>
               </div>
             </FadeIn>

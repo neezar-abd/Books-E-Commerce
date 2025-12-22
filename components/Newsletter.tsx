@@ -17,9 +17,9 @@ const Newsletter: React.FC = () => {
        <div className="container mx-auto px-4 text-center relative z-10">
           <FadeIn delay={0.1}>
             <div className="w-12 h-1 bg-secondary mx-auto mb-4 rounded-full"></div>
-            <span className="text-secondary font-medium uppercase tracking-wide">Our Newsletter</span>
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mt-4 mb-4">Subscribe to Our Newsletter to Get <br/> Updates to Our Latest Collection</h2>
-            <p className="text-gray-500 mb-8">Get 20% off on your first order just by subscribing to our newsletter</p>
+            <span className="text-secondary font-medium uppercase tracking-wide">Newsletter Kami</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mt-4 mb-4">Berlangganan Newsletter Kami untuk <br/> Update Koleksi Terbaru</h2>
+            <p className="text-gray-500 mb-8">Dapatkan diskon 20% untuk pesanan pertama dengan berlangganan newsletter kami</p>
           </FadeIn>
 
           <ScaleIn delay={0.3}>
@@ -27,9 +27,9 @@ const Newsletter: React.FC = () => {
              <div className="pl-4 text-gray-400">
                 <Mail size={20} />
              </div>
-             <input type="email" placeholder="Enter Email Address" className="flex-1 px-4 py-3 outline-none text-primary" />
+             <input type="email" placeholder="Masukkan Alamat Email" className="flex-1 px-4 py-3 outline-none text-primary" />
              <button className="bg-secondary text-primary font-bold px-8 py-3 rounded-full hover:bg-primary hover:text-white transition-colors">
-                Subscribe
+                Berlangganan
              </button>
             </div>
           </ScaleIn>

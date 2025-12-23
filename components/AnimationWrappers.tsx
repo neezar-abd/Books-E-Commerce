@@ -19,7 +19,6 @@ export function FadeIn({ children, delay = 0, duration = 0.5, className = '' }: 
       transition={{
         duration,
         delay,
-        ease: [0.4, 0, 0.2, 1],
       }}
       className={className}
     >
@@ -58,7 +57,6 @@ export function SlideIn({
       transition={{
         duration,
         delay,
-        ease: [0.4, 0, 0.2, 1],
       }}
       className={className}
     >
@@ -83,7 +81,6 @@ export function ScaleIn({ children, delay = 0, duration = 0.4, className = '' }:
       transition={{
         duration,
         delay,
-        ease: [0.4, 0, 0.2, 1],
       }}
       className={className}
     >
@@ -129,7 +126,6 @@ export const staggerItem = {
     y: 0,
     transition: {
       duration: 0.5,
-      ease: [0.4, 0, 0.2, 1],
     },
   },
 };

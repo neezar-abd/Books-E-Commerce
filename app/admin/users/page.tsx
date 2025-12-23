@@ -93,7 +93,6 @@ export default function AdminUsers() {
           <ExportButton
             data={filteredUsers}
             filename="users"
-            onExport={async () => await exportUsers()}
           />
         </div>
 

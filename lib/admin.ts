@@ -568,8 +568,8 @@ export async function exportOrders(format: 'csv' | 'excel' = 'csv') {
     const exportData = data?.map(order => ({
       'Order Number': order.order_number,
       'Date': new Date(order.created_at).toLocaleDateString('id-ID'),
-      'Customer': order.profiles?.full_name || 'N/A',
-      'Phone': order.profiles?.phone || 'N/A',
+      'Customer': order.profiles?.[0]?.full_name || 'N/A',
+      'Phone': order.profiles?.[0]?.phone || 'N/A',
       'Status': order.status,
       'Payment Status': order.payment_status,
       'Payment Method': order.payment_method,
@@ -612,7 +612,7 @@ export async function exportProducts() {
     const exportData = data?.map(product => ({
       'Title': product.title,
       'Author': product.author,
-      'Category': product.categories?.name || 'N/A',
+      'Category': product.categories?.[0]?.name || 'N/A',
       'Price': product.price,
       'Stock': product.stock,
       'ISBN': product.isbn || 'N/A',

@@ -470,7 +470,6 @@ export default function AdminProducts() {
             <ExportButton
               data={filteredProducts}
               filename="products"
-              onExport={async () => await exportProducts()}
             />
             {selectedProducts.size > 0 && (
               <button

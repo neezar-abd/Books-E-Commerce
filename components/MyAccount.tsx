@@ -5,19 +5,12 @@ import { Truck, CreditCard, Headphones, User, ChevronDown, Edit } from 'lucide-r
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { formatRupiah } from '@/lib/utils';
-import { profileService } from '@/lib/profile';
+import { profileService, Profile } from '@/lib/profile';
 import { authService } from '@/lib/auth';
 import { orderService } from '@/lib/orders';
 import { supabase } from '@/lib/supabase';
 
 type TabType = 'personal' | 'orders' | 'address' | 'payment' | 'password' | 'logout';
-
-interface Profile {
-  firstName: string;
-  lastName: string;
-  phone: string;
-  avatar_url: string | null;
-}
 
 const MyAccount: React.FC = () => {
   const router = useRouter();
@@ -30,8 +23,7 @@ const MyAccount: React.FC = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState('');
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    full_name: '',
     phone: '',
   });
 
@@ -61,8 +53,7 @@ const MyAccount: React.FC = () => {
       setProfile(profileData);
       setEmail(userEmail || '');
       setFormData({
-        firstName: profileData?.firstName || '',
-        lastName: profileData?.lastName || '',
+        full_name: profileData?.full_name || '',
         phone: profileData?.phone || '',
       });
 
@@ -80,8 +71,7 @@ const MyAccount: React.FC = () => {
     try {
       setSaving(true);
       await profileService.updateProfile({
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        full_name: formData.full_name,
         phone: formData.phone,
       });
       
@@ -142,7 +132,7 @@ const MyAccount: React.FC = () => {
               />
             ) : (
               <div className="w-full h-full bg-primary flex items-center justify-center text-white text-3xl font-bold">
-                {formData.firstName?.charAt(0) || 'U'}
+                {formData.full_name?.charAt(0) || 'U'}
               </div>
             )}
           </div>
@@ -155,29 +145,16 @@ const MyAccount: React.FC = () => {
       {/* Form */}
       <div className="flex-1">
         <div className="space-y-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-bold text-primary mb-2">
-                Nama Depan <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.firstName}
-                onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-primary mb-2">
-                Nama Belakang <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.lastName}
-                onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
-              />
-            </div>
+          <div>
+            <label className="block text-sm font-bold text-primary mb-2">
+              Nama Lengkap <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.full_name}
+              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
+            />
           </div>
 
           <div>

@@ -28,8 +28,8 @@ export function RevenueChart({ data }: RevenueChartProps) {
             borderRadius: '8px',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
           }}
-          formatter={(value: number) => [
-            `Rp ${value.toLocaleString('id-ID')}`,
+          formatter={(value: number | undefined) => [
+            value ? `Rp ${value.toLocaleString('id-ID')}` : 'Rp 0',
             'Revenue'
           ]}
         />
@@ -72,7 +72,7 @@ export function OrdersChart({ data }: OrdersChartProps) {
             borderRadius: '8px',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
           }}
-          formatter={(value: number) => [value, 'Orders']}
+          formatter={(value: number | undefined) => [value || 0, 'Orders']}
         />
         <Legend />
         <Bar 
@@ -106,12 +106,13 @@ export function OrderStatusChart({ data }: OrderStatusChartProps) {
           cx="50%"
           cy="50%"
           labelLine={false}
-          label={({ status, count, percent }) => 
-            `${status}: ${count} (${(percent * 100).toFixed(0)}%)`
+          label={({ name, value, percent }) => 
+            `${name}: ${value} (${((percent || 0) * 100).toFixed(0)}%)`
           }
           outerRadius={100}
           fill="#8884d8"
           dataKey="count"
+          nameKey="status"
         >
           {data.map((entry, index) => (
             <Cell 
@@ -169,7 +170,7 @@ export function TopProductsChart({ data }: TopProductsChartProps) {
             borderRadius: '8px',
             boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
           }}
-          formatter={(value: number) => [value, 'Sold']}
+          formatter={(value: number | undefined) => [value || 0, 'Sold']}
           labelFormatter={(label) => {
             const item = data.find(d => d.product_title.startsWith(label.substring(0, 20)));
             return item?.product_title || label;

@@ -59,7 +59,7 @@ const ChatBot: React.FC = () => {
       
       if (chatSessionRef.current) {
         const result = await chatSessionRef.current.sendMessage({ message: userMessage });
-        const responseText = result.text;
+        const responseText = result.text || "I apologize, but I couldn't generate a response. Please try again.";
         
         setMessages(prev => [...prev, { role: 'model', text: responseText }]);
       }

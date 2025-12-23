@@ -257,10 +257,10 @@ const MyAccount: React.FC = () => {
             </div>
 
             {/* Status & Actions */}
-            <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-              <div className="flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-gray-200">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                 <span
-                  className={`px-4 py-1 rounded-full text-sm font-bold ${
+                  className={`px-4 py-2 rounded-full text-sm font-bold w-fit ${
                     order.status === 'completed'
                       ? 'bg-green-100 text-green-600'
                       : 'bg-secondary text-primary'
@@ -268,31 +268,31 @@ const MyAccount: React.FC = () => {
                 >
                   {order.status === 'completed' ? 'Terkirim' : 'Diproses'}
                 </span>
-                <span className="text-gray-600">
+                <span className="text-gray-600 text-sm sm:text-base">
                   {order.status === 'completed'
                     ? 'Pesanan Anda telah Terkirim'
                     : 'Pesanan Anda sedang Diproses'}
                 </span>
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 {order.status === 'completed' ? (
-                  <button className="bg-primary text-white px-6 py-2 rounded-full font-bold hover:bg-opacity-90">
+                  <button className="bg-primary text-white px-4 sm:px-6 py-2 rounded-full font-bold hover:bg-opacity-90 text-sm sm:text-base">
                     Tambah Review
                   </button>
                 ) : (
                   <button 
                     onClick={() => router.push(`/track-order?order_id=${order.id}`)}
-                    className="bg-primary text-white px-6 py-2 rounded-full font-bold hover:bg-opacity-90"
+                    className="bg-primary text-white px-4 sm:px-6 py-2 rounded-full font-bold hover:bg-opacity-90 text-sm sm:text-base"
                   >
                     Lacak Pesanan
                   </button>
                 )}
-                <button className="border-2 border-gray-300 text-primary px-6 py-2 rounded-full font-bold hover:border-primary">
+                <button className="border-2 border-gray-300 text-primary px-4 sm:px-6 py-2 rounded-full font-bold hover:border-primary text-sm sm:text-base">
                   Invoice
                 </button>
                 {order.status !== 'completed' && (
-                  <button className="text-red-500 font-bold hover:text-red-600">
-                    Batalkan Pesanan
+                  <button className="text-red-500 font-bold hover:text-red-600 px-2 text-sm sm:text-base">
+                    Batalkan
                   </button>
                 )}
               </div>

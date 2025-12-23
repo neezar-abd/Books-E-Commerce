@@ -167,7 +167,6 @@ export default function AdminOrders() {
           <ExportButton
             data={filteredOrders}
             filename="orders"
-            onExport={async () => await exportOrders()}
           />
         </div>
 

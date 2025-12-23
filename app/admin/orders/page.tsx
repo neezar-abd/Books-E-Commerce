@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import AdminLayout from '@/components/AdminLayout';
+import ExportButton from '@/components/ExportButton';
 import {
   getAllOrders,
   updateOrderStatus,
   updatePaymentStatus,
   updateTrackingNumber,
+  exportOrders,
 } from '@/lib/admin';
 import { Search, Filter, Eye, Edit, Package } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -155,11 +157,18 @@ export default function AdminOrders() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Orders Management</h1>
-          <p className="text-gray-600 mt-2">
-            Manage and track all customer orders
-          </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Orders Management</h1>
+            <p className="text-gray-600 mt-2">
+              Manage and track all customer orders
+            </p>
+          </div>
+          <ExportButton
+            data={filteredOrders}
+            filename="orders"
+            onExport={async () => await exportOrders()}
+          />
         </div>
 
         {/* Filters */}

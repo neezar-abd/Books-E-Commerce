@@ -1,0 +1,668 @@
+/**
+ * Email Templates for Lumina Books
+ * HTML email templates for various notifications
+ */
+
+interface EmailTemplateProps {
+  customerName: string;
+  [key: string]: any;
+}
+
+// Base email wrapper with branding
+const EmailWrapper = ({ children, title }: { children: string; title: string }) => `
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title}</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      color: #ffffff;
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .content {
+      padding: 40px 30px;
+    }
+    .button {
+      display: inline-block;
+      padding: 14px 32px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #ffffff !important;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      margin: 20px 0;
+    }
+    .footer {
+      background-color: #f9fafb;
+      padding: 30px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+      border-top: 1px solid #e5e7eb;
+    }
+    .order-details {
+      background-color: #f9fafb;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+    }
+    .order-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .total {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📚 Lumina Books</h1>
+    </div>
+    ${children}
+    <div class="footer">
+      <p><strong>Lumina Books</strong></p>
+      <p>Toko buku online terpercaya</p>
+      <p style="margin-top: 20px; color: #9ca3af; font-size: 12px;">
+        Email ini dikirim otomatis. Mohon tidak membalas email ini.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+// Order Confirmation Email
+export const orderConfirmationEmail = ({
+  customerName,
+  orderNumber,
+  orderDate,
+  items,
+  subtotal,
+  shipping,
+  total,
+  trackOrderUrl,
+}: {
+  customerName: string;
+  orderNumber: string;
+  orderDate: string;
+  items: Array<{ title: string; quantity: number; price: number }>;
+  subtotal: number;
+  shipping: number;
+  total: number;
+  trackOrderUrl: string;
+}) => {
+  const itemsHtml = items
+    .map(
+      (item) => `
+    <div class="order-item">
+      <div>
+        <strong>${item.title}</strong><br>
+        <span style="color: #6b7280;">Qty: ${item.quantity}</span>
+      </div>
+      <div>${formatCurrency(item.price)}</div>
+    </div>
+  `
+    )
+    .join('');
+
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">Terima Kasih atas Pesanan Anda! 🎉</h2>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Halo <strong>${customerName}</strong>,
+      </p>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Pesanan Anda telah kami terima dan sedang kami proses. Berikut adalah detail pesanan Anda:
+      </p>
+      
+      <div class="order-details">
+        <div style="margin-bottom: 15px;">
+          <strong style="color: #111827;">Order Number:</strong> ${orderNumber}<br>
+          <strong style="color: #111827;">Tanggal:</strong> ${orderDate}
+        </div>
+        
+        <div style="border-top: 2px solid #e5e7eb; padding-top: 15px;">
+          <h3 style="color: #111827; margin-top: 0;">Produk yang Dipesan:</h3>
+          ${itemsHtml}
+          
+          <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #e5e7eb;">
+            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+              <span>Subtotal:</span>
+              <span>${formatCurrency(subtotal)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 5px 0;">
+              <span>Ongkir:</span>
+              <span>${formatCurrency(shipping)}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 10px 0; border-top: 1px solid #e5e7eb;">
+              <span class="total">Total:</span>
+              <span class="total">${formatCurrency(total)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Kami akan segera memproses pesanan Anda dan mengirimkan update status via email.
+      </p>
+      
+      <center>
+        <a href="${trackOrderUrl}" class="button">
+          Lacak Pesanan
+        </a>
+      </center>
+      
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        Jika ada pertanyaan, silakan hubungi customer service kami.
+      </p>
+    </div>
+  `;
+
+  return EmailWrapper({ children: content, title: 'Konfirmasi Pesanan' });
+};
+
+// Order Status Update Email
+export const orderStatusUpdateEmail = ({
+  customerName,
+  orderNumber,
+  status,
+  statusMessage,
+  trackingNumber,
+  trackOrderUrl,
+}: {
+  customerName: string;
+  orderNumber: string;
+  status: string;
+  statusMessage: string;
+  trackingNumber?: string;
+  trackOrderUrl: string;
+}) => {
+  const statusEmoji = {
+    processing: '⚙️',
+    shipped: '📦',
+    delivered: '✅',
+    cancelled: '❌',
+  }[status] || '📋';
+
+  const trackingHtml = trackingNumber
+    ? `
+    <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px;">
+      <strong style="color: #92400e;">Nomor Resi:</strong><br>
+      <span style="font-size: 18px; color: #78350f; font-weight: 600;">${trackingNumber}</span>
+    </div>
+  `
+    : '';
+
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">${statusEmoji} Update Status Pesanan</h2>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Halo <strong>${customerName}</strong>,
+      </p>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Status pesanan Anda <strong>${orderNumber}</strong> telah diupdate:
+      </p>
+      
+      <div style="background-color: #f0fdf4; border-left: 4px solid #22c55e; padding: 20px; margin: 20px 0; border-radius: 4px;">
+        <h3 style="color: #15803d; margin: 0 0 10px 0;">
+          Status: ${status.toUpperCase()}
+        </h3>
+        <p style="color: #166534; margin: 0; font-size: 16px;">
+          ${statusMessage}
+        </p>
+      </div>
+      
+      ${trackingHtml}
+      
+      <center>
+        <a href="${trackOrderUrl}" class="button">
+          Lacak Pesanan
+        </a>
+      </center>
+      
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        Terima kasih telah berbelanja di Lumina Books! 📚
+      </p>
+    </div>
+  `;
+
+  return EmailWrapper({ children: content, title: 'Update Status Pesanan' });
+};
+
+// Payment Confirmation Email
+export const paymentConfirmationEmail = ({
+  customerName,
+  orderNumber,
+  amount,
+  paymentMethod,
+  paymentDate,
+}: {
+  customerName: string;
+  orderNumber: string;
+  amount: number;
+  paymentMethod: string;
+  paymentDate: string;
+}) => {
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">✅ Pembayaran Berhasil!</h2>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Halo <strong>${customerName}</strong>,
+      </p>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Pembayaran Anda telah kami terima dan dikonfirmasi. Pesanan Anda akan segera kami proses.
+      </p>
+      
+      <div class="order-details">
+        <h3 style="color: #111827; margin-top: 0;">Detail Pembayaran</h3>
+        <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+          <strong>Order Number:</strong> ${orderNumber}
+        </div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+          <strong>Jumlah:</strong> <span style="color: #22c55e; font-size: 20px; font-weight: 700;">${formatCurrency(amount)}</span>
+        </div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+          <strong>Metode:</strong> ${paymentMethod}
+        </div>
+        <div style="padding: 10px 0;">
+          <strong>Tanggal:</strong> ${paymentDate}
+        </div>
+      </div>
+      
+      <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0; border-radius: 4px;">
+        <p style="color: #1e40af; margin: 0;">
+          <strong>📦 Proses Pengiriman</strong><br>
+          Pesanan Anda akan segera diproses dan dikirim. Kami akan mengirimkan nomor resi via email.
+        </p>
+      </div>
+      
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        Terima kasih atas kepercayaan Anda!
+      </p>
+    </div>
+  `;
+
+  return EmailWrapper({ children: content, title: 'Konfirmasi Pembayaran' });
+};
+
+// Welcome Email
+export const welcomeEmail = ({
+  customerName,
+  email,
+}: {
+  customerName: string;
+  email: string;
+}) => {
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">Selamat Datang di Lumina Books! 🎉</h2>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Halo <strong>${customerName}</strong>,
+      </p>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Terima kasih telah bergabung dengan Lumina Books! Kami sangat senang Anda menjadi bagian dari komunitas pembaca kami.
+      </p>
+      
+      <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; padding: 25px; margin: 25px 0; color: white;">
+        <h3 style="margin: 0 0 15px 0; color: white;">🎁 Selamat! Anda mendapatkan:</h3>
+        <ul style="margin: 0; padding-left: 20px; line-height: 1.8;">
+          <li>Gratis ongkir untuk pesanan pertama</li>
+          <li>Akses ke promo eksklusif member</li>
+          <li>Update buku baru & rekomendasi</li>
+          <li>Poin reward setiap pembelian</li>
+        </ul>
+      </div>
+      
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Mulai jelajahi koleksi buku kami dan temukan bacaan favorit Anda!
+      </p>
+      
+      <center>
+        <a href="${process.env.NEXT_PUBLIC_APP_URL}" class="button">
+          Mulai Belanja
+        </a>
+      </center>
+      
+      <div style="background-color: #f9fafb; border-radius: 8px; padding: 20px; margin: 30px 0;">
+        <h4 style="color: #111827; margin-top: 0;">📧 Detail Akun Anda</h4>
+        <p style="color: #374151; margin: 5px 0;">
+          <strong>Email:</strong> ${email}
+        </p>
+        <p style="color: #6b7280; font-size: 14px; margin-top: 15px;">
+          Gunakan email ini untuk login dan tracking pesanan.
+        </p>
+      </div>
+      
+      <p style="color: #6b7280; font-size: 14px;">
+        Selamat membaca! 📚✨
+      </p>
+    </div>
+  `;
+
+  return EmailWrapper({ children: content, title: 'Selamat Datang!' });
+};
+
+// Helper function to format currency
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+  }).format(amount);
+}
+
+// =============================================
+// ADMIN EMAIL TEMPLATES
+// =============================================
+
+// Admin: New Order Notification
+export const adminNewOrderEmail = ({
+  orderNumber,
+  customerName,
+  customerPhone,
+  items,
+  total,
+  paymentMethod,
+  shippingAddress,
+  orderUrl,
+}: {
+  orderNumber: string;
+  customerName: string;
+  customerPhone: string;
+  items: Array<{ title: string; quantity: number; price: number }>;
+  total: number;
+  paymentMethod: string;
+  shippingAddress: string;
+  orderUrl: string;
+}) => {
+  const itemsHtml = items
+    .map(
+      (item) => `
+    <div class="order-item">
+      <div>
+        <strong>${item.title}</strong><br>
+        <span style="color: #6b7280;">Qty: ${item.quantity}</span>
+      </div>
+      <div>${formatCurrency(item.price)}</div>
+    </div>
+  `
+    )
+    .join('');
+
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">🎉 Order Baru Masuk!</h2>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Ada order baru yang perlu diproses:
+      </p>
+      
+      <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 20px; margin: 20px 0; border-radius: 4px;">
+        <h3 style="color: #1e40af; margin: 0 0 10px 0;">
+          Order #${orderNumber}
+        </h3>
+        <p style="color: #1e3a8a; margin: 0; font-size: 18px; font-weight: 600;">
+          Total: ${formatCurrency(total)}
+        </p>
+      </div>
+      
+      <div class="order-details">
+        <h3 style="color: #111827; margin-top: 0;">Informasi Customer:</h3>
+        <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+          <strong>Nama:</strong> ${customerName}
+        </div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+          <strong>No. HP:</strong> ${customerPhone}
+        </div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+          <strong>Metode Bayar:</strong> ${paymentMethod}
+        </div>
+        <div style="padding: 10px 0;">
+          <strong>Alamat Kirim:</strong><br>
+          ${shippingAddress}
+        </div>
+      </div>
+      
+      <div class="order-details">
+        <h3 style="color: #111827; margin-top: 0;">Produk yang Dipesan:</h3>
+        ${itemsHtml}
+        <div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid #e5e7eb;">
+          <div style="display: flex; justify-content: space-between; padding: 10px 0;">
+            <span class="total">Total Pembayaran:</span>
+            <span class="total">${formatCurrency(total)}</span>
+          </div>
+        </div>
+      </div>
+      
+      <center>
+        <a href="${orderUrl}" class="button">
+          Lihat Detail Order
+        </a>
+      </center>
+      
+      <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+        Segera proses order ini untuk menjaga kepuasan pelanggan.
+      </p>
+    </div>
+  `;
+
+  return EmailWrapper({ children: content, title: 'Order Baru Masuk' });
+};
+
+// Admin: Payment Received Notification
+export const adminPaymentReceivedEmail = ({
+  orderNumber,
+  customerName,
+  amount,
+  paymentMethod,
+  paymentDate,
+  orderUrl,
+}: {
+  orderNumber: string;
+  customerName: string;
+  amount: number;
+  paymentMethod: string;
+  paymentDate: string;
+  orderUrl: string;
+}) => {
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">💰 Pembayaran Diterima!</h2>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Pembayaran telah dikonfirmasi untuk order berikut:
+      </p>
+      
+      <div style="background-color: #d1fae5; border-left: 4px solid #22c55e; padding: 20px; margin: 20px 0; border-radius: 4px;">
+        <h3 style="color: #065f46; margin: 0 0 10px 0;">
+          Order #${orderNumber}
+        </h3>
+        <p style="color: #047857; margin: 0; font-size: 24px; font-weight: 700;">
+          ${formatCurrency(amount)}
+        </p>
+      </div>
+      
+      <div class="order-details">
+        <h3 style="color: #111827; margin-top: 0;">Detail Pembayaran:</h3>
+        <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+          <strong>Customer:</strong> ${customerName}
+        </div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+          <strong>Jumlah:</strong> ${formatCurrency(amount)}
+        </div>
+        <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+          <strong>Metode:</strong> ${paymentMethod}
+        </div>
+        <div style="padding: 10px 0;">
+          <strong>Tanggal:</strong> ${paymentDate}
+        </div>
+      </div>
+      
+      <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px;">
+        <p style="color: #92400e; margin: 0;">
+          <strong>⚡ Action Required:</strong><br>
+          Segera proses pengiriman untuk order ini.
+        </p>
+      </div>
+      
+      <center>
+        <a href="${orderUrl}" class="button">
+          Proses Pengiriman
+        </a>
+      </center>
+    </div>
+  `;
+
+  return EmailWrapper({ children: content, title: 'Pembayaran Diterima' });
+};
+
+// Admin: Low Stock Alert
+export const adminLowStockEmail = ({
+  products,
+  dashboardUrl,
+}: {
+  products: Array<{ title: string; stock: number; id: string }>;
+  dashboardUrl: string;
+}) => {
+  const productsHtml = products
+    .map(
+      (product) => `
+    <div style="padding: 15px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong style="color: #111827;">${product.title}</strong>
+      </div>
+      <div style="background-color: #fee2e2; color: #991b1b; padding: 4px 12px; border-radius: 9999px; font-weight: 600; font-size: 14px;">
+        Stock: ${product.stock}
+      </div>
+    </div>
+  `
+    )
+    .join('');
+
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">⚠️ Peringatan Stock Menipis!</h2>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Beberapa produk memiliki stock yang hampir habis:
+      </p>
+      
+      <div style="background-color: #fee2e2; border-left: 4px solid #ef4444; padding: 20px; margin: 20px 0; border-radius: 4px;">
+        <h3 style="color: #991b1b; margin: 0;">
+          ${products.length} Produk Perlu Restock
+        </h3>
+      </div>
+      
+      <div style="background-color: #f9fafb; border-radius: 8px; margin: 20px 0;">
+        ${productsHtml}
+      </div>
+      
+      <div style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; border-radius: 4px;">
+        <p style="color: #92400e; margin: 0;">
+          <strong>💡 Rekomendasi:</strong><br>
+          Segera tambah stock untuk produk-produk di atas agar tidak kehabisan saat ada pesanan.
+        </p>
+      </div>
+      
+      <center>
+        <a href="${dashboardUrl}" class="button">
+          Kelola Produk
+        </a>
+      </center>
+    </div>
+  `;
+
+  return EmailWrapper({ children: content, title: 'Peringatan Stock' });
+};
+
+// Admin: Order Cancelled Notification
+export const adminOrderCancelledEmail = ({
+  orderNumber,
+  customerName,
+  reason,
+  total,
+  orderUrl,
+}: {
+  orderNumber: string;
+  customerName: string;
+  reason?: string;
+  total: number;
+  orderUrl: string;
+}) => {
+  const content = `
+    <div class="content">
+      <h2 style="color: #111827; margin-top: 0;">❌ Order Dibatalkan</h2>
+      <p style="color: #374151; font-size: 16px; line-height: 1.6;">
+        Order berikut telah dibatalkan:
+      </p>
+      
+      <div style="background-color: #fee2e2; border-left: 4px solid #ef4444; padding: 20px; margin: 20px 0; border-radius: 4px;">
+        <h3 style="color: #991b1b; margin: 0 0 10px 0;">
+          Order #${orderNumber}
+        </h3>
+        <p style="color: #7f1d1d; margin: 0; font-size: 18px;">
+          Total: ${formatCurrency(total)}
+        </p>
+      </div>
+      
+      <div class="order-details">
+        <div style="padding: 10px 0; border-bottom: 1px solid #e5e7eb;">
+          <strong>Customer:</strong> ${customerName}
+        </div>
+        ${
+          reason
+            ? `<div style="padding: 10px 0;">
+          <strong>Alasan:</strong><br>
+          ${reason}
+        </div>`
+            : ''
+        }
+      </div>
+      
+      <center>
+        <a href="${orderUrl}" class="button">
+          Lihat Detail
+        </a>
+      </center>
+    </div>
+  `;
+
+  return EmailWrapper({ children: content, title: 'Order Dibatalkan' });
+};
+
+// Export all templates
+export const EmailTemplates = {
+  orderConfirmation: orderConfirmationEmail,
+  orderStatusUpdate: orderStatusUpdateEmail,
+  paymentConfirmation: paymentConfirmationEmail,
+  welcome: welcomeEmail,
+  // Admin templates
+  adminNewOrder: adminNewOrderEmail,
+  adminPaymentReceived: adminPaymentReceivedEmail,
+  adminLowStock: adminLowStockEmail,
+  adminOrderCancelled: adminOrderCancelledEmail,
+};

@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from 'react';
 import AdminLayout from '@/components/AdminLayout';
-import { getDashboardStats, getRecentOrders } from '@/lib/admin';
+import { 
+  getDashboardStats, 
+  getRecentOrders,
+  getRevenueChartData,
+  getOrdersChartData,
+  getTopSellingProducts,
+  getOrderStatusDistribution,
+} from '@/lib/admin';
 import {
   TrendingUp,
   ShoppingCart,
@@ -10,9 +17,12 @@ import {
   Package,
   AlertCircle,
   DollarSign,
+  BarChart3,
+  PieChart as PieChartIcon,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { RevenueChart, OrdersChart, TopProductsChart, OrderStatusChart } from '@/components/Charts';
 
 interface DashboardStats {
   totalOrders: number;
@@ -26,6 +36,10 @@ interface DashboardStats {
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [revenueData, setRevenueData] = useState<any[]>([]);
+  const [ordersData, setOrdersData] = useState<any[]>([]);
+  const [topProducts, setTopProducts] = useState<any[]>([]);
+  const [statusDistribution, setStatusDistribution] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -34,12 +48,27 @@ export default function AdminDashboard() {
 
   const loadDashboardData = async () => {
     try {
-      const [statsData, ordersData] = await Promise.all([
+      const [
+        statsData, 
+        ordersData, 
+        revenueChartData,
+        ordersChartData,
+        topProductsData,
+        statusData
+      ] = await Promise.all([
         getDashboardStats(),
         getRecentOrders(5),
+        getRevenueChartData(),
+        getOrdersChartData(),
+        getTopSellingProducts(5),
+        getOrderStatusDistribution(),
       ]);
       setStats(statsData);
       setRecentOrders(ordersData || []);
+      setRevenueData(revenueChartData);
+      setOrdersData(ordersChartData);
+      setTopProducts(topProductsData);
+      setStatusDistribution(statusData);
     } catch (error) {
       console.error('Error loading dashboard:', error);
     } finally {
@@ -174,6 +203,89 @@ export default function AdminDashboard() {
               </div>
             </motion.div>
           ))}
+        </div>
+
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Revenue Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <BarChart3 className="text-blue-600" size={20} />
+              <h2 className="text-lg font-bold text-gray-900">Revenue Trend (Last 6 Months)</h2>
+            </div>
+            {revenueData.length > 0 ? (
+              <RevenueChart data={revenueData} />
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-gray-500">
+                No data available
+              </div>
+            )}
+          </motion.div>
+
+          {/* Orders Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.7 }}
+            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <ShoppingCart className="text-green-600" size={20} />
+              <h2 className="text-lg font-bold text-gray-900">Orders Trend (Last 6 Months)</h2>
+            </div>
+            {ordersData.length > 0 ? (
+              <OrdersChart data={ordersData} />
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-gray-500">
+                No data available
+              </div>
+            )}
+          </motion.div>
+
+          {/* Top Products */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <Package className="text-indigo-600" size={20} />
+              <h2 className="text-lg font-bold text-gray-900">Top Selling Products</h2>
+            </div>
+            {topProducts.length > 0 ? (
+              <TopProductsChart data={topProducts} />
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-gray-500">
+                No data available
+              </div>
+            )}
+          </motion.div>
+
+          {/* Order Status Distribution */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
+          >
+            <div className="flex items-center gap-2 mb-4">
+              <PieChartIcon className="text-purple-600" size={20} />
+              <h2 className="text-lg font-bold text-gray-900">Order Status Distribution</h2>
+            </div>
+            {statusDistribution.length > 0 ? (
+              <OrderStatusChart data={statusDistribution} />
+            ) : (
+              <div className="h-[300px] flex items-center justify-center text-gray-500">
+                No data available
+              </div>
+            )}
+          </motion.div>
         </div>
 
         {/* Recent Orders */}

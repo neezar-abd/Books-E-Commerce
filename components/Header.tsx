@@ -88,17 +88,17 @@ const Header: React.FC = () => {
             <div className="bg-secondary rounded-full p-1.5">
                <BookOpen size={20} className="text-white" fill="currentColor" />
             </div>
-            <span className="text-2xl font-bold text-primary tracking-tight">Lumina<span className="text-secondary">.</span></span>
+            <span className="text-2xl font-bold text-primary tracking-tight">Uchinaga<span className="text-secondary">.</span></span>
           </Link>
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-8 text-sm font-medium text-primary">
             {[
               { label: 'Home', href: '/' },
-              { label: 'Shop', href: '/#products' },
+              { label: 'Products', href: '/products' },
               { label: 'Categories', href: '/#categories' },
               { label: 'Bestsellers', href: '/#flash-sale' },
-              { label: 'Blog', href: '/#blog' },
+              { label: 'Contact', href: '/contact' },
             ].map((link) => (
               <Link 
                 key={link.label}
@@ -160,6 +160,13 @@ const Header: React.FC = () => {
                     >
                       Alamat
                     </Link>
+                    <Link 
+                      href="/track-order" 
+                      className="block px-4 py-2 text-sm hover:bg-surface transition-colors"
+                      onClick={() => setShowUserMenu(false)}
+                    >
+                      Lacak Pesanan
+                    </Link>
                     <hr className="my-2 border-gray-100" />
                     <button 
                       onClick={handleSignOut}
@@ -193,10 +200,10 @@ const Header: React.FC = () => {
           <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-lg py-4 px-4 flex flex-col gap-4 animate-fade-in z-40">
             {[
               { label: 'Home', href: '/' },
-              { label: 'Shop', href: '/#products' },
+              { label: 'Products', href: '/products' },
               { label: 'Categories', href: '/#categories' },
               { label: 'Bestsellers', href: '/#flash-sale' },
-              { label: 'Blog', href: '/#blog' },
+              { label: 'Contact', href: '/contact' },
             ].map((link) => (
               <Link 
                 key={link.label}

@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
                   <div className="bg-secondary rounded-full p-1.5 text-primary">
                      <BookOpen size={20} fill="currentColor" />
                   </div>
-                  <span className="text-2xl font-bold">Lumina<span className="text-secondary">.</span></span>
+                  <span className="text-2xl font-bold">Uchinaga<span className="text-secondary">.</span></span>
                </div>
                <p className="text-gray-400 text-sm mb-6 leading-relaxed">
                   Toko buku online terpercaya dengan koleksi lengkap dan berkualitas. Temukan bacaan favorit Anda dengan harga terbaik dan pengiriman cepat.
@@ -28,22 +28,22 @@ const Footer: React.FC = () => {
 
             {/* Links */}
             <div>
-               <h4 className="font-bold mb-6">Perusahaan</h4>
+               <h4 className="font-bold mb-6">Jelajahi</h4>
                <ul className="space-y-3 text-sm text-gray-400">
-                  <li><a href="/#features" className="hover:text-secondary">Tentang Kami</a></li>
+                  <li><a href="/products" className="hover:text-secondary">Semua Produk</a></li>
+                  <li><a href="/#categories" className="hover:text-secondary">Kategori</a></li>
+                  <li><a href="/#flash-sale" className="hover:text-secondary">Bestsellers</a></li>
                   <li><a href="/#blog" className="hover:text-secondary">Blog</a></li>
-                  <li><a href="/contact" className="hover:text-secondary">Hubungi Kami</a></li>
-                  <li><a href="/#" className="hover:text-secondary">Karir</a></li>
                </ul>
             </div>
 
             <div>
-               <h4 className="font-bold mb-6">Layanan Pelanggan</h4>
+               <h4 className="font-bold mb-6">Layanan</h4>
                <ul className="space-y-3 text-sm text-gray-400">
                   <li><a href="/my-account" className="hover:text-secondary">Akun Saya</a></li>
                   <li><a href="/track-order" className="hover:text-secondary">Lacak Pesanan</a></li>
-                  <li><a href="/#" className="hover:text-secondary">Pengembalian</a></li>
-                  <li><a href="/#faq" className="hover:text-secondary">FAQ</a></li>
+                  <li><a href="/cart" className="hover:text-secondary">Keranjang</a></li>
+                  <li><a href="/contact" className="hover:text-secondary">Hubungi Kami</a></li>
                </ul>
             </div>
 

@@ -80,15 +80,29 @@ const ProductSection: React.FC = () => {
             <p className="text-gray-500">Loading products...</p>
           </div>
         ) : (
-          <StaggerContainer staggerDelay={0.1}>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-               {products.map(product => (
-                 <motion.div key={product.id} variants={staggerItem}>
-                   <ProductCard product={product} />
-                 </motion.div>
-               ))}
-            </div>
-          </StaggerContainer>
+          <>
+            <StaggerContainer staggerDelay={0.1}>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 lg:gap-8">
+                 {products.map(product => (
+                   <motion.div key={product.id} variants={staggerItem}>
+                     <ProductCard product={product} />
+                   </motion.div>
+                 ))}
+              </div>
+            </StaggerContainer>
+
+            {/* View All Button */}
+            <FadeIn delay={0.3}>
+              <div className="text-center mt-12">
+                <Link 
+                  href="/products" 
+                  className="inline-block px-8 py-3 bg-primary text-white rounded-full hover:bg-primary/90 transition-all font-semibold text-sm"
+                >
+                  Lihat Semua Produk →
+                </Link>
+              </div>
+            </FadeIn>
+          </>
         )}
       </div>
     </section>

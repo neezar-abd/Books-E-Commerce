@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import AdminLayout from '@/components/AdminLayout';
-import { getAllUsers, updateUserRole } from '@/lib/admin';
+import ExportButton from '@/components/ExportButton';
+import { getAllUsers, updateUserRole, exportUsers } from '@/lib/admin';
 import { Search, Shield, User, Mail, Phone, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -84,9 +85,16 @@ export default function AdminUsers() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
-          <p className="text-gray-600 mt-2">Manage user accounts and permissions</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
+            <p className="text-gray-600 mt-2">Manage user accounts and permissions</p>
+          </div>
+          <ExportButton
+            data={filteredUsers}
+            filename="users"
+            onExport={async () => await exportUsers()}
+          />
         </div>
 
         {/* Filters */}

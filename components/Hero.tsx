@@ -24,15 +24,16 @@ const Hero: React.FC = () => {
           <div className="max-w-xl z-10">
             <FadeIn delay={0.1}>
               <div className="inline-flex items-center gap-2 bg-white px-3 py-1 rounded-full shadow-sm mb-6">
-                 <span className="text-xl">📚</span>
-                 <span className="text-sm font-semibold text-primary">Toko Buku Online Premium</span>
+                 <span className="text-xl"></span>
+                 <span className="text-sm font-semibold text-primary"></span>
               </div>
             </FadeIn>
             
             <SlideIn direction="up" delay={0.2}>
-              <h1 className="text-5xl lg:text-6xl font-bold text-primary leading-[1.15] mb-6">
-                Temukan Koleksi <span className="text-primary">Buku Pilihan</span> <br/>
-                Kami
+              <h1 className="text-5xl lg:text-6xl font-bold text-primary leading-[1.15] mb-6" style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 600, letterSpacing: '-0.01em' }}>
+                Temukan <br/>
+                <span className="text-secondary">Koleksi Buku</span> <br/>
+                Pilihan Kami
               </h1>
             </SlideIn>
             

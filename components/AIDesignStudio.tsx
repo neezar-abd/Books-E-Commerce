@@ -161,7 +161,7 @@ const AIDesignStudio: React.FC = () => {
                     <img src={generatedImage} alt="Generated" className="w-full h-full object-contain" />
                     <a 
                       href={generatedImage} 
-                      download="lumina-book-cover.png"
+                      download="uchinaga-book-cover.png"
                       className="absolute bottom-4 right-4 bg-white/90 backdrop-blur text-primary p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:text-secondary"
                       title="Download Image"
                     >

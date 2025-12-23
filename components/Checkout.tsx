@@ -128,7 +128,7 @@ const Checkout: React.FC = () => {
     'WELCOME20': 50000,
     'BOOKLOVERS': 75000,
     'SAVE10': 100000,
-    'LUMINA2024': 150000
+    'UCHINAGA2024': 150000
   };
 
   const handleApplyCoupon = () => {

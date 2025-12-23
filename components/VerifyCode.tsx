@@ -12,7 +12,7 @@ const VerifyCode: React.FC = () => {
 
   const testimonials = [
     {
-      quote: "Verifikasi dua faktor membuat saya merasa lebih aman. Sangat appreciate dengan komitmen Lumina terhadap keamanan pelanggan!",
+      quote: "Verifikasi dua faktor membuat saya merasa lebih aman. Sangat appreciate dengan komitmen Uchinaga Books terhadap keamanan pelanggan!",
       name: "Ronald Richards",
       role: "Pemilik Bisnis",
       image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
@@ -24,7 +24,7 @@ const VerifyCode: React.FC = () => {
       image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
-      quote: "Sistem keamanan yang modern dan user-friendly. Lumina benar-benar memperhatikan detail dalam setiap aspek!",
+      quote: "Sistem keamanan yang modern dan user-friendly. Uchinaga Books benar-benar memperhatikan detail dalam setiap aspek!",
       name: "David Kim",
       role: "Product Manager",
       image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
@@ -78,7 +78,7 @@ const VerifyCode: React.FC = () => {
             <div className="bg-secondary rounded-full p-2">
               <BookOpen size={24} className="text-white" fill="currentColor" />
             </div>
-            <span className="text-2xl font-bold text-primary tracking-tight">Lumina<span className="text-secondary">.</span></span>
+            <span className="text-2xl font-bold text-primary tracking-tight">Uchinaga<span className="text-secondary">Books</span></span>
           </Link>
 
           {/* Title */}

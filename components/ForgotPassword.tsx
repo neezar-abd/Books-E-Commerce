@@ -16,7 +16,7 @@ const ForgotPassword: React.FC = () => {
       image: "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
-      quote: "Keamanan akun sangat terjaga dengan sistem verifikasi yang ketat. Saya merasa aman berbelanja di Lumina.",
+      quote: "Keamanan akun sangat terjaga dengan sistem verifikasi yang ketat. Saya merasa aman berbelanja di Uchinaga Books.",
       name: "Sarah Johnson",
       role: "Digital Marketer",
       image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
@@ -41,7 +41,7 @@ const ForgotPassword: React.FC = () => {
             <div className="bg-secondary rounded-full p-2">
               <BookOpen size={24} className="text-white" fill="currentColor" />
             </div>
-            <span className="text-2xl font-bold text-primary tracking-tight">Lumina<span className="text-secondary">.</span></span>
+            <span className="text-2xl font-bold text-primary tracking-tight">Uchinaga<span className="text-secondary">Books</span></span>
           </Link>
 
           {/* Title */}

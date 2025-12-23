@@ -34,7 +34,7 @@ const Payment: React.FC = () => {
   const [bankAccount] = useState({
     bank: 'Bank Central Asia (BCA)',
     accountNumber: '1234567890',
-    accountName: 'PT LUMINA BOOKS'
+    accountName: 'PT UCHINAGA BOOKS'
   });
 
   useEffect(() => {

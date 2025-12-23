@@ -64,7 +64,7 @@ const SignUp: React.FC = () => {
 
   const testimonials = [
     {
-      quote: "Bergabung dengan Lumina adalah keputusan terbaik! Sekarang saya selalu mendapat rekomendasi buku yang sempurna sesuai selera saya.",
+      quote: "Bergabung dengan Uchinaga Books adalah keputusan terbaik! Sekarang saya selalu mendapat rekomendasi buku yang sempurna sesuai selera saya.",
       name: "Annette Black",
       role: "Arsitek Interior",
       image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
@@ -76,7 +76,7 @@ const SignUp: React.FC = () => {
       image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
-      quote: "Komunitas pembaca di Lumina sangat aktif dan supportif. Saya menemukan teman-teman baru yang berbagi passion yang sama.",
+      quote: "Komunitas pembaca di Uchinaga Books sangat aktif dan supportif. Saya menemukan teman-teman baru yang berbagi passion yang sama.",
       name: "Diana Putri",
       role: "Content Creator",
       image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
@@ -95,7 +95,7 @@ const SignUp: React.FC = () => {
             <div className="bg-secondary rounded-full p-2">
               <BookOpen size={24} className="text-white" fill="currentColor" />
             </div>
-            <span className="text-2xl font-bold text-primary tracking-tight">Lumina<span className="text-secondary">.</span></span>
+            <span className="text-2xl font-bold text-primary tracking-tight">Uchinaga<span className="text-secondary">Books</span></span>
           </Link>
 
           {/* Title */}

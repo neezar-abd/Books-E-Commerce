@@ -13,7 +13,7 @@ const ChatBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: "Welcome to Lumina Books. I am your literary concierge. How may I assist you in finding your next great read today?" }
+    { role: 'model', text: "Welcome to Uchinaga Books. I am your literary concierge. How may I assist you in finding your next great read today?" }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -40,7 +40,7 @@ const ChatBot: React.FC = () => {
       chatSessionRef.current = ai.chats.create({
         model: 'gemini-3-pro-preview',
         config: {
-          systemInstruction: "You are a sophisticated, helpful, and elegant literary assistant for 'Lumina Books', a high-end minimalist bookstore. Your tone is professional, warm, and well-read. You help users find books, discuss genres (Fiction, Non-Fiction, Art & Design, Psychology), and answer questions about the store's features (Free Shipping over $180, 24/7 support). Keep responses concise but eloquent.",
+          systemInstruction: "You are a sophisticated, helpful, and elegant literary assistant for 'Uchinaga Books', a high-end minimalist bookstore. Your tone is professional, warm, and well-read. You help users find books, discuss genres (Fiction, Non-Fiction, Art & Design, Psychology), and answer questions about the store's features (Free Shipping over $180, 24/7 support). Keep responses concise but eloquent.",
         },
       });
     }

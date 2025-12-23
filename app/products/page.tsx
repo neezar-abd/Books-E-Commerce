@@ -3,8 +3,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export const metadata = {
-  title: 'Semua Produk - Lumina Books',
-  description: 'Jelajahi koleksi lengkap buku-buku berkualitas dari Lumina Books',
+  title: 'Semua Produk - Uchinaga Books',
+  description: 'Jelajahi koleksi lengkap buku-buku berkualitas dari Uchinaga Books',
 };
 
 export default function ProductsPage() {

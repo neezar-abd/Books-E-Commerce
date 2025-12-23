@@ -69,7 +69,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
     formats: ['Hardcover', 'Paperback', 'eBook'],
     inStock: true,
     isbn: '978-0-123456-78-9',
-    publisher: 'Penerbit Lumina',
+    publisher: 'Penerbit Uchinaga Books',
     pages: 342,
     language: 'Indonesia',
     publishDate: '15 Maret 2024',

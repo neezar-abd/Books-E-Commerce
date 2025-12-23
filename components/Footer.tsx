@@ -52,7 +52,7 @@ const Footer: React.FC = () => {
                <h4 className="font-bold mb-6">Kontak Kami</h4>
                <ul className="space-y-4 text-sm text-gray-400">
                   <li><span className="block text-white mb-1">+62123-456-789</span></li>
-                  <li><span className="block text-white mb-1">hello@lumina.com</span></li>
+                  <li><span className="block text-white mb-1">hello@uchinagabooks.com</span></li>
                   <li><span className="block leading-relaxed">Jl. Sudirman No. 789, Menteng, Jakarta Pusat, DKI Jakarta 10310</span></li>
                </ul>
             </div>
@@ -60,7 +60,7 @@ const Footer: React.FC = () => {
 
          {/* Bottom Bar */}
          <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-secondary">
-            <p>Copyright © 2024 Lumina. All Rights Reserved.</p>
+            <p>Copyright © 2024 Uchinaga Books. All Rights Reserved.</p>
             <div className="flex gap-4 mt-4 md:mt-0">
                <span>Indonesia ▼</span>
                <span>|</span>

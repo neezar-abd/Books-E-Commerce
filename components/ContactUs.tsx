@@ -108,7 +108,7 @@ const ContactUs: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <Mail size={18} />
-                    <span className="text-white/90">hello@lumina.com</span>
+                    <span className="text-white/90">hello@uchinagabooks.com</span>
                   </div>
                 </div>
               </div>

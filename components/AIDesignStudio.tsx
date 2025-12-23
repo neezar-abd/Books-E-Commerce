@@ -17,7 +17,7 @@ const AIDesignStudio: React.FC = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setSelectedImage(reader.result as string);
-        setGeneratedImage(null); // Reset generated image on new upload
+        setGeneratedImage(null); // Reset generated images on new upload
       };
       reader.readAsDataURL(file);
     }

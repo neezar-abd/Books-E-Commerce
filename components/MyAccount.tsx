@@ -10,7 +10,7 @@ import { authService } from '@/lib/auth';
 import { orderService } from '@/lib/orders';
 import { supabase } from '@/lib/supabase';
 
-type TabType = 'personal' | 'orders' | 'address' | 'payment' | 'password' | 'logout';
+type TabType = 'personal' | 'orders' | 'address' | 'logout';
 
 const MyAccount: React.FC = () => {
   const router = useRouter();
@@ -461,106 +461,6 @@ const MyAccount: React.FC = () => {
     </div>
   );
 
-  const renderPaymentMethod = () => (
-    <div>
-      {/* Saved Payment Methods */}
-      <div className="space-y-4 mb-8">
-        {/* PayPal */}
-        <div className="flex items-center justify-between p-6 border-2 border-gray-200 rounded-xl">
-          <div className="flex items-center gap-4">
-            <div className="text-2xl font-bold text-blue-600">PayPal</div>
-          </div>
-          <button className="text-primary font-bold hover:text-secondary">Link Account</button>
-        </div>
-
-        {/* Visa Card */}
-        <div className="flex items-center justify-between p-6 border-2 border-gray-200 rounded-xl">
-          <div className="flex items-center gap-4">
-            <div className="text-2xl font-bold text-blue-700">VISA</div>
-            <span className="text-gray-600">**** **** **** 8047</span>
-          </div>
-          <button className="text-red-500 font-bold hover:text-red-600">Delete</button>
-        </div>
-
-        {/* Google Pay */}
-        <div className="flex items-center justify-between p-6 border-2 border-gray-200 rounded-xl">
-          <div className="flex items-center gap-4">
-            <div className="text-lg font-bold">Google Pay</div>
-          </div>
-          <button className="text-primary font-bold hover:text-secondary">Link Account</button>
-        </div>
-      </div>
-
-      {/* Add New Card Form */}
-      <div className="border-t-2 border-gray-200 pt-8">
-        <h2 className="text-2xl font-bold text-primary mb-6">Tambah Kartu Kredit/Debit Baru</h2>
-        
-        <form className="space-y-5">
-          <div>
-            <label className="block text-sm font-bold text-primary mb-2">
-              Nama Pemegang Kartu <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Contoh: John Doe"
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-bold text-primary mb-2">
-              Nomor Kartu <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="4716 9627 1635 8047"
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-bold text-primary mb-2">
-                Tanggal Kadaluarsa <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="02/30"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-primary mb-2">
-                CVV <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                placeholder="000"
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
-              />
-            </div>
-          </div>
-
-          <label className="flex items-center gap-3 cursor-pointer">
-            <div className="w-5 h-5 bg-primary rounded border-2 border-primary flex items-center justify-center">
-              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <span className="text-sm text-primary">Simpan kartu untuk pembayaran di masa depan</span>
-          </label>
-
-          <button
-            type="submit"
-            className="bg-primary text-white px-10 py-3 rounded-full font-bold hover:bg-opacity-90 transition-all"
-          >
-            Tambah Kartu
-          </button>
-        </form>
-      </div>
-    </div>
-  );
-
   const renderLogout = () => (
     <div className="text-center py-12">
       <h2 className="text-2xl font-bold text-primary mb-4">Keluar</h2>
@@ -626,22 +526,6 @@ const MyAccount: React.FC = () => {
                 Kelola Alamat
               </button>
               <button
-                onClick={() => setActiveTab('payment')}
-                className={`w-full px-6 py-4 text-left font-bold transition-colors ${
-                  activeTab === 'payment' ? 'bg-secondary text-primary' : 'text-gray-600 hover:bg-surface'
-                }`}
-              >
-                Metode Pembayaran
-              </button>
-              <button
-                onClick={() => setActiveTab('password')}
-                className={`w-full px-6 py-4 text-left font-bold transition-colors ${
-                  activeTab === 'password' ? 'bg-secondary text-primary' : 'text-gray-600 hover:bg-surface'
-                }`}
-              >
-                Kelola Password
-              </button>
-              <button
                 onClick={() => setActiveTab('logout')}
                 className={`w-full px-6 py-4 text-left font-bold transition-colors ${
                   activeTab === 'logout' ? 'bg-secondary text-primary' : 'text-red-500 hover:bg-red-50'
@@ -658,12 +542,6 @@ const MyAccount: React.FC = () => {
               {activeTab === 'personal' && renderPersonalInfo()}
               {activeTab === 'orders' && renderOrders()}
               {activeTab === 'address' && renderManageAddress()}
-              {activeTab === 'payment' && renderPaymentMethod()}
-              {activeTab === 'password' && (
-                <div className="text-center py-12 text-gray-500">
-                  Konten Kelola Password akan ditambahkan
-                </div>
-              )}
               {activeTab === 'logout' && renderLogout()}
             </div>
           </div>

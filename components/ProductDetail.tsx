@@ -251,7 +251,7 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
             <div className="flex items-center gap-4 pt-4">
               <span className="text-gray-600 font-medium">Bagikan:</span>
               <div className="flex gap-2">
-                {['facebook', 'twitter', 'whatsapp', 'email'].map((social) => (
+                {['whatsapp', 'email'].map((social) => (
                   <button key={social} className="w-10 h-10 border border-gray-300 rounded-full flex items-center justify-center hover:bg-primary hover:text-white hover:border-primary transition-all">
                     <Share2 size={16} />
                   </button>

@@ -163,8 +163,8 @@ const Cart: React.FC = () => {
           {/* Cart Items */}
           <div className="lg:col-span-2">
             
-            {/* Table Header */}
-            <div className="bg-secondary rounded-t-2xl px-6 py-4 grid grid-cols-12 gap-4 font-bold text-primary">
+            {/* Table Header - Hidden on mobile */}
+            <div className="hidden sm:grid bg-secondary rounded-t-2xl px-6 py-4 grid-cols-12 gap-4 font-bold text-primary">
               <div className="col-span-5">Produk</div>
               <div className="col-span-2 text-center">Harga</div>
               <div className="col-span-2 text-center">Jumlah</div>
@@ -172,7 +172,7 @@ const Cart: React.FC = () => {
             </div>
 
             {/* Cart Items */}
-            <div className="bg-white border-x border-b border-gray-200 rounded-b-2xl divide-y divide-gray-200">
+            <div className="bg-white border border-gray-200 rounded-b-2xl divide-y divide-gray-200">
               {cartItems.length === 0 ? (
                 <div className="p-12 text-center">
                   <p className="text-gray-500 mb-4">Keranjang belanja Anda kosong</p>
@@ -182,55 +182,56 @@ const Cart: React.FC = () => {
                 </div>
               ) : (
                 cartItems.map(item => (
-                  <div key={item.id} className="p-6 grid grid-cols-12 gap-4 items-center">
+                  <div key={item.id} className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-12 gap-4 items-start sm:items-center">
                     
                     {/* Remove Button & Product Info */}
-                    <div className="col-span-5 flex items-center gap-4">
+                    <div className="sm:col-span-5 flex items-start gap-3">
                       <button
                         onClick={() => removeItem(item.id)}
-                        className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-red-500 hover:text-red-500 transition-all flex-shrink-0"
+                        className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center hover:border-red-500 hover:text-red-500 transition-all flex-shrink-0 mt-1"
                       >
                         <X size={16} />
                       </button>
                       <img
                         src={item.products?.image || 'https://via.placeholder.com/80x96'}
                         alt={item.products?.title || 'Product'}
-                        className="w-20 h-24 object-cover rounded-lg flex-shrink-0"
+                        className="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded-lg flex-shrink-0"
                       />
-                      <div>
-                        <h3 className="font-bold text-primary mb-1">{item.products?.title || 'Unknown Product'}</h3>
-                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-primary mb-1 truncate text-sm sm:text-base">{item.products?.title || 'Unknown Product'}</h3>
+                        <p className="text-xs sm:text-sm text-gray-500">Qty: {item.quantity}</p>
+                        <p className="text-sm sm:text-base font-bold text-primary mt-1 sm:hidden">{formatRupiah((item.products?.price || 0) * item.quantity)}</p>
                       </div>
                     </div>
 
-                    {/* Price */}
-                    <div className="col-span-2 text-center">
+                    {/* Price - Hidden on mobile */}
+                    <div className="hidden sm:block sm:col-span-2 text-center">
                       <span className="font-bold text-primary">{formatRupiah(item.products?.price || 0)}</span>
                     </div>
 
                     {/* Quantity */}
-                    <div className="col-span-2 flex justify-center">
+                    <div className="sm:col-span-2 flex justify-start sm:justify-center">
                       <div className="flex items-center border-2 border-gray-300 rounded-full overflow-hidden">
                         <button
                           onClick={() => updateQuantity(item.id, -1)}
                           disabled={updating === item.id}
-                          className="w-10 h-10 flex items-center justify-center hover:bg-surface transition-colors disabled:opacity-50"
+                          className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-surface transition-colors disabled:opacity-50 text-xs sm:text-base"
                         >
                           <Minus size={16} />
                         </button>
-                        <span className="w-12 text-center font-bold">{item.quantity}</span>
+                        <span className="w-8 sm:w-12 text-center font-bold text-xs sm:text-base">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.id, 1)}
                           disabled={updating === item.id}
-                          className="w-10 h-10 flex items-center justify-center hover:bg-surface transition-colors disabled:opacity-50"
+                          className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center hover:bg-surface transition-colors disabled:opacity-50 text-xs sm:text-base"
                         >
                           <Plus size={16} />
                         </button>
                       </div>
                     </div>
 
-                    {/* Subtotal */}
-                    <div className="col-span-3 text-center">
+                    {/* Subtotal - Hidden on mobile (shown above) */}
+                    <div className="hidden sm:block sm:col-span-3 text-center">
                       <span className="font-bold text-primary text-lg">{formatRupiah((item.products?.price || 0) * item.quantity)}</span>
                     </div>
                   </div>

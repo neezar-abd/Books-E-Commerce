@@ -214,43 +214,43 @@ const MyAccount: React.FC = () => {
 
       <div className="space-y-6">
         {orders.map((order) => (
-          <div key={order.id} className="border-2 border-gray-200 rounded-2xl p-6">
+          <div key={order.id} className="border-2 border-gray-200 rounded-2xl p-4 sm:p-6">
             {/* Order Header */}
-            <div className="bg-secondary rounded-xl p-4 mb-4 grid grid-cols-4 gap-4">
-              <div>
-                <p className="text-sm text-primary/70 mb-1">ID Pesanan</p>
-                <p className="font-bold text-primary">{order.order_number}</p>
+            <div className="bg-secondary rounded-xl p-4 mb-4 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-primary/70 mb-1">ID Pesanan</p>
+                <p className="font-bold text-primary text-sm sm:text-base truncate">{order.order_number}</p>
               </div>
-              <div>
-                <p className="text-sm text-primary/70 mb-1">Total Pembayaran</p>
-                <p className="font-bold text-primary">{formatRupiah(order.total)}</p>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-primary/70 mb-1">Total</p>
+                <p className="font-bold text-primary text-sm sm:text-base truncate">{formatRupiah(order.total)}</p>
               </div>
-              <div>
-                <p className="text-sm text-primary/70 mb-1">Metode Pembayaran</p>
-                <p className="font-bold text-primary">{order.payment_method}</p>
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-primary/70 mb-1">Metode</p>
+                <p className="font-bold text-primary text-sm sm:text-base truncate">{order.payment_method}</p>
               </div>
-              <div>
-                <p className="text-sm text-primary/70 mb-1">
-                  {order.status === 'completed' ? 'Tanggal Diterima' : 'Estimasi Pengiriman'}
+              <div className="min-w-0">
+                <p className="text-xs sm:text-sm text-primary/70 mb-1">
+                  {order.status === 'completed' ? 'Diterima' : 'Estimasi'}
                 </p>
-                <p className="font-bold text-primary">{new Date(order.created_at).toLocaleDateString('id-ID')}</p>
+                <p className="font-bold text-primary text-sm sm:text-base truncate">{new Date(order.created_at).toLocaleDateString('id-ID')}</p>
               </div>
             </div>
 
             {/* Products */}
-            <div className="space-y-3 mb-4">
+            <div className="space-y-2 sm:space-y-3 mb-4">
               {order.order_items && order.order_items.map((item: any, index: number) => (
-                <div key={index} className="flex items-center gap-4">
+                <div key={index} className="flex items-start gap-3 sm:gap-4">
                   {item.product_image && (
                     <img
                       src={item.product_image}
                       alt={item.product_title}
-                      className="w-16 h-20 object-cover rounded-lg"
+                      className="w-12 h-16 sm:w-16 sm:h-20 object-cover rounded-lg flex-shrink-0"
                     />
                   )}
-                  <div>
-                    <h4 className="font-bold text-primary">{item.product_title}</h4>
-                    <p className="text-sm text-gray-500">{item.quantity} Qty. - {formatRupiah(item.price)}</p>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-primary text-sm sm:text-base truncate">{item.product_title}</h4>
+                    <p className="text-xs sm:text-sm text-gray-500">{item.quantity} Qty. - {formatRupiah(item.price)}</p>
                   </div>
                 </div>
               ))}

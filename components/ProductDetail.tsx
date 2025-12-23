@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react';
 import { Star, Heart, ShoppingCart, Share2, ChevronLeft, ChevronRight, Check, Truck, Shield, RotateCcw } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { formatRupiah } from '@/lib/utils';
+import { cartService } from '@/lib/cart';
 
 interface ProductDetailProps {
   product?: {
@@ -27,10 +29,26 @@ interface ProductDetailProps {
 }
 
 const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
+  const router = useRouter();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedFormat, setSelectedFormat] = useState('Hardcover');
   const [activeTab, setActiveTab] = useState('deskripsi');
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
+
+  const handleAddToCart = async () => {
+    try {
+      setIsAddingToCart(true);
+      // Add to cart using cartService
+      // For now, just show alert as we need user authentication
+      alert(`Ditambahkan ke keranjang: ${quantity} x ${currentProduct.title}`);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert('Gagal menambahkan ke keranjang');
+    } finally {
+      setIsAddingToCart(false);
+    }
+  };
 
   // Default product data (for demo)
   const defaultProduct = {
@@ -209,15 +227,19 @@ const ProductDetail: React.FC<ProductDetailProps> = ({ product }) => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
-              <button className="flex-1 bg-primary text-white py-4 rounded-full font-bold hover:bg-opacity-90 transition-all flex items-center justify-center gap-2">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button 
+                onClick={handleAddToCart}
+                disabled={isAddingToCart}
+                className="flex-1 bg-primary text-white py-4 rounded-full font-bold hover:bg-opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              >
                 <ShoppingCart size={20} />
-                Tambah ke Keranjang
+                {isAddingToCart ? 'Menambahkan...' : 'Tambah ke Keranjang'}
               </button>
               <button className="flex-1 bg-secondary text-primary py-4 rounded-full font-bold hover:bg-opacity-90 transition-all">
                 Beli Sekarang
               </button>
-              <button className="w-14 h-14 border-2 border-gray-300 rounded-full flex items-center justify-center hover:border-primary hover:text-primary transition-all">
+              <button className="w-14 h-14 border-2 border-gray-300 rounded-full flex items-center justify-center hover:border-primary hover:text-primary transition-all flex-shrink-0">
                 <Heart size={20} />
               </button>
             </div>

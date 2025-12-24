@@ -1,0 +1,49 @@
+/* Progress Bar Customization */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: linear-gradient(to right, #6366f1, #ec4899, #6366f1);
+  background-size: 200% 100%;
+  animation: slideGradient 1.5s linear infinite;
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2.5px;
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.6), 0 0 5px rgba(236, 72, 153, 0.4);
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 15px rgba(236, 72, 153, 0.8), 0 0 8px rgba(99, 102, 241, 0.6);
+}
+
+#nprogress.custom {
+  pointer-events: none;
+}
+
+#nprogress.custom .bar {
+  background: linear-gradient(
+    90deg,
+    #6366f1 0%,
+    #ec4899 50%,
+    #6366f1 100%
+  );
+  background-size: 200% 100%;
+}
+
+@keyframes slideGradient {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Remove ripple effect for cleaner look */
+#nprogress .spinner {
+  display: none !important;
+}

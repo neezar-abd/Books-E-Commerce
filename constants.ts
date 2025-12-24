@@ -94,17 +94,17 @@ export const DEALS: Deal[] = [
 export const TESTIMONIALS: Testimonial[] = [
   {
     id: 1,
-    name: "Siti Nurhaliza",
-    role: "Dosen Sastra",
-    avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+    name: "Sophie Martin",
+    role: "Art Curator",
+    avatar: "User",
     quote: "Kurasi di Lumina sangat istimewa. Saya menemukan edisi langka dengan sampul yang merupakan karya seni sejati.",
     rating: 5.0
   },
   {
     id: 2,
-    name: "Budi Santoso",
-    role: "Art Director",
-    avatar: "https://randomuser.me/api/portraits/men/32.jpg",
+    name: "Marco Rossi",
+    role: "Designer",
+    avatar: "User",
     quote: "Saya suka seleksi minimalisnya. Membantu saya menemukan buku yang tidak hanya enak dibaca tapi juga indah di rak.",
     rating: 5.0
   }

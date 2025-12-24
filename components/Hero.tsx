@@ -30,7 +30,7 @@ const Hero: React.FC = () => {
             </FadeIn>
             
             <SlideIn direction="up" delay={0.2}>
-              <h1 className="text-5xl lg:text-6xl font-bold text-primary leading-[1.15] mb-6" style={{ fontFamily: 'Fredoka, sans-serif', fontWeight: 600, letterSpacing: '-0.01em' }}>
+              <h1 className="text-5xl lg:text-6xl font-bold text-primary leading-[1.15] mb-6" style={{ fontFamily: 'Satoshi, sans-serif', fontWeight: 700, letterSpacing: '-0.01em' }}>
                 Temukan <br/>
                 <span className="text-secondary">Koleksi Buku</span> <br/>
                 Pilihan Kami

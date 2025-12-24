@@ -10,11 +10,12 @@ interface FadeInProps {
   className?: string;
 }
 
-export function FadeIn({ children, delay = 0, duration = 0.5, className = '' }: FadeInProps) {
+// Simple subtle fade in animation
+export function FadeIn({ children, delay = 0, duration = 0.3, className = '' }: FadeInProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{
         duration,
@@ -39,20 +40,14 @@ export function SlideIn({
   children,
   direction = 'up',
   delay = 0,
-  duration = 0.6,
+  duration = 0.3,
   className = '',
 }: SlideInProps) {
-  const directionOffset = {
-    left: { x: -30, y: 0 },
-    right: { x: 30, y: 0 },
-    up: { x: 0, y: 30 },
-    down: { x: 0, y: -30 },
-  };
-
+  // SlideIn now uses subtle fade only (no movement)
   return (
     <motion.div
-      initial={{ opacity: 0, ...directionOffset[direction] }}
-      whileInView={{ opacity: 1, x: 0, y: 0 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{
         duration,
@@ -72,11 +67,12 @@ interface ScaleInProps {
   className?: string;
 }
 
-export function ScaleIn({ children, delay = 0, duration = 0.4, className = '' }: ScaleInProps) {
+export function ScaleIn({ children, delay = 0, duration = 0.3, className = '' }: ScaleInProps) {
+  // ScaleIn now uses subtle fade only (no scaling)
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      whileInView={{ opacity: 1, scale: 1 }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{
         duration,
@@ -120,12 +116,11 @@ export function StaggerContainer({
 }
 
 export const staggerItem = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    y: 0,
     transition: {
-      duration: 0.5,
+      duration: 0.3,
     },
   },
 };

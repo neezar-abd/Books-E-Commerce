@@ -11,10 +11,10 @@ const Categories: React.FC = () => {
           
           {/* Large Card - Fiction */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.5, delay: 0.1 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
             className="lg:col-span-5 bg-white p-8 rounded-3xl relative overflow-hidden group hover:shadow-card transition-all h-full"
           >
              <div className="relative z-10">
@@ -44,10 +44,10 @@ const Categories: React.FC = () => {
              
              {/* Non-Fiction */}
              <motion.div
-               initial={{ opacity: 0, x: 50 }}
-               whileInView={{ opacity: 1, x: 0 }}
+               initial={{ opacity: 0 }}
+               whileInView={{ opacity: 1 }}
                viewport={{ once: true, margin: '-50px' }}
-               transition={{ duration: 0.5, delay: 0.2 }}
+               transition={{ duration: 0.3, delay: 0.2 }}
                className="bg-white p-8 rounded-3xl relative overflow-hidden group hover:shadow-card transition-all flex items-center justify-between h-full"
              >
                 <div className="relative z-10 max-w-[45%]">
@@ -68,10 +68,10 @@ const Categories: React.FC = () => {
 
              {/* Art & Design */}
              <motion.div
-               initial={{ opacity: 0, x: 50 }}
-               whileInView={{ opacity: 1, x: 0 }}
+               initial={{ opacity: 0 }}
+               whileInView={{ opacity: 1 }}
                viewport={{ once: true, margin: '-50px' }}
-               transition={{ duration: 0.5, delay: 0.3 }}
+               transition={{ duration: 0.3, delay: 0.3 }}
                className="bg-white p-8 rounded-3xl relative overflow-hidden group hover:shadow-card transition-all flex items-center justify-between h-full"
              >
                 <div className="relative z-10 max-w-[45%]">

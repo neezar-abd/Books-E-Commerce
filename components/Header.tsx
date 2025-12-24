@@ -88,7 +88,7 @@ const Header: React.FC = () => {
             <div className="bg-secondary rounded-full p-1.5">
                <BookOpen size={20} className="text-white" fill="currentColor" />
             </div>
-            <span className="text-2xl font-bold text-primary tracking-tight">Uchinaga<span className="text-secondary">.</span></span>
+            <span className="text-2xl font-bold text-primary tracking-tight">Uchinaga<span className="text-secondary">Books</span></span>
           </Link>
 
           {/* Desktop Nav */}

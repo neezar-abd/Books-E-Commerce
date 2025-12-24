@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
                   <div className="bg-secondary rounded-full p-1.5 text-primary">
                      <BookOpen size={20} fill="currentColor" />
                   </div>
-                  <span className="text-2xl font-bold">Uchinaga<span className="text-secondary">.</span></span>
+                  <span className="text-2xl font-bold">Uchinaga<span className="text-secondary">Books</span></span>
                </div>
                <p className="text-gray-400 text-sm mb-6 leading-relaxed">
                   Toko buku online terpercaya dengan koleksi lengkap dan berkualitas. Temukan bacaan favorit Anda dengan harga terbaik dan pengiriman cepat.

@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { TESTIMONIALS } from '@/constants';
-import { Quote, Star } from 'lucide-react';
+import { Quote, Star, User } from 'lucide-react';
 import { FadeIn, StaggerContainer, staggerItem } from './AnimationWrappers';
 
 const Testimonials: React.FC = () => {
@@ -25,7 +25,9 @@ const Testimonials: React.FC = () => {
                <motion.div key={t.id} variants={staggerItem} className="bg-white p-8 rounded-3xl relative hover:shadow-soft transition-shadow">
                 <div className="flex items-center gap-4 mb-6">
                    <div className="relative">
-                      <img src={t.avatar} alt={t.name} className="w-16 h-16 rounded-full object-cover border-4 border-surface" />
+                      <div className="w-16 h-16 rounded-full bg-secondary bg-opacity-10 flex items-center justify-center border-4 border-surface">
+                         <User size={28} className="text-secondary" />
+                      </div>
                       <div className="absolute -bottom-2 -right-2 bg-primary rounded-full p-1 text-white">
                          <Quote size={12} fill="currentColor" />
                       </div>

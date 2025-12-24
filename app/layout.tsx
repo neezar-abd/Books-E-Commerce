@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import './progress-bar.css';
+import ProgressBar from '@/components/ProgressBar';
 
 export const metadata: Metadata = {
   title: 'Uchinaga Books - Toko Buku Premium Indonesia',
@@ -20,9 +22,11 @@ export default function RootLayout({
         <link href="https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,700,900&display=swap" rel="stylesheet" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body>{children}</body>
+      <body>
+        <ProgressBar />
+        {children}
+      </body>
     </html>
   );
 }

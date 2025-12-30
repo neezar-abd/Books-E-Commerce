@@ -78,7 +78,7 @@ const Header: React.FC = () => {
     <header className="w-full relative z-50">
       {/* Top Bar - Like Shopee */}
       <div className="bg-primary text-white text-xs py-2 px-4 z-50">
-        <div className="container-80 px-4 flex justify-between items-center">
+        <div className="container-80 flex justify-between items-center">
           <div className="flex items-center gap-4">
             {user ? (
               userRole === 'seller' ? (
@@ -197,7 +197,7 @@ const Header: React.FC = () => {
 
       {/* Main Navbar */}
       <div className="bg-primary py-4 sticky top-0 z-[100]">
-        <div className="container-80 px-4 flex items-center gap-6">
+        <div className="container-80 flex items-center gap-6">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
             <div className="bg-secondary rounded-full p-1.5">
@@ -244,7 +244,7 @@ const Header: React.FC = () => {
         </div>
 
         {/* Search suggestions (if needed) */}
-        <div className="container-80 px-4 mt-2 hidden lg:block">
+        <div className="container-80 mt-2 hidden lg:block">
           <div className="flex items-center gap-3 text-white/80 text-xs overflow-x-auto no-scrollbar">
             {['Novel Romantis', 'Buku Anak', 'Self Improvement', 'Komik', 'Bisnis', 'Sejarah'].map((tag) => (
               <Link
@@ -261,7 +261,7 @@ const Header: React.FC = () => {
 
       {/* Navigation Row */}
       <div className="bg-white border-b border-gray-100 hidden lg:block">
-        <div className="container-80 px-4">
+        <div className="container-80">
           <nav className="flex items-center gap-8 py-3 text-sm font-medium text-primary">
             {[
               { label: 'Beranda', href: '/' },

@@ -123,7 +123,7 @@ const AllProducts: React.FC = () => {
 
   return (
     <section className="bg-surface min-h-screen pb-20">
-      <div className="container-80 px-4">
+      <div className="container-80">
         {/* Breadcrumb */}
         <FadeIn delay={0.1}>
           <div className="mb-4 pt-6">
@@ -358,8 +358,8 @@ const AllProducts: React.FC = () => {
                         key={i}
                         onClick={() => setCurrentPage(pageNum)}
                         className={`w-9 h-9 rounded-lg transition-all text-sm ${currentPage === pageNum
-                            ? 'bg-primary text-white'
-                            : 'border border-gray-200 hover:bg-white'
+                          ? 'bg-primary text-white'
+                          : 'border border-gray-200 hover:bg-white'
                           }`}
                       >
                         {pageNum}

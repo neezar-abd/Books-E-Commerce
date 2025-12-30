@@ -22,7 +22,7 @@ const CATEGORIES = [
 const Categories: React.FC = () => {
   return (
     <section className="py-6 bg-white" id="categories">
-      <div className="container-80 px-4">
+      <div className="container-80">
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-lg font-bold text-primary">KATEGORI</h2>
           <Link href="/products" className="text-sm text-secondary hover:underline">

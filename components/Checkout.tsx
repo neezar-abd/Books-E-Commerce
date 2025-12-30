@@ -75,7 +75,7 @@ const Checkout: React.FC = () => {
       try {
         setLoading(true);
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (!user) {
           router.push('/sign-in?redirect=/checkout');
           return;
@@ -128,7 +128,7 @@ const Checkout: React.FC = () => {
     'WELCOME20': 50000,
     'BOOKLOVERS': 75000,
     'SAVE10': 100000,
-    'UCHINAGA2024': 150000
+    'ZAREE2024': 150000
   };
 
   const handleApplyCoupon = () => {
@@ -224,7 +224,7 @@ const Checkout: React.FC = () => {
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">
       <div className="container mx-auto px-4 lg:px-8">
-        
+
         {/* Breadcrumb */}
         <div className="text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-primary">Beranda</Link>
@@ -243,12 +243,12 @@ const Checkout: React.FC = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
             {/* Billing Details */}
             <div className="lg:col-span-2">
               <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
                 <h2 className="text-2xl font-bold text-primary mb-6">Detail Penagihan</h2>
-                
+
                 <form className="space-y-5">
                   {/* Name Fields */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -300,7 +300,7 @@ const Checkout: React.FC = () => {
                       Negara <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
-                      <select 
+                      <select
                         value={formData.country}
                         onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                         className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors appearance-none"
@@ -335,7 +335,7 @@ const Checkout: React.FC = () => {
                         Provinsi <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <select 
+                        <select
                           value={formData.province}
                           onChange={(e) => handleProvinceChange(e.target.value)}
                           className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors appearance-none"
@@ -354,7 +354,7 @@ const Checkout: React.FC = () => {
                         Kota <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
-                        <select 
+                        <select
                           value={formData.city}
                           onChange={(e) => setFormData({ ...formData, city: e.target.value })}
                           className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
@@ -386,79 +386,79 @@ const Checkout: React.FC = () => {
                       className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
                       required
                     />
-                </div>
-
-                {/* Phone */}
-                <div>
-                  <label className="block text-sm font-bold text-primary mb-2">
-                    Telepon <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="Masukkan Nomor Telepon"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
-                    required
-                  />
-                </div>
-
-                {/* Email */}
-                <div>
-                  <label className="block text-sm font-bold text-primary mb-2">
-                    Email <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    placeholder="Masukkan Alamat Email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
-                    required
-                  />
-                </div>
-
-                {/* Delivery Address */}
-                <div>
-                  <label className="block text-sm font-bold text-primary mb-3">
-                    Alamat Pengiriman <span className="text-red-500">*</span>
-                  </label>
-                  <div className="space-y-3">
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <div className="relative">
-                        <input
-                          type="radio"
-                          name="delivery"
-                          checked={deliveryOption === 'same'}
-                          onChange={() => setDeliveryOption('same')}
-                          className="w-5 h-5 appearance-none border-2 border-gray-300 rounded-full checked:border-primary checked:border-[6px] transition-all"
-                        />
-                      </div>
-                      <span className="text-primary">Sama dengan alamat pengiriman</span>
-                    </label>
-                    <label className="flex items-center gap-3 cursor-pointer">
-                      <div className="relative">
-                        <input
-                          type="radio"
-                          name="delivery"
-                          checked={deliveryOption === 'different'}
-                          onChange={() => setDeliveryOption('different')}
-                          className="w-5 h-5 appearance-none border-2 border-gray-300 rounded-full checked:border-primary checked:border-[6px] transition-all"
-                        />
-                      </div>
-                      <span className="text-primary">Gunakan alamat penagihan yang berbeda</span>
-                    </label>
                   </div>
-                </div>
-              </form>
+
+                  {/* Phone */}
+                  <div>
+                    <label className="block text-sm font-bold text-primary mb-2">
+                      Telepon <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      placeholder="Masukkan Nomor Telepon"
+                      value={formData.phone}
+                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
+                      required
+                    />
+                  </div>
+
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm font-bold text-primary mb-2">
+                      Email <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      placeholder="Masukkan Alamat Email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
+                      required
+                    />
+                  </div>
+
+                  {/* Delivery Address */}
+                  <div>
+                    <label className="block text-sm font-bold text-primary mb-3">
+                      Alamat Pengiriman <span className="text-red-500">*</span>
+                    </label>
+                    <div className="space-y-3">
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <div className="relative">
+                          <input
+                            type="radio"
+                            name="delivery"
+                            checked={deliveryOption === 'same'}
+                            onChange={() => setDeliveryOption('same')}
+                            className="w-5 h-5 appearance-none border-2 border-gray-300 rounded-full checked:border-primary checked:border-[6px] transition-all"
+                          />
+                        </div>
+                        <span className="text-primary">Sama dengan alamat pengiriman</span>
+                      </label>
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <div className="relative">
+                          <input
+                            type="radio"
+                            name="delivery"
+                            checked={deliveryOption === 'different'}
+                            onChange={() => setDeliveryOption('different')}
+                            className="w-5 h-5 appearance-none border-2 border-gray-300 rounded-full checked:border-primary checked:border-[6px] transition-all"
+                          />
+                        </div>
+                        <span className="text-primary">Gunakan alamat penagihan yang berbeda</span>
+                      </label>
+                    </div>
+                  </div>
+                </form>
+              </div>
             </div>
-          </div>
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 sticky top-24">
                 <h2 className="text-2xl font-bold text-primary mb-6">Ringkasan Pesanan</h2>
-                
+
                 {/* Coupon Section */}
                 <div className="mb-6 p-4 bg-gray-50 rounded-xl">
                   <label className="block text-sm font-bold text-primary mb-2">Kode Kupon (Opsional)</label>
@@ -491,7 +491,7 @@ const Checkout: React.FC = () => {
                     <p className="text-xs text-green-600 mt-2">✓ Kupon "{appliedCoupon.code}" diterapkan</p>
                   )}
                 </div>
-                
+
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Items</span>
@@ -523,7 +523,7 @@ const Checkout: React.FC = () => {
                   </div>
                 </div>
 
-                <button 
+                <button
                   onClick={handleCheckout}
                   className="w-full bg-primary text-white py-4 rounded-full font-bold hover:bg-opacity-90 transition-all"
                 >

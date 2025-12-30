@@ -115,8 +115,8 @@ export default function SellerRegister() {
                             <React.Fragment key={s}>
                                 <div
                                     className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${step >= s
-                                            ? 'bg-primary text-white'
-                                            : 'bg-gray-200 text-gray-500'
+                                        ? 'bg-primary text-white'
+                                        : 'bg-gray-200 text-gray-500'
                                         }`}
                                 >
                                     {step > s ? <CheckCircle size={20} /> : s}
@@ -150,7 +150,7 @@ export default function SellerRegister() {
                                         <Store size={32} className="text-primary" />
                                     </div>
                                     <h1 className="text-2xl font-bold text-primary">Daftar Jadi Seller</h1>
-                                    <p className="text-gray-500 mt-2">Mulai jual buku Anda di Uchinaga Books</p>
+                                    <p className="text-gray-500 mt-2">Mulai jual produk Anda di Zaree Marketplace</p>
                                 </div>
 
                                 {error && (
@@ -171,7 +171,7 @@ export default function SellerRegister() {
                                                 onChange={handleNameChange}
                                                 required
                                                 className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                                                placeholder="Toko Buku Sejahtera"
+                                                placeholder="Toko Sejahtera"
                                             />
                                         </div>
 
@@ -181,14 +181,14 @@ export default function SellerRegister() {
                                             </label>
                                             <div className="flex items-center">
                                                 <span className="px-4 py-3 bg-gray-100 border border-r-0 border-gray-200 rounded-l-xl text-gray-500 text-sm">
-                                                    uchinagabooks.com/store/
+                                                    zaree.id/store/
                                                 </span>
                                                 <input
                                                     type="text"
                                                     value={form.storeSlug}
                                                     onChange={(e) => setForm({ ...form, storeSlug: e.target.value })}
                                                     className="flex-1 px-4 py-3 border border-gray-200 rounded-r-xl focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                                                    placeholder="toko-buku-sejahtera"
+                                                    placeholder="toko-sejahtera"
                                                 />
                                             </div>
                                         </div>

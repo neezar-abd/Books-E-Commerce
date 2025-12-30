@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Store, MapPin, Star, Package, MessageCircle, CheckCircle, Search } from 'lucide-react';
+import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -25,7 +26,10 @@ interface StoreData {
     is_verified: boolean;
 }
 
-export default function StorePage({ params }: { params: { slug: string } }) {
+export default function StorePage() {
+    const params = useParams();
+    const slug = params?.slug as string;
+
     const [store, setStore] = useState<StoreData | null>(null);
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -33,8 +37,10 @@ export default function StorePage({ params }: { params: { slug: string } }) {
     const [sortBy, setSortBy] = useState('newest');
 
     useEffect(() => {
-        fetchStoreData();
-    }, [params.slug]);
+        if (slug) {
+            fetchStoreData();
+        }
+    }, [slug]);
 
     const fetchStoreData = async () => {
         try {
@@ -42,7 +48,7 @@ export default function StorePage({ params }: { params: { slug: string } }) {
             const { data: storeData, error: storeError } = await supabase
                 .from('stores')
                 .select('*')
-                .eq('slug', params.slug)
+                .eq('slug', slug)
                 .eq('is_active', true)
                 .single();
 

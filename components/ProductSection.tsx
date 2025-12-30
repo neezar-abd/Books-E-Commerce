@@ -40,7 +40,7 @@ const ProductSection: React.FC = () => {
 
   return (
     <section className="py-6 bg-surface" id="products">
-      <div className="container-80 px-4">
+      <div className="container-80">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-4">

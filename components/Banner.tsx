@@ -116,7 +116,7 @@ const Banner: React.FC = () => {
 
     return (
         <section className="py-4 bg-surface">
-            <div className="container-80 px-4">
+            <div className="container-80">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                     {/* Main Banner Carousel */}
                     <div className="lg:col-span-2 relative rounded-2xl overflow-hidden group h-[280px] md:h-[340px]">
@@ -173,8 +173,8 @@ const Banner: React.FC = () => {
                                     key={index}
                                     onClick={() => goToSlide(index)}
                                     className={`w-2 h-2 rounded-full transition-all ${index === currentSlide
-                                            ? 'bg-white w-6'
-                                            : 'bg-white/50 hover:bg-white/70'
+                                        ? 'bg-white w-6'
+                                        : 'bg-white/50 hover:bg-white/70'
                                         }`}
                                 />
                             ))}

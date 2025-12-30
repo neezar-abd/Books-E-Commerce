@@ -10,8 +10,9 @@ import ImageUpload from '@/components/ImageUpload';
 interface Product {
     id: string;
     title: string;
-    author: string;
-    isbn?: string;
+    sku?: string;
+    brand?: string;
+    weight?: number;
     price: number;
     original_price: number;
     stock: number;
@@ -19,7 +20,8 @@ interface Product {
     is_featured: boolean;
     category_id: string;
     description: string;
-    sold?: number;
+    total_sold?: number;
+    condition?: string;
 }
 
 export default function SellerProducts() {
@@ -35,14 +37,16 @@ export default function SellerProducts() {
 
     const [form, setForm] = useState({
         title: '',
-        author: '',
-        isbn: '',
+        sku: '',
+        brand: '',
+        weight: '',
         price: '',
         original_price: '',
         stock: '',
         image: '',
         description: '',
         category_id: '',
+        condition: 'new',
     });
 
     useEffect(() => {
@@ -85,14 +89,16 @@ export default function SellerProducts() {
     const resetForm = () => {
         setForm({
             title: '',
-            author: '',
-            isbn: '',
+            sku: '',
+            brand: '',
+            weight: '',
             price: '',
             original_price: '',
             stock: '',
             image: '',
             description: '',
             category_id: '',
+            condition: 'new',
         });
         setEditingProduct(null);
         setShowForm(false);
@@ -102,14 +108,16 @@ export default function SellerProducts() {
         setEditingProduct(product);
         setForm({
             title: product.title,
-            author: product.author,
-            isbn: product.isbn || '',
+            sku: product.sku || '',
+            brand: product.brand || '',
+            weight: product.weight?.toString() || '',
             price: product.price.toString(),
             original_price: product.original_price?.toString() || '',
             stock: product.stock.toString(),
             image: product.image || '',
             description: product.description || '',
             category_id: product.category_id || '',
+            condition: product.condition || 'new',
         });
         setShowForm(true);
     };
@@ -122,14 +130,16 @@ export default function SellerProducts() {
         try {
             const productData = {
                 title: form.title,
-                author: form.author,
-                isbn: form.isbn || null,
+                sku: form.sku || null,
+                brand: form.brand || null,
+                weight: form.weight ? parseInt(form.weight) : null,
                 price: parseFloat(form.price),
                 original_price: form.original_price ? parseFloat(form.original_price) : null,
                 stock: parseInt(form.stock),
                 image: form.image,
                 description: form.description,
                 category_id: form.category_id || null,
+                condition: form.condition,
                 store_id: storeId,
             };
 
@@ -186,7 +196,8 @@ export default function SellerProducts() {
 
     const filteredProducts = products.filter(p =>
         p.title.toLowerCase().includes(search.toLowerCase()) ||
-        p.author.toLowerCase().includes(search.toLowerCase())
+        (p.brand && p.brand.toLowerCase().includes(search.toLowerCase())) ||
+        (p.sku && p.sku.toLowerCase().includes(search.toLowerCase()))
     );
 
     if (loading) {
@@ -309,10 +320,10 @@ export default function SellerProducts() {
                                             {product.title}
                                         </h3>
                                         <p className="text-xs text-gray-500 mb-1">
-                                            <span className="text-gray-400">SKU:</span> {product.isbn || '-'}
+                                            <span className="text-gray-400">SKU:</span> {product.sku || '-'}
                                         </p>
                                         <p className="text-xs text-gray-500">
-                                            <span className="text-gray-400">Penulis:</span> {product.author || '-'}
+                                            <span className="text-gray-400">Brand:</span> {product.brand || '-'}
                                         </p>
                                     </div>
                                 </div>
@@ -333,7 +344,7 @@ export default function SellerProducts() {
 
                                 {/* Sales */}
                                 <div className="col-span-2 flex flex-col justify-center text-sm text-center">
-                                    <span className="font-medium text-gray-900">{product.sold || 0}</span>
+                                    <span className="font-medium text-gray-900">{product.total_sold || 0}</span>
                                     <span className="text-xs text-gray-500">Terjual</span>
                                     {product.is_featured && (
                                         <div className="flex items-center justify-center gap-1 mt-1 text-green-600">
@@ -393,21 +404,22 @@ export default function SellerProducts() {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Penulis *</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Brand/Merk</label>
                                     <input
                                         type="text"
-                                        value={form.author}
-                                        onChange={(e) => setForm({ ...form, author: e.target.value })}
-                                        required
+                                        value={form.brand}
+                                        onChange={(e) => setForm({ ...form, brand: e.target.value })}
+                                        placeholder="Contoh: Samsung, Nike, dll"
                                         className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">ISBN/SKU</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">SKU</label>
                                     <input
                                         type="text"
-                                        value={form.isbn}
-                                        onChange={(e) => setForm({ ...form, isbn: e.target.value })}
+                                        value={form.sku}
+                                        onChange={(e) => setForm({ ...form, sku: e.target.value })}
+                                        placeholder="Kode unik produk"
                                         className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20"
                                     />
                                 </div>
@@ -433,7 +445,7 @@ export default function SellerProducts() {
                                     />
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
+                            <div className="grid grid-cols-3 gap-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Stok *</label>
                                     <input
@@ -445,18 +457,40 @@ export default function SellerProducts() {
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Berat (gram)</label>
+                                    <input
+                                        type="number"
+                                        value={form.weight}
+                                        onChange={(e) => setForm({ ...form, weight: e.target.value })}
+                                        placeholder="gram"
+                                        className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Kondisi</label>
                                     <select
-                                        value={form.category_id}
-                                        onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+                                        value={form.condition}
+                                        onChange={(e) => setForm({ ...form, condition: e.target.value })}
                                         className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20"
                                     >
-                                        <option value="">Pilih Kategori</option>
-                                        {categories.map(cat => (
-                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                        ))}
+                                        <option value="new">Baru</option>
+                                        <option value="used">Bekas</option>
+                                        <option value="refurbished">Refurbished</option>
                                     </select>
                                 </div>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                                <select
+                                    value={form.category_id}
+                                    onChange={(e) => setForm({ ...form, category_id: e.target.value })}
+                                    className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20"
+                                >
+                                    <option value="">Pilih Kategori</option>
+                                    {categories.map(cat => (
+                                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                    ))}
+                                </select>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-2">Gambar Produk</label>

@@ -204,7 +204,7 @@ const Header: React.FC = () => {
               <BookOpen size={24} className="text-primary" fill="currentColor" />
             </div>
             <span className="text-2xl font-bold text-white tracking-tight hidden md:inline">
-              Uchinaga<span className="text-secondary">Books</span>
+              Zaree
             </span>
           </Link>
 
@@ -215,7 +215,7 @@ const Header: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari buku favorit Anda..."
+                placeholder="Cari produk di Zaree..."
                 className="w-full py-2.5 px-4 rounded-l-lg bg-white text-primary placeholder-gray-400 focus:outline-none"
               />
               <button
@@ -246,7 +246,7 @@ const Header: React.FC = () => {
         {/* Search suggestions (if needed) */}
         <div className="container-80 mt-2 hidden lg:block">
           <div className="flex items-center gap-3 text-white/80 text-xs overflow-x-auto no-scrollbar">
-            {['Novel Romantis', 'Buku Anak', 'Self Improvement', 'Komik', 'Bisnis', 'Sejarah'].map((tag) => (
+            {['Elektronik', 'Fashion Pria', 'Fashion Wanita', 'Kesehatan', 'Rumah Tangga', 'Makanan'].map((tag) => (
               <Link
                 key={tag}
                 href={`/products?search=${encodeURIComponent(tag)}`}

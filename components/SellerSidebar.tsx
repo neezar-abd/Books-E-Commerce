@@ -77,7 +77,7 @@ export default function SellerSidebar() {
                             </div>
                             <div>
                                 <h1 className="text-lg font-bold">Seller Center</h1>
-                                <p className="text-xs text-white/60">Uchinaga Books</p>
+                                <p className="text-xs text-white/60">Zaree Seller Center</p>
                             </div>
                         </Link>
                     </div>

@@ -382,7 +382,7 @@ export default function SellerProducts() {
                         </div>
                         <form onSubmit={handleSubmit} className="p-6 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Judul Buku *</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Nama Produk *</label>
                                 <input
                                     type="text"
                                     value={form.title}

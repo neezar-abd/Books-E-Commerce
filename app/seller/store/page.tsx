@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Store, Save, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { Store, Save, Loader2, CheckCircle, AlertCircle, ChevronDown } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { regionsService, Province, City } from '@/lib/regions';
 import ImageUpload from '@/components/ImageUpload';
 
 interface StoreData {
@@ -26,9 +27,48 @@ export default function SellerStore() {
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+    // Province/City state
+    const [provinces, setProvinces] = useState<Province[]>([]);
+    const [cities, setCities] = useState<City[]>([]);
+    const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(null);
+
     useEffect(() => {
         fetchStore();
+        loadProvinces();
     }, []);
+
+    // Load provinces on mount
+    const loadProvinces = async () => {
+        const data = await regionsService.getProvinces();
+        setProvinces(data);
+    };
+
+    // Load cities when province changes
+    useEffect(() => {
+        if (selectedProvinceId) {
+            loadCities(selectedProvinceId);
+        } else {
+            setCities([]);
+        }
+    }, [selectedProvinceId]);
+
+    const loadCities = async (provinceId: number) => {
+        const data = await regionsService.getCitiesByProvince(provinceId);
+        setCities(data);
+    };
+
+    const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const provinceId = parseInt(e.target.value);
+        const province = provinces.find(p => p.id === provinceId);
+        setSelectedProvinceId(provinceId || null);
+        setStore(prev => prev ? { ...prev, province: province?.name || '', city: '' } : null);
+    };
+
+    const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const cityId = parseInt(e.target.value);
+        const city = cities.find(c => c.id === cityId);
+        setStore(prev => prev ? { ...prev, city: city?.name || '' } : null);
+    };
 
     const fetchStore = async () => {
         try {
@@ -200,22 +240,41 @@ export default function SellerStore() {
                 {/* Location */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Kota</label>
-                        <input
-                            type="text"
-                            value={store.city || ''}
-                            onChange={(e) => setStore({ ...store, city: e.target.value })}
-                            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20"
-                        />
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
+                        <div className="relative">
+                            <select
+                                value={selectedProvinceId || ''}
+                                onChange={handleProvinceChange}
+                                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20 appearance-none bg-white cursor-pointer"
+                            >
+                                <option value="">Pilih Provinsi</option>
+                                {provinces.map(province => (
+                                    <option key={province.id} value={province.id}>
+                                        {province.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
+                        </div>
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
-                        <input
-                            type="text"
-                            value={store.province || ''}
-                            onChange={(e) => setStore({ ...store, province: e.target.value })}
-                            className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20"
-                        />
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Kota/Kabupaten</label>
+                        <div className="relative">
+                            <select
+                                value={cities.find(c => c.name === store.city)?.id || ''}
+                                onChange={handleCityChange}
+                                disabled={!selectedProvinceId}
+                                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20 appearance-none bg-white cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
+                            >
+                                <option value="">{selectedProvinceId ? 'Pilih Kota/Kabupaten' : 'Pilih provinsi dulu'}</option>
+                                {cities.map(city => (
+                                    <option key={city.id} value={city.id}>
+                                        {city.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
+                        </div>
                     </div>
                 </div>
 

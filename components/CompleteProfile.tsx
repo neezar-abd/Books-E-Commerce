@@ -31,17 +31,17 @@ const CompleteProfile: React.FC = () => {
 
   return (
     <div className="min-h-screen flex">
-      
+
       {/* Left Side - Form */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
-          
+
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 mb-12">
             <div className="bg-secondary rounded-full p-2">
               <BookOpen size={24} className="text-white" fill="currentColor" />
             </div>
-            <span className="text-2xl font-bold text-primary tracking-tight">Uchinaga<span className="text-secondary">Books</span></span>
+            <span className="text-2xl font-bold text-primary tracking-tight">Zaree</span>
           </Link>
 
           {/* Title */}
@@ -50,7 +50,7 @@ const CompleteProfile: React.FC = () => {
 
           {/* Form */}
           <form className="space-y-6">
-            
+
             {/* Profile Photo */}
             <div>
               <label className="block text-sm font-bold text-primary mb-3">
@@ -129,16 +129,15 @@ const CompleteProfile: React.FC = () => {
               <h3 className="text-white font-bold text-xl">{testimonials[currentTestimonial].name}</h3>
               <p className="text-white/80">{testimonials[currentTestimonial].role}</p>
             </div>
-            
+
             {/* Dots */}
             <div className="flex gap-2 mt-6">
               {testimonials.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentTestimonial(index)}
-                  className={`h-2 rounded-full transition-all ${
-                    index === currentTestimonial ? 'w-12 bg-secondary' : 'w-2 bg-white/50'
-                  }`}
+                  className={`h-2 rounded-full transition-all ${index === currentTestimonial ? 'w-12 bg-secondary' : 'w-2 bg-white/50'
+                    }`}
                 />
               ))}
             </div>

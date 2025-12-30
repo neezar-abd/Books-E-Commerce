@@ -13,11 +13,11 @@ const ChatBot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: "Welcome to Uchinaga Books. I am your literary concierge. How may I assist you in finding your next great read today?" }
+    { role: 'model', text: "Halo! Selamat datang di Zaree. Saya asisten belanja Anda. Ada yang bisa saya bantu hari ini?" }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+
   // Ref to hold the chat session instance
   const chatSessionRef = useRef<Chat | null>(null);
 
@@ -40,7 +40,7 @@ const ChatBot: React.FC = () => {
       chatSessionRef.current = ai.chats.create({
         model: 'gemini-3-pro-preview',
         config: {
-          systemInstruction: "You are a sophisticated, helpful, and elegant literary assistant for 'Uchinaga Books', a high-end minimalist bookstore. Your tone is professional, warm, and well-read. You help users find books, discuss genres (Fiction, Non-Fiction, Art & Design, Psychology), and answer questions about the store's features (Free Shipping over $180, 24/7 support). Keep responses concise but eloquent.",
+          systemInstruction: "You are a helpful, friendly shopping assistant for 'Zaree', a modern e-commerce marketplace in Indonesia. Your tone is professional, warm, and helpful. You help users find products, discuss categories (Electronics, Fashion, Health & Beauty, Home, Food, Sports), and answer questions about the store's features (Free Shipping, 24/7 support, easy returns). Keep responses concise and helpful. Respond in Indonesian.",
         },
       });
     }
@@ -56,11 +56,11 @@ const ChatBot: React.FC = () => {
 
     try {
       initializeChat();
-      
+
       if (chatSessionRef.current) {
         const result = await chatSessionRef.current.sendMessage({ message: userMessage });
         const responseText = result.text || "I apologize, but I couldn't generate a response. Please try again.";
-        
+
         setMessages(prev => [...prev, { role: 'model', text: responseText }]);
       }
     } catch (error) {
@@ -80,11 +80,11 @@ const ChatBot: React.FC = () => {
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
-      
+
       {/* Chat Window */}
       {isOpen && (
         <div className="bg-white w-[90vw] md:w-[400px] h-[500px] rounded-3xl shadow-2xl mb-4 border border-gray-100 flex flex-col overflow-hidden animate-fade-in-up">
-          
+
           {/* Header */}
           <div className="bg-primary p-4 flex items-center justify-between text-white">
             <div className="flex items-center gap-3">
@@ -98,7 +98,7 @@ const ChatBot: React.FC = () => {
                 </p>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => setIsOpen(false)}
               className="p-1 hover:bg-white/10 rounded-full transition-colors"
             >
@@ -109,19 +109,18 @@ const ChatBot: React.FC = () => {
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50/50">
             {messages.map((msg, idx) => (
-              <div 
-                key={idx} 
+              <div
+                key={idx}
                 className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}
               >
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === 'user' ? 'bg-secondary text-primary' : 'bg-primary text-white'}`}>
                   {msg.role === 'user' ? <User size={14} /> : <Bot size={14} />}
                 </div>
-                <div 
-                  className={`max-w-[75%] p-3 rounded-2xl text-sm leading-relaxed ${
-                    msg.role === 'user' 
-                      ? 'bg-white border border-gray-100 text-primary rounded-tr-none shadow-sm' 
-                      : 'bg-primary text-white rounded-tl-none shadow-md'
-                  }`}
+                <div
+                  className={`max-w-[75%] p-3 rounded-2xl text-sm leading-relaxed ${msg.role === 'user'
+                    ? 'bg-white border border-gray-100 text-primary rounded-tr-none shadow-sm'
+                    : 'bg-primary text-white rounded-tl-none shadow-md'
+                    }`}
                 >
                   {msg.text}
                 </div>
@@ -129,7 +128,7 @@ const ChatBot: React.FC = () => {
             ))}
             {isLoading && (
               <div className="flex gap-3">
-                 <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0">
                   <Bot size={14} />
                 </div>
                 <div className="bg-primary text-white p-3 rounded-2xl rounded-tl-none shadow-md flex items-center gap-2">
@@ -144,8 +143,8 @@ const ChatBot: React.FC = () => {
           {/* Input Area */}
           <div className="p-4 bg-white border-t border-gray-100">
             <div className="flex items-center gap-2 bg-surface px-4 py-2 rounded-full border border-gray-200 focus-within:border-primary transition-colors">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
@@ -153,7 +152,7 @@ const ChatBot: React.FC = () => {
                 className="flex-1 bg-transparent outline-none text-sm text-primary placeholder-gray-400"
                 disabled={isLoading}
               />
-              <button 
+              <button
                 onClick={handleSend}
                 disabled={!input.trim() || isLoading}
                 className="text-primary hover:text-secondary disabled:opacity-30 transition-colors"
@@ -169,7 +168,7 @@ const ChatBot: React.FC = () => {
       )}
 
       {/* Floating Button */}
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-14 h-14 bg-primary text-white rounded-full shadow-soft hover:bg-secondary hover:text-primary transition-all duration-300 flex items-center justify-center group"
       >

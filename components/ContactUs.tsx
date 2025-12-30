@@ -8,7 +8,7 @@ const ContactUs: React.FC = () => {
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">
       <div className="container mx-auto px-4 lg:px-8">
-        
+
         {/* Breadcrumb */}
         <div className="text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-primary">Beranda</Link>
@@ -20,12 +20,12 @@ const ContactUs: React.FC = () => {
         <h1 className="text-4xl font-bold text-primary mb-12 text-center">Hubungi Kami</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-          
+
           {/* Contact Form */}
           <div>
             <h2 className="text-2xl font-bold text-primary mb-2">Hubungi Kami</h2>
             <p className="text-gray-600 mb-6">Alamat email Anda tidak akan dipublikasikan. Kolom yang wajib diisi ditandai dengan *</p>
-            
+
             <form className="space-y-5">
               {/* Name & Email */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -88,7 +88,7 @@ const ContactUs: React.FC = () => {
           {/* Contact Info */}
           <div className="bg-primary text-white rounded-3xl p-8">
             <div className="space-y-8">
-              
+
               {/* Address */}
               <div>
                 <h3 className="text-2xl font-bold mb-3">Alamat</h3>
@@ -108,7 +108,7 @@ const ContactUs: React.FC = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <Mail size={18} />
-                    <span className="text-white/90">hello@uchinagabooks.com</span>
+                    <span className="text-white/90">hello@zaree.id</span>
                   </div>
                 </div>
               </div>

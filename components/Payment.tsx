@@ -34,7 +34,7 @@ const Payment: React.FC = () => {
   const [bankAccount] = useState({
     bank: 'Bank Central Asia (BCA)',
     accountNumber: '1234567890',
-    accountName: 'PT UCHINAGA BOOKS'
+    accountName: 'PT ZAREE INDONESIA'
   });
 
   useEffect(() => {
@@ -123,7 +123,7 @@ const Payment: React.FC = () => {
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">
       <div className="container mx-auto px-4 lg:px-8">
-        
+
         {/* Breadcrumb */}
         <div className="text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-primary">Beranda</Link>
@@ -139,19 +139,19 @@ const Payment: React.FC = () => {
         <h1 className="text-4xl font-bold text-primary mb-8">Pembayaran</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Payment Method */}
           <div className="lg:col-span-2">
             <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
               <h2 className="text-2xl font-bold text-primary mb-6">Metode Pembayaran</h2>
-              
+
               {/* QRIS */}
               <div className="mb-8">
                 <h3 className="text-lg font-bold text-primary mb-4">QRIS</h3>
                 <div className="bg-surface rounded-2xl p-8 flex flex-col items-center">
-                  <img 
-                    src="/qris.png" 
-                    alt="QRIS Payment" 
+                  <img
+                    src="/qris.png"
+                    alt="QRIS Payment"
                     className="w-64 h-64 object-contain mb-4"
                   />
                   <p className="text-center text-gray-600 mb-4">
@@ -219,7 +219,7 @@ const Payment: React.FC = () => {
           <div className="lg:col-span-1">
             <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 sticky top-24">
               <h2 className="text-2xl font-bold text-primary mb-6">Detail Pesanan</h2>
-              
+
               <div className="space-y-4 mb-6">
                 <div>
                   <label className="text-sm font-bold text-gray-600">Nomor Pesanan</label>

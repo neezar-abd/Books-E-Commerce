@@ -4,12 +4,14 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Filter, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { formatRupiah } from '@/lib/utils';
 import { FadeIn, StaggerContainer, staggerItem } from './AnimationWrappers';
 import { supabase } from '@/lib/supabase';
 import ProductCard from './ProductCard';
 
 const AllProducts: React.FC = () => {
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<any[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -21,6 +23,18 @@ const AllProducts: React.FC = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 18; // 6 columns x 3 rows
+
+  // Read search query from URL
+  useEffect(() => {
+    const urlSearch = searchParams.get('search');
+    if (urlSearch) {
+      setSearchTerm(urlSearch);
+    }
+    const urlCategory = searchParams.get('category');
+    if (urlCategory) {
+      setSelectedCategory(urlCategory);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     fetchProducts();
@@ -140,22 +154,10 @@ const AllProducts: React.FC = () => {
           </div>
         </FadeIn>
 
-        {/* Search & Filter Bar */}
+        {/* Filter Bar */}
         <FadeIn delay={0.2}>
           <div className="bg-white rounded-xl p-4 mb-4 shadow-sm">
             <div className="flex flex-col md:flex-row gap-3">
-              {/* Search */}
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                <input
-                  type="text"
-                  placeholder="Cari produk..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm"
-                />
-              </div>
-
               {/* Sort */}
               <div className="relative">
                 <select

@@ -157,12 +157,9 @@ export default function AdminOrders() {
     <AdminLayout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex justify-between items-start">
+        <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Orders Management</h1>
-            <p className="text-gray-600 mt-2">
-              Manage and track all customer orders
-            </p>
+            <h1 className="text-2xl font-bold text-primary">Pesanan Saya</h1>
           </div>
           <ExportButton
             data={filteredOrders}
@@ -170,152 +167,149 @@ export default function AdminOrders() {
           />
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
-              />
-              <input
-                type="text"
-                placeholder="Search by order number or customer name..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Status Filter */}
-            <div className="relative">
-              <Filter
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-                size={20}
-              />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
-              >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="processing">Processing</option>
-                <option value="shipped">Shipped</option>
-                <option value="delivered">Delivered</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
-            <span>Total: {filteredOrders.length} orders</span>
-          </div>
-        </div>
-
-        {/* Orders Table */}
+        {/* Status Tabs */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Order Number
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Payment
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
-                {filteredOrders.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
-                      No orders found
-                    </td>
-                  </tr>
-                ) : (
-                  filteredOrders.map((order) => (
-                    <motion.tr
-                      key={order.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="hover:bg-gray-50"
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {order.order_number}
-                        </div>
-                        {order.tracking_number && (
-                          <div className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                            <Package size={12} />
-                            {order.tracking_number}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {order.profiles?.full_name || 'N/A'}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {order.profiles?.phone || ''}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {formatCurrency(order.total)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                            order.status
-                          )}`}
-                        >
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getPaymentStatusColor(
-                            order.payment_status
-                          )}`}
-                        >
-                          {order.payment_status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(order.created_at)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <button
-                          onClick={() => handleEditOrder(order)}
-                          className="text-blue-600 hover:text-blue-700 font-medium"
-                        >
-                          <Edit size={18} />
-                        </button>
-                      </td>
-                    </motion.tr>
-                  ))
+          <div className="flex border-b">
+            {[
+              { key: 'all', label: 'Semua' },
+              { key: 'pending', label: 'Belum Bayar' },
+              { key: 'processing', label: 'Perlu Dikirim' },
+              { key: 'shipped', label: 'Dikirim' },
+              { key: 'delivered', label: 'Selesai' },
+              { key: 'cancelled', label: 'Dibatalkan' },
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setStatusFilter(tab.key)}
+                className={`px-6 py-4 text-sm font-medium transition-colors relative ${statusFilter === tab.key
+                    ? 'text-primary'
+                    : 'text-gray-600 hover:text-primary'
+                  }`}
+              >
+                {tab.label}
+                {statusFilter === tab.key && (
+                  <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
                 )}
-              </tbody>
-            </table>
+              </button>
+            ))}
+          </div>
+
+          {/* Search & Filter Row */}
+          <div className="p-4 border-b bg-gray-50">
+            <div className="flex gap-4">
+              <div className="relative flex-1">
+                <Search
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  size={18}
+                />
+                <input
+                  type="text"
+                  placeholder="Cari nomor pesanan atau nama pelanggan..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
+                />
+              </div>
+              <button
+                onClick={() => { setSearchTerm(''); setStatusFilter('all'); }}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-600 hover:bg-gray-100"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+
+          {/* Orders Count */}
+          <div className="px-4 py-3 border-b">
+            <span className="text-sm font-medium text-gray-700">{filteredOrders.length} Pesanan</span>
+          </div>
+
+          {/* Table Header */}
+          <div className="grid grid-cols-12 gap-4 px-4 py-3 bg-gray-50 border-b text-xs font-medium text-gray-500 uppercase">
+            <div className="col-span-4">Produk</div>
+            <div className="col-span-2 text-center">Total Pesanan</div>
+            <div className="col-span-2 text-center">Status</div>
+            <div className="col-span-2 text-center">Pembayaran</div>
+            <div className="col-span-2 text-right">Aksi</div>
+          </div>
+
+          {/* Order Rows */}
+          <div className="divide-y divide-gray-100">
+            {filteredOrders.length === 0 ? (
+              <div className="text-center py-16">
+                <Package size={48} className="mx-auto mb-4 text-gray-300" />
+                <p className="text-gray-500">Tidak ada pesanan ditemukan</p>
+              </div>
+            ) : (
+              filteredOrders.map((order) => (
+                <motion.div
+                  key={order.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="grid grid-cols-12 gap-4 p-4 hover:bg-gray-50 transition-colors"
+                >
+                  {/* Order Info */}
+                  <div className="col-span-4">
+                    <div className="text-sm font-medium text-gray-900 mb-1">
+                      {order.order_number}
+                    </div>
+                    <div className="text-xs text-gray-500 mb-1">
+                      {order.profiles?.full_name || 'N/A'}
+                    </div>
+                    <div className="text-xs text-gray-400">
+                      {formatDate(order.created_at)}
+                    </div>
+                    {order.tracking_number && (
+                      <div className="text-xs text-primary flex items-center gap-1 mt-1">
+                        <Package size={12} />
+                        {order.tracking_number}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Total */}
+                  <div className="col-span-2 flex items-center justify-center">
+                    <span className="font-medium text-gray-900">
+                      {formatCurrency(order.total)}
+                    </span>
+                  </div>
+
+                  {/* Status */}
+                  <div className="col-span-2 flex items-center justify-center">
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}
+                    >
+                      {order.status === 'pending' ? 'Menunggu' :
+                        order.status === 'processing' ? 'Diproses' :
+                          order.status === 'shipped' ? 'Dikirim' :
+                            order.status === 'delivered' ? 'Selesai' :
+                              order.status === 'cancelled' ? 'Batal' : order.status}
+                    </span>
+                  </div>
+
+                  {/* Payment Status */}
+                  <div className="col-span-2 flex items-center justify-center">
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${getPaymentStatusColor(order.payment_status)}`}
+                    >
+                      {order.payment_status === 'pending' ? 'Belum Bayar' :
+                        order.payment_status === 'paid' ? 'Lunas' :
+                          order.payment_status === 'failed' ? 'Gagal' : order.payment_status}
+                    </span>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="col-span-2 flex flex-col items-end justify-center gap-1">
+                    <button
+                      onClick={() => handleEditOrder(order)}
+                      className="text-primary hover:text-primary/80 text-sm font-medium hover:underline"
+                    >
+                      Detail
+                    </button>
+                  </div>
+                </motion.div>
+              ))
+            )}
           </div>
         </div>
       </div>

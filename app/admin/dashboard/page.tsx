@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import AdminLayout from '@/components/AdminLayout';
-import { 
-  getDashboardStats, 
+import {
+  getDashboardStats,
   getRecentOrders,
   getRevenueChartData,
   getOrdersChartData,
@@ -49,8 +49,8 @@ export default function AdminDashboard() {
   const loadDashboardData = async () => {
     try {
       const [
-        statsData, 
-        ordersData, 
+        statsData,
+        ordersData,
         revenueChartData,
         ordersChartData,
         topProductsData,
@@ -121,49 +121,43 @@ export default function AdminDashboard() {
   const statCards = [
     {
       icon: ShoppingCart,
-      label: 'Total Orders',
+      label: 'Total Pesanan',
       value: stats?.totalOrders || 0,
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'bg-blue-50',
-      textColor: 'text-blue-600',
+      bgColor: 'bg-primary/10',
+      textColor: 'text-primary',
     },
     {
       icon: AlertCircle,
-      label: 'Pending Orders',
+      label: 'Perlu Diproses',
       value: stats?.pendingOrders || 0,
-      color: 'from-yellow-500 to-yellow-600',
       bgColor: 'bg-yellow-50',
       textColor: 'text-yellow-600',
     },
     {
       icon: DollarSign,
-      label: 'Total Revenue',
+      label: 'Total Pendapatan',
       value: formatCurrency(stats?.totalRevenue || 0),
-      color: 'from-green-500 to-green-600',
       bgColor: 'bg-green-50',
       textColor: 'text-green-600',
     },
     {
       icon: Users,
-      label: 'Total Users',
+      label: 'Total Pengguna',
       value: stats?.totalUsers || 0,
-      color: 'from-purple-500 to-purple-600',
       bgColor: 'bg-purple-50',
       textColor: 'text-purple-600',
     },
     {
       icon: Package,
-      label: 'Total Products',
+      label: 'Total Produk',
       value: stats?.totalProducts || 0,
-      color: 'from-indigo-500 to-indigo-600',
-      bgColor: 'bg-indigo-50',
-      textColor: 'text-indigo-600',
+      bgColor: 'bg-primary/10',
+      textColor: 'text-primary',
     },
     {
       icon: TrendingUp,
-      label: 'Low Stock Items',
+      label: 'Stok Menipis',
       value: stats?.lowStockProducts || 0,
-      color: 'from-red-500 to-red-600',
       bgColor: 'bg-red-50',
       textColor: 'text-red-600',
     },
@@ -174,9 +168,9 @@ export default function AdminDashboard() {
       <div className="space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-2">
-            Welcome back! Here's what's happening with your store today.
+          <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
+          <p className="text-gray-500 mt-1">
+            Selamat datang! Berikut ringkasan toko Anda hari ini.
           </p>
         </div>
 

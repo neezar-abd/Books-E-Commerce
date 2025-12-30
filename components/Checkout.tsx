@@ -168,41 +168,10 @@ const Checkout: React.FC = () => {
         return;
       }
 
-      // Create shipping address object
-      const shippingAddress = {
-        recipient_name: `${formData.firstName} ${formData.lastName}`,
-        recipient_phone: formData.phone,
-        address: formData.address,
-        city: formData.city,
-        province: formData.province,
-        postal_code: formData.zipCode,
-        email: formData.email
-      };
+      setLoading(true);
 
-      // Create order with correct column names
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          order_number: `ORD-${Date.now()}`,
-          user_id: user.id,
-          status: 'pending',
-          payment_status: 'pending',
-          payment_method: 'QRIS',
-          subtotal: subtotal,
-          shipping_cost: SHIPPING_COST,
-          tax: taxes,
-          discount: discount,
-          total: total,
-          shipping_address: shippingAddress
-        })
-        .select()
-        .single();
-
-      if (orderError) throw orderError;
-
-      // Create order items
+      // Create order items array
       const orderItems = cartItems.map(item => ({
-        order_id: order.id,
         product_id: item.product_id,
         product_title: item.products?.title || 'Unknown',
         product_image: item.products?.image,
@@ -211,17 +180,44 @@ const Checkout: React.FC = () => {
         subtotal: (item.products?.price || 0) * item.quantity
       }));
 
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
+      // Call API route to create order with email notifications
+      const response = await fetch('/api/orders/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: user.id,
+          order_number: `ORD-${Date.now()}`,
+          subtotal: subtotal,
+          shipping_cost: SHIPPING_COST,
+          tax: taxes,
+          discount: discount,
+          total: total,
+          payment_method: 'QRIS',
+          shipping_address: {
+            recipient_name: `${formData.firstName} ${formData.lastName}`,
+            recipient_phone: formData.phone,
+            address: formData.address,
+            city: formData.city,
+            province: formData.province,
+            postal_code: formData.zipCode,
+            email: formData.email
+          },
+          order_items: orderItems
+        })
+      });
 
-      if (itemsError) throw itemsError;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Gagal membuat pesanan');
+      }
 
+      const result = await response.json();
       // Redirect to payment
-      router.push(`/checkout?step=payment&orderId=${order.id}`);
-    } catch (error: any) {
-      console.error('Error creating order:', error);
-      alert('Gagal membuat pesanan: ' + (error.message || 'silakan coba lagi'));
+      router.push(`/checkout?step=payment&orderId=${result.orderId}`);
+    } catch (error) {
+      console.error('Checkout error:', error);
+      alert(error instanceof Error ? error.message : 'Gagal membuat pesanan. Mohon coba lagi.');
+      setLoading(false);
     }
   };
 

@@ -126,3 +126,10 @@ button:active {
 .page-transition {
   animation: fadeIn 0.4s ease-out;
 }
+
+/* Custom container - 80% width */
+.container-80 {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}

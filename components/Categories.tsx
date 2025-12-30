@@ -1,95 +1,53 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { Book, BookOpen, Baby, Palette, Briefcase, Heart, Lightbulb, Music, Globe, Utensils, Dumbbell, Sparkles } from 'lucide-react';
+import Link from 'next/link';
+
+const CATEGORIES = [
+  { name: 'Fiksi', icon: BookOpen, color: 'bg-blue-50 text-blue-600', href: '/products?category=fiction' },
+  { name: 'Non-Fiksi', icon: Book, color: 'bg-green-50 text-green-600', href: '/products?category=non-fiction' },
+  { name: 'Anak-Anak', icon: Baby, color: 'bg-pink-50 text-pink-600', href: '/products?category=children' },
+  { name: 'Seni & Desain', icon: Palette, color: 'bg-purple-50 text-purple-600', href: '/products?category=art' },
+  { name: 'Bisnis', icon: Briefcase, color: 'bg-amber-50 text-amber-600', href: '/products?category=business' },
+  { name: 'Romansa', icon: Heart, color: 'bg-red-50 text-red-600', href: '/products?category=romance' },
+  { name: 'Self-Help', icon: Lightbulb, color: 'bg-yellow-50 text-yellow-600', href: '/products?category=self-help' },
+  { name: 'Musik', icon: Music, color: 'bg-indigo-50 text-indigo-600', href: '/products?category=music' },
+  { name: 'Sejarah', icon: Globe, color: 'bg-teal-50 text-teal-600', href: '/products?category=history' },
+  { name: 'Kuliner', icon: Utensils, color: 'bg-orange-50 text-orange-600', href: '/products?category=culinary' },
+  { name: 'Kesehatan', icon: Dumbbell, color: 'bg-lime-50 text-lime-600', href: '/products?category=health' },
+  { name: 'Semua Promo', icon: Sparkles, color: 'bg-secondary/20 text-secondary', href: '/products?promo=true' },
+];
 
 const Categories: React.FC = () => {
   return (
-    <section className="py-16 bg-surface">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-auto lg:h-[600px]">
-          
-          {/* Large Card - Fiction */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="lg:col-span-5 bg-white p-8 rounded-3xl relative overflow-hidden group hover:shadow-card transition-all h-full"
-          >
-             <div className="relative z-10">
-                <span className="text-secondary font-medium mb-1 block">1500+ Judul</span>
-                <h2 className="text-4xl font-bold text-primary mb-4">Fiksi</h2>
-                <div className="space-y-1 text-gray-500 text-sm">
-                   <p>Temukan dunia melampaui imajinasi,</p>
-                   <p>dari klasik hingga kontemporer.</p>
-                </div>
-                
-                <div className="mt-8 space-y-2 text-sm text-gray-600">
-                   <p className="cursor-pointer hover:text-secondary">Fiksi Sastra</p>
-                   <p className="cursor-pointer hover:text-secondary">Sci-Fi & Fantasi</p>
-                   <p className="cursor-pointer hover:text-secondary">Misteri & Thriller</p>
-                   <p className="cursor-pointer hover:text-secondary">Romansa</p>
-                </div>
-             </div>
-             <img 
-               src="https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-               alt="Fiction" 
-               className="absolute bottom-0 right-[-50px] w-2/3 h-auto object-contain transition-transform duration-500 group-hover:scale-110 group-hover:-translate-x-4 opacity-80"
-             />
-          </motion.div>
+    <section className="py-6 bg-white" id="categories">
+      <div className="container-80 px-4">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-primary">KATEGORI</h2>
+          <Link href="/products" className="text-sm text-secondary hover:underline">
+            Lihat Semua
+          </Link>
+        </div>
 
-          {/* Right Column */}
-          <div className="lg:col-span-7 grid grid-rows-2 gap-6">
-             
-             {/* Non-Fiction */}
-             <motion.div
-               initial={{ opacity: 0 }}
-               whileInView={{ opacity: 1 }}
-               viewport={{ once: true, margin: '-50px' }}
-               transition={{ duration: 0.3, delay: 0.2 }}
-               className="bg-white p-8 rounded-3xl relative overflow-hidden group hover:shadow-card transition-all flex items-center justify-between h-full"
-             >
-                <div className="relative z-10 max-w-[45%]">
-                   <span className="text-secondary font-medium mb-1 block">750+ Judul</span>
-                   <h2 className="text-3xl font-bold text-primary mb-4">Non-Fiksi</h2>
-                   <div className="space-y-2 text-sm text-gray-600">
-                      <p className="cursor-pointer hover:text-secondary">Biografi</p>
-                      <p className="cursor-pointer hover:text-secondary">Sejarah</p>
-                      <p className="cursor-pointer hover:text-secondary">Pengembangan Diri</p>
-                   </div>
+        <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-4">
+          {CATEGORIES.map((category) => {
+            const IconComponent = category.icon;
+            return (
+              <Link
+                key={category.name}
+                href={category.href}
+                className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-surface transition-all group cursor-pointer"
+              >
+                <div className={`w-12 h-12 rounded-xl ${category.color} flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                  <IconComponent size={24} />
                 </div>
-                <img 
-                  src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                  alt="Non-Fiction" 
-                  className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-40 object-cover rounded-xl shadow-md transition-transform duration-500 group-hover:scale-105"
-                />
-             </motion.div>
-
-             {/* Art & Design */}
-             <motion.div
-               initial={{ opacity: 0 }}
-               whileInView={{ opacity: 1 }}
-               viewport={{ once: true, margin: '-50px' }}
-               transition={{ duration: 0.3, delay: 0.3 }}
-               className="bg-white p-8 rounded-3xl relative overflow-hidden group hover:shadow-card transition-all flex items-center justify-between h-full"
-             >
-                <div className="relative z-10 max-w-[45%]">
-                   <span className="text-secondary font-medium mb-1 block">450+ Judul</span>
-                   <h2 className="text-3xl font-bold text-primary mb-4">Seni & Desain</h2>
-                   <div className="space-y-2 text-sm text-gray-600">
-                      <p className="cursor-pointer hover:text-secondary">Fotografi</p>
-                      <p className="cursor-pointer hover:text-secondary">Arsitektur</p>
-                      <p className="cursor-pointer hover:text-secondary">Desain Grafis</p>
-                   </div>
-                </div>
-                <img 
-                  src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                  alt="Art Books" 
-                  className="absolute right-0 top-1/2 -translate-y-1/2 w-1/2 h-40 object-cover rounded-xl shadow-md transition-transform duration-500 group-hover:scale-105"
-                />
-             </motion.div>
-          </div>
+                <span className="text-xs text-center text-primary font-medium leading-tight">
+                  {category.name}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>

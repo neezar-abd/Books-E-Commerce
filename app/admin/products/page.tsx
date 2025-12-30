@@ -281,7 +281,7 @@ export default function AdminProducts() {
       if (!line) continue;
 
       const parts = line.split(',').map(p => p.trim());
-      
+
       // Parse price safely
       let price = 50000;
       if (priceIndex !== -1 && parts[priceIndex]) {
@@ -331,7 +331,7 @@ export default function AdminProducts() {
           pages = parsedPages;
         }
       }
-      
+
       products.push({
         title: parts[titleIndex] || '',
         author: parts[authorIndex] || '',
@@ -533,107 +533,129 @@ export default function AdminProducts() {
           </div>
         </div>
 
-        {/* Products Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredProducts.map((product) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className={`bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-all relative ${
-                selectedProducts.has(product.id)
-                  ? 'border-blue-500 ring-2 ring-blue-200'
-                  : 'border-gray-100'
-              }`}
-            >
-              {/* Checkbox */}
-              <button
-                onClick={() => handleSelectProduct(product.id)}
-                className="absolute top-3 right-3 z-10 flex items-center justify-center"
+        {/* Products Table */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          {/* Table Header */}
+          <div className="grid grid-cols-12 gap-4 p-4 bg-gray-50 border-b text-xs font-medium text-gray-500 uppercase">
+            <div className="col-span-1 flex items-center">
+              <input
+                type="checkbox"
+                checked={selectedProducts.size === filteredProducts.length && filteredProducts.length > 0}
+                onChange={handleSelectAll}
+                className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <div className="col-span-4">Info Produk</div>
+            <div className="col-span-1 text-center">Harga</div>
+            <div className="col-span-1 text-center">Stok</div>
+            <div className="col-span-3">Penjualan</div>
+            <div className="col-span-2 text-right">Aksi</div>
+          </div>
+
+          {/* Product Rows */}
+          <div className="divide-y divide-gray-100">
+            {filteredProducts.map((product) => (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className={`grid grid-cols-12 gap-4 p-4 hover:bg-gray-50 transition-colors ${selectedProducts.has(product.id) ? 'bg-blue-50' : ''
+                  }`}
               >
-                {selectedProducts.has(product.id) ? (
-                  <CheckCircle2 size={24} className="text-blue-600" />
-                ) : (
-                  <Circle size={24} className="text-gray-300 hover:text-gray-400" />
-                )}
-              </button>
-
-              {/* Product Image */}
-              <div className="relative h-48 bg-gray-100">
-                {product.image ? (
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                    className="w-full h-full object-cover"
+                {/* Checkbox */}
+                <div className="col-span-1 flex items-start pt-2">
+                  <input
+                    type="checkbox"
+                    checked={selectedProducts.has(product.id)}
+                    onChange={() => handleSelectProduct(product.id)}
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                   />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <ImageIcon className="text-gray-400" size={48} />
-                  </div>
-                )}
-                {product.stock < 10 && (
-                  <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
-                    Low Stock
-                  </div>
-                )}
-              </div>
-
-              {/* Product Info */}
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-1 line-clamp-2">
-                  {product.title}
-                </h3>
-                <p className="text-sm text-gray-600 mb-2">{product.author}</p>
-
-                <div className="flex items-center gap-2 mb-2">
-                  {product.categories?.name && (
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                      {product.categories.name}
-                    </span>
-                  )}
-                  {product.is_featured && (
-                    <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                      Featured
-                    </span>
-                  )}
                 </div>
 
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <div className="font-bold text-gray-900">
-                      {formatCurrency(product.price)}
-                    </div>
-                    <div className="text-sm text-gray-600">
-                      Stock: {product.stock}
-                    </div>
+                {/* Product Info */}
+                <div className="col-span-4 flex gap-3">
+                  <div className="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
+                    {product.image ? (
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <ImageIcon className="text-gray-400" size={24} />
+                      </div>
+                    )}
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-medium text-gray-900 line-clamp-2 mb-1">
+                      {product.title}
+                    </h3>
+                    <p className="text-xs text-gray-500 mb-1">
+                      <span className="text-gray-400">SKU:</span> {product.isbn || '-'}
+                    </p>
+                    <p className="text-xs text-gray-500 mb-1">
+                      <span className="text-gray-400">ID Produk:</span> {product.id?.slice(0, 12)}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      <span className="text-gray-400">Penulis:</span> {product.author || '-'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Price */}
+                <div className="col-span-1 flex items-center justify-center">
+                  <span className="font-medium text-gray-900">
+                    {formatCurrency(product.price)}
+                  </span>
+                </div>
+
+                {/* Stock */}
+                <div className="col-span-1 flex items-center justify-center">
+                  <span className={`font-medium ${product.stock < 10 ? 'text-red-600' : 'text-gray-900'}`}>
+                    {product.stock}
+                  </span>
+                </div>
+
+                {/* Sales Stats */}
+                <div className="col-span-3 flex flex-col justify-center text-sm">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="font-medium text-gray-900">Penjualan {product.sold || 0}</span>
+                  </div>
+                  <p className="text-xs text-gray-500">Penjualan 30 Hari Terakhir {product.sold_month || 0}</p>
+                  <p className="text-xs text-gray-500">Kunjungan 30 Hari Terakhir {product.views_month || 0}</p>
+                  {product.is_featured && (
+                    <div className="flex items-center gap-1 mt-1 text-green-600">
+                      <CheckCircle2 size={14} />
+                      <span className="text-xs font-medium">Info Optimal</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-2">
+                <div className="col-span-2 flex flex-col items-end justify-center gap-1">
                   <button
                     onClick={() => handleOpenModal(product)}
-                    className="flex-1 flex items-center justify-center gap-2 bg-blue-50 text-blue-600 py-2 px-4 rounded-lg hover:bg-blue-100 transition-colors"
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline"
                   >
-                    <Edit size={16} />
-                    Edit
+                    Ubah
                   </button>
                   <button
                     onClick={() => handleDeleteProduct(product.id)}
-                    className="flex items-center justify-center gap-2 bg-red-50 text-red-600 py-2 px-4 rounded-lg hover:bg-red-100 transition-colors"
+                    className="text-red-500 hover:text-red-700 text-sm font-medium hover:underline"
                   >
-                    <Trash2 size={16} />
+                    Hapus
                   </button>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
 
-          {filteredProducts.length === 0 && (
-            <div className="col-span-full text-center py-12 text-gray-500">
-              No products found
-            </div>
-          )}
+            {filteredProducts.length === 0 && (
+              <div className="text-center py-12 text-gray-500">
+                Tidak ada produk ditemukan
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -750,7 +772,7 @@ export default function AdminProducts() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Discount (%) 
+                    Discount (%)
                   </label>
                   <input
                     type="number"
@@ -1056,7 +1078,7 @@ export default function AdminProducts() {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-900 mb-2">Format CSV yang Didukung:</h4>
                 <code className="text-xs text-blue-800 block whitespace-pre-wrap font-mono">
-{`Judul Buku,Penulis,Deskripsi,Harga,Diskon,Stok,ISBN,Penerbit,Tahun,Halaman
+                  {`Judul Buku,Penulis,Deskripsi,Harga,Diskon,Stok,ISBN,Penerbit,Tahun,Halaman
 Laut Bercerita,Leila S. Chudori,Novel sejarah,95000,10,15,978-602-309,Gramedia,2012,348
 Amba,Laksmi Pamuntjak,Kisah epik,85000,0,20,978-602-123,Kepustakaan,2012,392`}
                 </code>

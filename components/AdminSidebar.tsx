@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   ShoppingBag,
   Package,
+  Store,
   Users,
   FileText,
   Settings,
@@ -22,6 +23,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
   { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
   { icon: Package, label: 'Products', href: '/admin/products' },
+  { icon: Store, label: 'Stores', href: '/admin/stores' },
   { icon: Users, label: 'Users', href: '/admin/users' },
   { icon: FileText, label: 'Content', href: '/admin/content' },
   { icon: Settings, label: 'Settings', href: '/admin/settings' },
@@ -98,10 +100,9 @@ export default function AdminSidebar() {
                     className={`
                       flex items-center gap-3 px-4 py-3 rounded-lg
                       transition-colors duration-200
-                      ${
-                        isActive
-                          ? 'bg-blue-600 text-white'
-                          : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                      ${isActive
+                        ? 'bg-blue-600 text-white'
+                        : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                       }
                     `}
                   >

@@ -80,7 +80,7 @@ const ProductDetail: React.FC = () => {
     if (!product) return;
     try {
       setIsAddingToCart(true);
-      await cartService.addItem(product.id, quantity);
+      await cartService.addToCart(product.id, quantity);
       alert(`Ditambahkan ke keranjang: ${quantity} x ${product.title}`);
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -213,8 +213,8 @@ const ProductDetail: React.FC = () => {
                     key={format}
                     onClick={() => setSelectedFormat(format)}
                     className={`px-6 py-3 rounded-full border-2 font-medium transition-all ${selectedFormat === format
-                        ? 'border-primary bg-primary text-white'
-                        : 'border-gray-300 text-gray-700 hover:border-primary'
+                      ? 'border-primary bg-primary text-white'
+                      : 'border-gray-300 text-gray-700 hover:border-primary'
                       }`}
                   >
                     {format}
@@ -318,8 +318,8 @@ const ProductDetail: React.FC = () => {
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`px-8 py-4 font-semibold transition-all ${activeTab === tab.key
-                    ? 'text-primary border-b-2 border-primary'
-                    : 'text-gray-500 hover:text-primary'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-gray-500 hover:text-primary'
                   }`}
               >
                 {tab.label}

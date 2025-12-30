@@ -4,8 +4,8 @@ import './progress-bar.css';
 import ProgressBar from '@/components/ProgressBar';
 
 export const metadata: Metadata = {
-  title: 'Uchinaga Books - Toko Buku Premium Indonesia',
-  description: 'Temukan koleksi buku pilihan dengan kualitas dan desain premium untuk para pecinta literatur',
+  title: 'Zaree - Marketplace Online Terpercaya Indonesia',
+  description: 'Temukan berbagai produk berkualitas dengan harga terbaik. Belanja mudah, aman, dan pengiriman cepat ke seluruh Indonesia',
   icons: {
     icon: '/favicon.svg',
   },

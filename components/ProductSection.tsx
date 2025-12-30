@@ -10,10 +10,10 @@ import { supabase } from '@/lib/supabase';
 import ProductCard from './ProductCard';
 
 const ProductSection: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('Semua Buku');
+  const [activeTab, setActiveTab] = useState('Semua Produk');
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const tabs = ['Semua Buku', 'Terbaru', 'Terlaris', 'Pilihan Kritikus'];
+  const tabs = ['Semua Produk', 'Terbaru', 'Terlaris', 'Promo'];
 
   useEffect(() => {
     const fetchProducts = async () => {

@@ -12,10 +12,10 @@ const Footer: React.FC = () => {
                      <div className="bg-secondary rounded-full p-1.5 text-primary">
                         <BookOpen size={20} fill="currentColor" />
                      </div>
-                     <span className="text-2xl font-bold">Uchinaga<span className="text-secondary">Books</span></span>
+                     <span className="text-2xl font-bold">Zaree</span>
                   </div>
                   <p className="text-gray-400 text-sm mb-6 leading-relaxed">
-                     Toko buku online terpercaya dengan koleksi lengkap dan berkualitas. Temukan bacaan favorit Anda dengan harga terbaik dan pengiriman cepat.
+                     Marketplace online terpercaya dengan produk berkualitas. Temukan kebutuhan Anda dengan harga terbaik dan pengiriman cepat ke seluruh Indonesia.
                   </p>
                   <div className="flex gap-4">
                      {[Facebook, Twitter, Instagram, Youtube].map((Icon, i) => (
@@ -53,7 +53,7 @@ const Footer: React.FC = () => {
                   <h4 className="font-bold mb-6">Kontak Kami</h4>
                   <ul className="space-y-4 text-sm text-gray-400">
                      <li><span className="block text-white mb-1">+62123-456-789</span></li>
-                     <li><span className="block text-white mb-1">hello@uchinagabooks.com</span></li>
+                     <li><span className="block text-white mb-1">hello@zaree.id</span></li>
                      <li><span className="block leading-relaxed">Jl. Sudirman No. 789, Menteng, Jakarta Pusat, DKI Jakarta 10310</span></li>
                   </ul>
                </div>
@@ -61,7 +61,7 @@ const Footer: React.FC = () => {
 
             {/* Bottom Bar */}
             <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-secondary">
-               <p>Copyright © 2024 Uchinaga Books. All Rights Reserved.</p>
+               <p>Copyright © 2024 Zaree. All Rights Reserved.</p>
                <div className="flex gap-4 mt-4 md:mt-0">
                   <span>Indonesia ▼</span>
                   <span>|</span>

@@ -178,7 +178,7 @@ export default function SellerStore() {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">URL Toko</label>
                             <div className="text-sm text-gray-500 bg-gray-50 px-4 py-3 rounded-xl">
-                                uchinagabooks.com/store/<span className="font-medium">{store.slug}</span>
+                                zaree.id/store/<span className="font-medium">{store.slug}</span>
                             </div>
                         </div>
                     </div>

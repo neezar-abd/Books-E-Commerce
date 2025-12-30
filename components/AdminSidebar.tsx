@@ -76,7 +76,7 @@ export default function AdminSidebar() {
             <Link href="/admin/dashboard" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg" />
               <div>
-                <h1 className="text-xl font-bold">Uchinaga Books</h1>
+                <h1 className="text-xl font-bold">Zaree Admin</h1>
                 <p className="text-xs text-gray-400">Admin Panel</p>
               </div>
             </Link>

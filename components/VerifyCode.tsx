@@ -4,15 +4,24 @@ import React, { useState, useRef, KeyboardEvent } from 'react';
 import { BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 const VerifyCode: React.FC = () => {
-  const [codes, setCodes] = useState<string[]>(['', '', '', '', '', '']);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email') || '';
+
+  const [codes, setCodes] = useState<string[]>(['', '', '', '', '', '', '', '']); // 8 digits
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [resending, setResending] = useState(false);
 
   const testimonials = [
     {
-      quote: "Verifikasi dua faktor membuat saya merasa lebih aman. Sangat appreciate dengan komitmen Uchinaga Books terhadap keamanan pelanggan!",
+      quote: "Verifikasi dua faktor membuat saya merasa lebih aman. Sangat appreciate dengan komitmen Zaree terhadap keamanan pelanggan!",
       name: "Ronald Richards",
       role: "Pemilik Bisnis",
       image: "https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
@@ -24,7 +33,7 @@ const VerifyCode: React.FC = () => {
       image: "https://images.unsplash.com/photo-1507842217343-583bb7270b66?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
     },
     {
-      quote: "Sistem keamanan yang modern dan user-friendly. Uchinaga Books benar-benar memperhatikan detail dalam setiap aspek!",
+      quote: "Sistem keamanan yang modern dan user-friendly. Zaree benar-benar memperhatikan detail dalam setiap aspek!",
       name: "David Kim",
       role: "Product Manager",
       image: "https://images.unsplash.com/photo-1589829085413-56de8ae18c73?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
@@ -39,7 +48,7 @@ const VerifyCode: React.FC = () => {
     setCodes(newCodes);
 
     // Auto-focus next input
-    if (value && index < 5) {
+    if (value && index < 7) {
       inputRefs.current[index + 1]?.focus();
     }
   };
@@ -53,17 +62,83 @@ const VerifyCode: React.FC = () => {
 
   const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text').slice(0, 6);
-    const newCodes = pastedData.split('').concat(Array(6).fill('')).slice(0, 6);
+    const pastedData = e.clipboardData.getData('text').slice(0, 8);
+    const newCodes = pastedData.split('').concat(Array(8).fill('')).slice(0, 8);
     setCodes(newCodes);
 
     // Focus last filled input or next empty
-    const lastFilledIndex = Math.min(pastedData.length, 5);
+    const lastFilledIndex = Math.min(pastedData.length, 7);
     inputRefs.current[lastFilledIndex]?.focus();
   };
 
   const setInputRef = (index: number) => (el: HTMLInputElement | null): void => {
     inputRefs.current[index] = el;
+  };
+
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const otp = codes.join('');
+    if (otp.length !== 8) {
+      setError('Masukkan kode 8 digit lengkap');
+      return;
+    }
+
+    if (!email) {
+      setError('Email tidak ditemukan. Silakan daftar ulang.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      // Verify OTP with Supabase
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
+        email: email,
+        token: otp,
+        type: 'email'
+      });
+
+      if (verifyError) throw verifyError;
+
+      // Success! Redirect to home
+      router.push('/');
+
+    } catch (err: any) {
+      console.error('Verification error:', err);
+      setError(err.message || 'Kode verifikasi salah atau sudah kedaluwarsa');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (!email) {
+      setError('Email tidak ditemukan');
+      return;
+    }
+
+    setResending(true);
+    setError('');
+
+    try {
+      // Resend OTP
+      const { error: resendError } = await supabase.auth.resend({
+        type: 'signup',
+        email: email
+      });
+
+      if (resendError) throw resendError;
+
+      alert('Kode verifikasi baru telah dikirim ke email Anda!');
+
+    } catch (err: any) {
+      console.error('Resend error:', err);
+      setError('Gagal mengirim ulang kode');
+    } finally {
+      setResending(false);
+    }
   };
 
   return (
@@ -84,18 +159,25 @@ const VerifyCode: React.FC = () => {
           {/* Title */}
           <h1 className="text-4xl font-bold text-primary mb-2">Verifikasi Kode</h1>
           <p className="text-gray-600 mb-8">
-            Silakan masukkan kode yang baru saja kami kirim ke email <span className="font-bold text-primary">contoh@gmail.com</span>
+            Silakan masukkan kode 8 digit yang baru saja kami kirim ke email <span className="font-bold text-primary">{email || 'Anda'}</span>
           </p>
 
+          {/* Error Message */}
+          {error && (
+            <div className="p-4 bg-red-50 border-2 border-red-200 text-red-700 rounded-xl text-sm mb-6">
+              {error}
+            </div>
+          )}
+
           {/* Form */}
-          <form className="space-y-6">
+          <form onSubmit={handleVerify} className="space-y-6">
 
             {/* Code Inputs */}
             <div>
               <label className="block text-sm font-bold text-primary mb-4">
                 Kode <span className="text-red-500">*</span>
               </label>
-              <div className="flex gap-3 justify-between" onPaste={handlePaste}>
+              <div className="flex gap-2 justify-between" onPaste={handlePaste}>
                 {codes.map((code, index) => (
                   <input
                     key={index}
@@ -106,7 +188,7 @@ const VerifyCode: React.FC = () => {
                     value={code}
                     onChange={(e) => handleChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
-                    className="w-14 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
+                    className="w-10 h-10 text-center text-xl font-bold border-2 border-gray-200 rounded-lg focus:outline-none focus:border-primary transition-colors"
                   />
                 ))}
               </div>
@@ -115,14 +197,23 @@ const VerifyCode: React.FC = () => {
             {/* Verify Button */}
             <button
               type="submit"
-              className="w-full bg-primary text-white py-4 rounded-full font-bold hover:bg-opacity-90 transition-all"
+              disabled={loading}
+              className="w-full bg-primary text-white py-4 rounded-full font-bold hover:bg-opacity-90 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Verifikasi
+              {loading ? 'Memverifikasi...' : 'Verifikasi'}
             </button>
 
             {/* Resend Code */}
             <p className="text-center text-sm text-gray-600 mt-6">
-              Tidak menerima kode? <button type="button" className="font-bold text-primary underline hover:text-secondary">Kirim Ulang Kode</button>
+              Tidak menerima kode? {' '}
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={resending}
+                className="font-bold text-primary underline hover:text-secondary disabled:opacity-50"
+              >
+                {resending ? 'Mengirim...' : 'Kirim Ulang Kode'}
+              </button>
             </p>
           </form>
         </div>

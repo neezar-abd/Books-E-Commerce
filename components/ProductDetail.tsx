@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { formatRupiah } from '@/lib/utils';
 import { cartService } from '@/lib/cart';
 import { supabase } from '@/lib/supabase';
+import { browsingHistory } from '@/lib/browsing-history';
 
 interface Product {
   id: string;
@@ -65,6 +66,11 @@ const ProductDetail: React.FC = () => {
         }
 
         setProduct(data);
+
+        // Track product view in browsing history
+        if (data.id && data.category_id) {
+          browsingHistory.addProduct(data.id, data.category_id);
+        }
       } catch (err: any) {
         console.error('Error fetching product:', err);
         setError('Gagal memuat produk');

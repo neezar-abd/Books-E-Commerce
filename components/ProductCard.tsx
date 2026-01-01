@@ -43,11 +43,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
     return (
         <Link href={`/product/${product.id}`} className="group block h-full">
             <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col">
-                {/* Image Container */}
-                <div className="relative aspect-square overflow-hidden">
+                <div className="relative aspect-square overflow-hidden bg-gray-100">
                     <img
-                        src={product.image}
+                        src={product.image || '/images/placeholder-product.png'}
                         alt={product.title}
+                        onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://via.placeholder.com/400x400/E5E7EB/6B7280?text=No+Image';
+                        }}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
 

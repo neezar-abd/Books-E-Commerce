@@ -2,7 +2,7 @@ import Header from '@/components/Header';
 import Banner from '@/components/Banner';
 import Categories from '@/components/Categories';
 import ProductSection from '@/components/ProductSection';
-import FlashSale from '@/components/FlashSale';
+import RecommendedProducts from '@/components/RecommendedProducts';
 import Footer from '@/components/Footer';
 
 export default function Home() {
@@ -19,8 +19,8 @@ export default function Home() {
         <section id="products">
           <ProductSection />
         </section>
-        <section id="flash-sale">
-          <FlashSale />
+        <section id="recommended">
+          <RecommendedProducts />
         </section>
       </main>
       <Footer />

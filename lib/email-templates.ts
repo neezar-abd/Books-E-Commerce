@@ -281,7 +281,7 @@ export function generateAdminOrderNotificationEmail(data: OrderEmailData): strin
     </div>
 
     <div class="footer">
-      <p>Email otomatis dari Lumina Books</p>
+      <p>Email otomatis dari Zaree</p>
       <p style="margin-top: 8px; color: #999;">Jangan balas email ini</p>
     </div>
   </div>
@@ -523,7 +523,7 @@ export function generateCustomerOrderConfirmationEmail(data: OrderEmailData): st
 
     <div class="footer">
       <p>Kami sedang memproses pesanan Anda</p>
-      <p style="margin-top: 12px;">Lumina Books - Toko Buku Online</p>
+      <p style="margin-top: 12px;">Zaree - Marketplace Indonesia</p>
     </div>
   </div>
 </body>

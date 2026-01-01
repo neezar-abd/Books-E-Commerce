@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
         .eq('id', user_id)
         .single();
 
-      const emailData = {
+      const baseEmailData = {
         orderNumber: order.order_number,
         customerName: profile?.full_name || shipping_address.recipient_name,
         customerEmail: profile?.email || shipping_address.email,
@@ -131,22 +131,53 @@ export async function POST(req: NextRequest) {
 
       console.log('📧 [API] Sending email notifications...');
 
-      // Send email to admin
-      if (process.env.ADMIN_EMAIL) {
-        console.log(`📨 [API] Sending admin notification to: ${process.env.ADMIN_EMAIL}`);
-        const adminEmailSent = await sendEmail({
-          to: process.env.ADMIN_EMAIL,
-          subject: `🎉 Pesanan Baru #${order.order_number} dari ${emailData.customerName}`,
-          html: generateAdminOrderNotificationEmail(emailData),
-        });
-
-        if (adminEmailSent) {
-          console.log('✅ [API] Admin email sent successfully');
-        } else {
-          console.log('⚠️ [API] Failed to send admin email');
+      // Group order items by store
+      const itemsByStore: { [storeId: string]: any[] } = {};
+      order_items.forEach((item: any) => {
+        if (!item.store_id) return;
+        if (!itemsByStore[item.store_id]) {
+          itemsByStore[item.store_id] = [];
         }
-      } else {
-        console.log('⚠️ [API] ADMIN_EMAIL not configured');
+        itemsByStore[item.store_id].push(item);
+      });
+
+      // Send email to each seller
+      for (const [storeId, storeItems] of Object.entries(itemsByStore)) {
+        try {
+          // Fetch store email
+          const { data: store } = await supabaseAdmin
+            .from('stores')
+            .select('name, email')
+            .eq('id', storeId)
+            .single();
+
+          if (store?.email) {
+            const sellerEmailData = {
+              ...baseEmailData,
+              items: storeItems, // Only items from this store
+              subtotal: storeItems.reduce((sum: number, item: any) => sum + item.subtotal, 0),
+              // Recalculate totals for this store's items
+              total: storeItems.reduce((sum: number, item: any) => sum + item.subtotal, 0),
+            };
+
+            console.log(`📨 [API] Sending seller notification to ${store.name} (${store.email})`);
+            const sellerEmailSent = await sendEmail({
+              to: store.email,
+              subject: `🎉 Pesanan Baru #${order.order_number} untuk ${store.name}`,
+              html: generateAdminOrderNotificationEmail(sellerEmailData),
+            });
+
+            if (sellerEmailSent) {
+              console.log(`✅ [API] Seller email sent to ${store.name}`);
+            } else {
+              console.log(`⚠️ [API] Failed to send email to ${store.name}`);
+            }
+          } else {
+            console.log(`⚠️ [API] No email found for store ${storeId}`);
+          }
+        } catch (storeError) {
+          console.error(`❌ [API] Error sending email for store ${storeId}:`, storeError);
+        }
       }
 
       // Send confirmation email to customer
@@ -155,8 +186,8 @@ export async function POST(req: NextRequest) {
         console.log(`📨 [API] Sending customer confirmation to: ${customerEmail}`);
         const customerEmailSent = await sendEmail({
           to: customerEmail,
-          subject: `Konfirmasi Pesanan #${order.order_number} - Lumina Books`,
-          html: generateCustomerOrderConfirmationEmail(emailData),
+          subject: `Konfirmasi Pesanan #${order.order_number} - Zaree`,
+          html: generateCustomerOrderConfirmationEmail(baseEmailData),
         });
 
         if (customerEmailSent) {

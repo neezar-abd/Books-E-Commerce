@@ -2,6 +2,9 @@ import AllProducts from '@/components/AllProducts';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
+// Force dynamic rendering for search params
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Semua Produk - Zaree',
   description: 'Jelajahi berbagai produk berkualitas dari Zaree Marketplace',

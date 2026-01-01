@@ -286,12 +286,6 @@ const ProductDetail: React.FC = () => {
 
             {/* Product Meta */}
             <div className="border-t border-gray-200 pt-6 space-y-3">
-              {product.isbn && (
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">ISBN:</span>
-                  <span className="font-medium text-primary">{product.isbn}</span>
-                </div>
-              )}
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">ID Produk:</span>
                 <span className="font-medium text-primary text-sm">{product.id}</span>

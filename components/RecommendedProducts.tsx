@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { recommendationEngine } from '@/lib/recommendation-engine';
 import ProductCard from './ProductCard';
-import { SlideIn } from './AnimationWrappers';
 
 const RecommendedProducts: React.FC = () => {
     const [products, setProducts] = useState<any[]>([]);
@@ -13,84 +13,24 @@ const RecommendedProducts: React.FC = () => {
     const [title, setTitle] = useState('Rekomendasi Untuk Anda');
 
     useEffect(() => {
-        fetchRecommendedProducts();
+        fetchRecommendations();
     }, []);
 
-    const fetchRecommendedProducts = async () => {
+    const fetchRecommendations = async () => {
         try {
             setLoading(true);
 
             // Check if user is logged in
             const { data: { user } } = await supabase.auth.getUser();
 
-            let recommendedProducts: any[] = [];
-
-            if (user) {
-                // USER LOGGED IN: Personalized recommendations
-                setTitle('Rekomendasi Untuk Anda');
-
-                // Step 1: Get user's order history to find preferred categories
-                const { data: orders } = await supabase
-                    .from('orders')
-                    .select(`
-            id,
-            order_items (
-              product_id,
-              products (
-                category_id
-              )
-            )
-          `)
-                    .eq('user_id', user.id)
-                    .limit(10);
-
-                // Extract category IDs from order history
-                const categoryIds = new Set<string>();
-                orders?.forEach(order => {
-                    order.order_items?.forEach((item: any) => {
-                        if (item.products?.category_id) {
-                            categoryIds.add(item.products.category_id);
-                        }
-                    });
-                });
-
-                if (categoryIds.size > 0) {
-                    // Fetch products from user's preferred categories
-                    const { data: categoryProducts } = await supabase
-                        .from('products')
-                        .select('*')
-                        .in('category_id', Array.from(categoryIds))
-                        .order('total_sold', { ascending: false })
-                        .limit(12);
-
-                    recommendedProducts = categoryProducts || [];
-                }
-
-                // If not enough products, fill with best sellers
-                if (recommendedProducts.length < 12) {
-                    const { data: bestSellers } = await supabase
-                        .from('products')
-                        .select('*')
-                        .order('total_sold', { ascending: false })
-                        .limit(12 - recommendedProducts.length);
-
-                    recommendedProducts = [...recommendedProducts, ...(bestSellers || [])];
-                }
-
-            } else {
-                // USER NOT LOGGED IN: Show trending/popular products
-                setTitle('Produk Terlaris');
-
-                const { data: trending } = await supabase
-                    .from('products')
-                    .select('*')
-                    .order('total_sold', { ascending: false })
-                    .limit(12);
-
-                recommendedProducts = trending || [];
-            }
+            // Use recommendation engine
+            const { products: recommendedProducts, reason } = await recommendationEngine.getRecommendations(
+                user?.id,
+                12
+            );
 
             setProducts(recommendedProducts);
+            setTitle(reason);
 
         } catch (error) {
             console.error('Error fetching recommendations:', error);

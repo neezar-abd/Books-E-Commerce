@@ -12,14 +12,16 @@ import { browsingHistory } from '@/lib/browsing-history';
 interface Product {
   id: string;
   title: string;
-  author: string;
+  brand?: string;
+  sku?: string;
+  weight?: number;
+  condition?: string;
   price: number;
   original_price?: number;
   rating?: number;
   description: string;
   image: string;
   stock: number;
-  isbn?: string;
   category_id?: string;
   store_id?: string;
   stores?: {
@@ -183,10 +185,12 @@ const ProductDetail: React.FC = () => {
               </Link>
             )}
 
-            {/* Title & Author */}
+            {/* Title & Brand */}
             <div>
               <h1 className="text-4xl font-bold text-primary mb-2">{product.title}</h1>
-              <p className="text-lg text-muted">oleh {product.author}</p>
+              {product.brand && (
+                <p className="text-lg text-muted">Brand: <span className="font-semibold text-primary">{product.brand}</span></p>
+              )}
             </div>
 
             {/* Rating */}
@@ -349,18 +353,28 @@ const ProductDetail: React.FC = () => {
                 <h3 className="text-2xl font-bold text-primary mb-6">Informasi Tambahan</h3>
                 <table className="w-full">
                   <tbody className="divide-y divide-gray-200">
-                    <tr>
-                      <td className="py-4 text-gray-600 font-medium w-1/3">Judul</td>
-                      <td className="py-4 text-primary font-medium">{product.title}</td>
-                    </tr>
-                    <tr>
-                      <td className="py-4 text-gray-600 font-medium">Penulis</td>
-                      <td className="py-4 text-primary font-medium">{product.author}</td>
-                    </tr>
-                    {product.isbn && (
+                    {product.brand && (
                       <tr>
-                        <td className="py-4 text-gray-600 font-medium">ISBN</td>
-                        <td className="py-4 text-primary font-medium">{product.isbn}</td>
+                        <td className="py-4 text-gray-600 font-medium w-1/3">Brand</td>
+                        <td className="py-4 text-primary font-medium">{product.brand}</td>
+                      </tr>
+                    )}
+                    {product.condition && (
+                      <tr>
+                        <td className="py-4 text-gray-600 font-medium">Kondisi</td>
+                        <td className="py-4 text-primary font-medium">{product.condition}</td>
+                      </tr>
+                    )}
+                    {product.weight && (
+                      <tr>
+                        <td className="py-4 text-gray-600 font-medium">Berat</td>
+                        <td className="py-4 text-primary font-medium">{product.weight} gram</td>
+                      </tr>
+                    )}
+                    {product.sku && (
+                      <tr>
+                        <td className="py-4 text-gray-600 font-medium">SKU</td>
+                        <td className="py-4 text-primary font-medium">{product.sku}</td>
                       </tr>
                     )}
                     <tr>

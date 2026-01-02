@@ -94,7 +94,7 @@ export const profileService = {
       profile = data;
     }
 
-    return profile;
+    return profile!;
   },
 
   // Get user's email from auth

@@ -18,12 +18,12 @@ const MyAccount: React.FC = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  
+
   // Profile data
   const [profile, setProfile] = useState<Profile | null>(null);
   const [email, setEmail] = useState('');
   const [formData, setFormData] = useState({
-    full_name: '',
+    name: '',
     phone: '',
   });
 
@@ -38,7 +38,7 @@ const MyAccount: React.FC = () => {
   const loadProfile = async () => {
     try {
       setLoading(true);
-      
+
       // Check if user is logged in
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -49,11 +49,11 @@ const MyAccount: React.FC = () => {
       // Load profile
       const profileData = await profileService.getProfile();
       const userEmail = await profileService.getUserEmail();
-      
+
       setProfile(profileData);
       setEmail(userEmail || '');
       setFormData({
-        full_name: profileData?.full_name || '',
+        name: profileData?.name || '',
         phone: profileData?.phone || '',
       });
 
@@ -71,10 +71,10 @@ const MyAccount: React.FC = () => {
     try {
       setSaving(true);
       await profileService.updateProfile({
-        full_name: formData.full_name,
+        name: formData.name,
         phone: formData.phone,
       });
-      
+
       alert('Profil berhasil diperbarui!');
       await loadProfile(); // Refresh data
     } catch (error) {
@@ -124,15 +124,15 @@ const MyAccount: React.FC = () => {
       <div className="flex-shrink-0">
         <div className="relative">
           <div className="w-32 h-32 rounded-full overflow-hidden bg-gray-200">
-            {profile?.avatar_url ? (
+            {profile?.avatar ? (
               <img
-                src={profile.avatar_url}
+                src={profile.avatar}
                 alt="Profile"
                 className="w-full h-full object-cover"
               />
             ) : (
               <div className="w-full h-full bg-primary flex items-center justify-center text-white text-3xl font-bold">
-                {formData.full_name?.charAt(0) || 'U'}
+                {formData.name?.charAt(0) || 'U'}
               </div>
             )}
           </div>
@@ -151,8 +151,8 @@ const MyAccount: React.FC = () => {
             </label>
             <input
               type="text"
-              value={formData.full_name}
-              onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-primary transition-colors"
             />
           </div>
@@ -260,11 +260,10 @@ const MyAccount: React.FC = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-4 border-t border-gray-200">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                 <span
-                  className={`px-4 py-2 rounded-full text-sm font-bold w-fit ${
-                    order.status === 'completed'
-                      ? 'bg-green-100 text-green-600'
-                      : 'bg-secondary text-primary'
-                  }`}
+                  className={`px-4 py-2 rounded-full text-sm font-bold w-fit ${order.status === 'completed'
+                    ? 'bg-green-100 text-green-600'
+                    : 'bg-secondary text-primary'
+                    }`}
                 >
                   {order.status === 'completed' ? 'Terkirim' : 'Diproses'}
                 </span>
@@ -280,7 +279,7 @@ const MyAccount: React.FC = () => {
                     Tambah Review
                   </button>
                 ) : (
-                  <button 
+                  <button
                     onClick={() => router.push(`/track-order?order_id=${order.id}`)}
                     className="bg-primary text-white px-4 sm:px-6 py-2 rounded-full font-bold hover:bg-opacity-90 text-sm sm:text-base"
                   >
@@ -324,7 +323,7 @@ const MyAccount: React.FC = () => {
       {/* Add New Address Form */}
       <div className="border-t-2 border-gray-200 pt-8">
         <h2 className="text-2xl font-bold text-primary mb-6">Tambah Alamat Baru</h2>
-        
+
         <form className="space-y-5">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -485,7 +484,7 @@ const MyAccount: React.FC = () => {
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">
       <div className="container mx-auto px-4 lg:px-8">
-        
+
         {/* Breadcrumb */}
         <div className="text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-primary">Beranda</Link>
@@ -497,39 +496,35 @@ const MyAccount: React.FC = () => {
         <h1 className="text-4xl font-bold text-primary mb-8">Akun Saya</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          
+
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden">
               <button
                 onClick={() => setActiveTab('personal')}
-                className={`w-full px-6 py-4 text-left font-bold transition-colors ${
-                  activeTab === 'personal' ? 'bg-secondary text-primary' : 'text-gray-600 hover:bg-surface'
-                }`}
+                className={`w-full px-6 py-4 text-left font-bold transition-colors ${activeTab === 'personal' ? 'bg-secondary text-primary' : 'text-gray-600 hover:bg-surface'
+                  }`}
               >
                 Informasi Personal
               </button>
               <button
                 onClick={() => setActiveTab('orders')}
-                className={`w-full px-6 py-4 text-left font-bold transition-colors ${
-                  activeTab === 'orders' ? 'bg-secondary text-primary' : 'text-gray-600 hover:bg-surface'
-                }`}
+                className={`w-full px-6 py-4 text-left font-bold transition-colors ${activeTab === 'orders' ? 'bg-secondary text-primary' : 'text-gray-600 hover:bg-surface'
+                  }`}
               >
                 Pesanan Saya
               </button>
               <button
                 onClick={() => setActiveTab('address')}
-                className={`w-full px-6 py-4 text-left font-bold transition-colors ${
-                  activeTab === 'address' ? 'bg-secondary text-primary' : 'text-gray-600 hover:bg-surface'
-                }`}
+                className={`w-full px-6 py-4 text-left font-bold transition-colors ${activeTab === 'address' ? 'bg-secondary text-primary' : 'text-gray-600 hover:bg-surface'
+                  }`}
               >
                 Kelola Alamat
               </button>
               <button
                 onClick={() => setActiveTab('logout')}
-                className={`w-full px-6 py-4 text-left font-bold transition-colors ${
-                  activeTab === 'logout' ? 'bg-secondary text-primary' : 'text-red-500 hover:bg-red-50'
-                }`}
+                className={`w-full px-6 py-4 text-left font-bold transition-colors ${activeTab === 'logout' ? 'bg-secondary text-primary' : 'text-red-500 hover:bg-red-50'
+                  }`}
               >
                 Keluar
               </button>

@@ -49,7 +49,9 @@ const AllProducts: React.FC = () => {
       setLoading(true);
       const { data, error } = await supabase
         .from('products')
-        .select('*');
+        .select('*')
+        .eq('is_active', true)
+        .or('moderation_status.eq.approved,moderation_status.is.null');
 
       if (error) throw error;
       setProducts(data || []);

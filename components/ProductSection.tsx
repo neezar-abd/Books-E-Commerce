@@ -19,16 +19,36 @@ const ProductSection: React.FC = () => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
+
+        // Try fetching featured products first
+        let { data, error } = await supabase
           .from('products')
           .select('*')
-          .eq('is_featured', true)
-          .limit(6); // Show 6 products on homepage
+          .eq('is_active', true)
+          .or('moderation_status.eq.approved,moderation_status.is.null')
+          .limit(6);
 
-        if (error) throw error;
-        setProducts(data || []);
-      } catch (error) {
-        console.error('Error fetching products:', error);
+        // If error, try without any filter
+        if (error) {
+          console.warn('Products query error, trying fallback:', error.message || error);
+          const fallback = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_active', true)
+            .limit(6);
+
+          data = fallback.data;
+          error = fallback.error;
+        }
+
+        if (error) {
+          console.error('Error fetching products:', error.message || error);
+          setProducts([]);
+        } else {
+          setProducts(data || []);
+        }
+      } catch (err: any) {
+        console.error('Error fetching products:', err.message || err);
         setProducts([]);
       } finally {
         setLoading(false);

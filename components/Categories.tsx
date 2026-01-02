@@ -1,87 +1,72 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Smartphone, Shirt, Heart, Home, UtensilsCrossed, Dumbbell, Gamepad2, Car, BookOpen, ShoppingBag, Sparkles, Tag } from 'lucide-react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import Image from 'next/image';
 
 interface Category {
   id: string;
   name: string;
   slug: string;
   icon: string;
+  image?: string;
 }
-
-// Icon mapping based on category name/icon field
-const iconMap: { [key: string]: React.ElementType } = {
-  'Smartphone': Smartphone,
-  'Shirt': Shirt,
-  'ShoppingBag': ShoppingBag,
-  'Heart': Heart,
-  'Home': Home,
-  'Coffee': UtensilsCrossed,
-  'Dumbbell': Dumbbell,
-  'Gamepad2': Gamepad2,
-  'Car': Car,
-  'BookOpen': BookOpen,
-  'Sparkles': Sparkles,
-  'Tag': Tag,
-};
-
-const colorMap: { [key: string]: string } = {
-  'elektronik': 'bg-blue-50 text-blue-600',
-  'fashion-pria': 'bg-indigo-50 text-indigo-600',
-  'fashion-wanita': 'bg-pink-50 text-pink-600',
-  'kesehatan-kecantikan': 'bg-rose-50 text-rose-600',
-  'rumah-tangga': 'bg-amber-50 text-amber-600',
-  'makanan-minuman': 'bg-orange-50 text-orange-600',
-  'olahraga-outdoor': 'bg-green-50 text-green-600',
-  'hobi-koleksi': 'bg-purple-50 text-purple-600',
-  'otomotif': 'bg-slate-50 text-slate-600',
-  'buku-alat-tulis': 'bg-teal-50 text-teal-600',
-};
 
 const Categories: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('categories')
-          .select('*')
-          .eq('is_active', true)
-          .order('position', { ascending: true })
-          .limit(12);
+    // Temporarily disabled - use fallback categories
+    // const fetchCategories = async () => {
+    //   try {
+    //     const { data, error } = await supabase
+    //       .from('categories')
+    //       .select('*')
+    //       .eq('is_active', true)
+    //       .order('position', { ascending: true });
 
-        if (!error && data) {
-          setCategories(data);
-        }
-      } catch (err) {
-        console.error('Error fetching categories:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    //     if (!error && data) {
+    //       setCategories(data);
+    //     }
+    //   } catch (err) {
+    //     console.error('Error fetching categories:', err);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
 
-    fetchCategories();
+    // fetchCategories();
+    setLoading(false); // Use fallback
   }, []);
 
-  // Fallback categories if database is empty
+  // ALL 24 categories with local images
   const fallbackCategories = [
-    { name: 'Elektronik', slug: 'elektronik', icon: 'Smartphone' },
-    { name: 'Fashion Pria', slug: 'fashion-pria', icon: 'Shirt' },
-    { name: 'Fashion Wanita', slug: 'fashion-wanita', icon: 'ShoppingBag' },
-    { name: 'Kesehatan', slug: 'kesehatan-kecantikan', icon: 'Heart' },
-    { name: 'Rumah Tangga', slug: 'rumah-tangga', icon: 'Home' },
-    { name: 'Makanan', slug: 'makanan-minuman', icon: 'Coffee' },
-    { name: 'Olahraga', slug: 'olahraga-outdoor', icon: 'Dumbbell' },
-    { name: 'Hobi', slug: 'hobi-koleksi', icon: 'Gamepad2' },
-    { name: 'Otomotif', slug: 'otomotif', icon: 'Car' },
-    { name: 'Buku', slug: 'buku-alat-tulis', icon: 'BookOpen' },
-    { name: 'Promo', slug: 'promo', icon: 'Sparkles' },
-    { name: 'Semua', slug: 'all', icon: 'Tag' },
+    { name: 'Buku & Alat Tulis', slug: 'buku-alat-tulis', image: '/gambar/banner/kategori/Buku & Alat Tulis.png' },
+    { name: 'Aksesoris Fashion', slug: 'aksesoris-fashion', image: '/gambar/banner/kategori/aksesoris fashion.png' },
+    { name: 'Fashion Bayi & Anak', slug: 'fashion-bayi-anak', image: '/gambar/banner/kategori/fashion bayi dan anak.png' },
+    { name: 'Fashion Muslim', slug: 'fashion-muslim', image: '/gambar/banner/kategori/fashion muslim.png' },
+    { name: 'Fotografi', slug: 'fotografi', image: '/gambar/banner/kategori/fotografi.png' },
+    { name: 'Handphone & Aksesoris', slug: 'handphone', image: '/gambar/banner/kategori/handphone aksesoris.png' },
+    { name: 'Hobi & Koleksi', slug: 'hobi-koleksi', image: '/gambar/banner/kategori/hobi dan koleksi.png' },
+    { name: 'Ibu & Bayi', slug: 'ibu-bayi', image: '/gambar/banner/kategori/ibu dan bayi.png' },
+    { name: 'Jam Tangan', slug: 'jam-tangan', image: '/gambar/banner/kategori/jam tangan.png' },
+    { name: 'Kesehatan', slug: 'kesehatan', image: '/gambar/banner/kategori/kesehatan.png' },
+    { name: 'Komputer & Aksesoris', slug: 'komputer', image: '/gambar/banner/kategori/komputer aksesoris.png' },
+    { name: 'Makanan & Minuman', slug: 'makanan-minuman', image: '/gambar/banner/kategori/makanan dan minuman.png' },
+    { name: 'Olahraga & Outdoor', slug: 'olahraga-outdoor', image: '/gambar/banner/kategori/olahraga dan outdoor.png' },
+    { name: 'Otomotif', slug: 'otomotif', image: '/gambar/banner/kategori/otomotif.png' },
+    { name: 'Pakaian Pria', slug: 'pakaian-pria', image: '/gambar/banner/kategori/pakaian pria.png' },
+    { name: 'Pakaian Wanita', slug: 'pakaian-wanita', image: '/gambar/banner/kategori/pakaian wanita.png' },
+    { name: 'Perawatan & Kecantikan', slug: 'perawatan-kecantikan', image: '/gambar/banner/kategori/perawatan dan kecantikan.png' },
+    { name: 'Perlengkapan Rumah', slug: 'perlengkapan-rumah', image: '/gambar/banner/kategori/perlengkapan rumah.png' },
+    { name: 'Sepatu Pria', slug: 'sepatu-pria', image: '/gambar/banner/kategori/sepatu pria.png' },
+    { name: 'Sepatu Wanita', slug: 'sepatu-wanita', image: '/gambar/banner/kategori/sepatu wanita.png' },
+    { name: 'Souvenir & Perlengkapan', slug: 'souvenir', image: '/gambar/banner/kategori/souvenir dan perlengkapan.png' },
+    { name: 'Tas Pria', slug: 'tas-pria', image: '/gambar/banner/kategori/tas pria.png' },
+    { name: 'Tas Wanita', slug: 'tas-wanita', image: '/gambar/banner/kategori/tas wanita.png' },
+    { name: 'Voucher', slug: 'voucher', image: '/gambar/banner/kategori/voucher.png' },
   ];
 
   const displayCategories = categories.length > 0 ? categories : fallbackCategories;
@@ -97,30 +82,35 @@ const Categories: React.FC = () => {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-4">
-            {[...Array(12)].map((_, i) => (
-              <div key={i} className="flex flex-col items-center gap-2 p-3 animate-pulse">
-                <div className="w-12 h-12 rounded-xl bg-gray-200" />
-                <div className="w-16 h-3 rounded bg-gray-200" />
+          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-4">
+            {[...Array(24)].map((_, i) => (
+              <div key={i} className="flex flex-col items-center gap-2 p-2 animate-pulse">
+                <div className="w-14 h-14 rounded-xl bg-gray-200" />
+                <div className="w-12 h-2 rounded bg-gray-200" />
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-12 gap-4">
+          <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-3">
             {displayCategories.map((category) => {
-              const IconComponent = iconMap[category.icon] || Tag;
-              const colorClass = colorMap[category.slug] || 'bg-gray-50 text-gray-600';
+              const imagePath = category.image || `/gambar/banner/kategori/${category.name}.png`;
 
               return (
                 <Link
                   key={category.slug}
                   href={`/products?category=${category.slug}`}
-                  className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-surface transition-all group cursor-pointer"
+                  className="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-surface transition-all group cursor-pointer"
                 >
-                  <div className={`w-12 h-12 rounded-xl ${colorClass} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <IconComponent size={24} />
+                  <div className="w-14 h-14 rounded-xl overflow-hidden bg-white shadow-sm group-hover:scale-105 transition-transform">
+                    <Image
+                      src={imagePath}
+                      alt={category.name}
+                      width={56}
+                      height={56}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
-                  <span className="text-xs text-center text-primary font-medium leading-tight">
+                  <span className="text-[10px] text-center text-primary font-medium leading-tight line-clamp-2">
                     {category.name}
                   </span>
                 </Link>

@@ -1,355 +1,370 @@
 'use client';
 
-import { useState } from 'react';
-import AdminLayout from '@/components/AdminLayout';
-import { Save, Settings as SettingsIcon, Mail, Globe } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import Card from '@/components/horizon/card';
+import { supabase } from '@/lib/supabase';
+import {
+  getBannedKeywords,
+  addBannedKeyword,
+  removeBannedKeyword
+} from '@/lib/moderation';
 import { motion } from 'framer-motion';
+import {
+  MdPercent,
+  MdWarning,
+  MdAdd,
+  MdDelete,
+  MdSave,
+  MdCheckCircle,
+  MdError
+} from 'react-icons/md';
+
+interface Category {
+  id: string;
+  name: string;
+}
+
+interface BannedKeyword {
+  id: string;
+  keyword: string;
+  severity: 'warning' | 'block' | 'report';
+}
 
 export default function AdminSettings() {
-  const [activeTab, setActiveTab] = useState('general');
-  const [isSaving, setIsSaving] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [adminId, setAdminId] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  // General Settings
-  const [generalSettings, setGeneralSettings] = useState({
-    site_name: 'Lumina Books',
-    site_tagline: 'Your Premier Online Bookstore',
-    contact_email: 'info@luminabooks.com',
-    contact_phone: '+62 812-3456-7890',
-    address: 'Jakarta, Indonesia',
-  });
+  // Commission settings
+  const [globalCommission, setGlobalCommission] = useState<number>(5);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [categoryCommissions, setCategoryCommissions] = useState<Record<string, number>>({});
 
-  // Shipping Settings
-  const [shippingSettings, setShippingSettings] = useState({
-    free_shipping_threshold: '500000',
-    flat_rate_shipping: '15000',
-    estimated_delivery: '3-5 working days',
-  });
+  // Banned keywords
+  const [bannedKeywords, setBannedKeywords] = useState<BannedKeyword[]>([]);
+  const [newKeyword, setNewKeyword] = useState('');
+  const [newSeverity, setNewSeverity] = useState<'warning' | 'block' | 'report'>('warning');
 
-  // Payment Settings
-  const [paymentSettings, setPaymentSettings] = useState({
-    cod_enabled: true,
-    bank_transfer_enabled: true,
-    ewallet_enabled: true,
-  });
+  useEffect(() => {
+    loadData();
+    getCurrentUser();
+  }, []);
 
-  const handleSave = async (section: string) => {
-    setIsSaving(true);
+  const getCurrentUser = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) setAdminId(user.id);
+  };
+
+  const loadData = async () => {
+    setLoading(true);
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert(`${section} settings saved successfully!`);
+      // Load categories
+      const { data: cats } = await supabase
+        .from('categories')
+        .select('id, name')
+        .order('name');
+      setCategories(cats || []);
+
+      // Load commission settings
+      const { data: commissions } = await supabase
+        .from('commission_settings')
+        .select('*');
+
+      if (commissions) {
+        const global = commissions.find(c => c.is_global);
+        if (global) setGlobalCommission(global.commission_rate);
+
+        const catComms: Record<string, number> = {};
+        commissions.filter(c => c.category_id).forEach(c => {
+          catComms[c.category_id!] = c.commission_rate;
+        });
+        setCategoryCommissions(catComms);
+      }
+
+      // Load banned keywords
+      const keywords = await getBannedKeywords();
+      setBannedKeywords(keywords);
+
     } catch (error) {
-      console.error('Error saving settings:', error);
-      alert('Failed to save settings');
+      console.error('Error loading settings:', error);
     } finally {
-      setIsSaving(false);
+      setLoading(false);
     }
   };
 
-  const tabs = [
-    { id: 'general', label: 'General', icon: SettingsIcon },
-    { id: 'shipping', label: 'Shipping', icon: Globe },
-    { id: 'payment', label: 'Payment', icon: Mail },
-  ];
+  const saveGlobalCommission = async () => {
+    try {
+      const { data: existing } = await supabase
+        .from('commission_settings')
+        .select('id')
+        .eq('is_global', true)
+        .single();
+
+      if (existing) {
+        await supabase
+          .from('commission_settings')
+          .update({ commission_rate: globalCommission })
+          .eq('id', existing.id);
+      } else {
+        await supabase
+          .from('commission_settings')
+          .insert({ is_global: true, commission_rate: globalCommission });
+      }
+
+      setMessage({ type: 'success', text: 'Global commission saved!' });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message });
+    }
+    setTimeout(() => setMessage(null), 3000);
+  };
+
+  const saveCategoryCommission = async (categoryId: string, rate: number) => {
+    try {
+      const { data: existing } = await supabase
+        .from('commission_settings')
+        .select('id')
+        .eq('category_id', categoryId)
+        .single();
+
+      if (existing) {
+        await supabase
+          .from('commission_settings')
+          .update({ commission_rate: rate })
+          .eq('id', existing.id);
+      } else {
+        await supabase
+          .from('commission_settings')
+          .insert({ category_id: categoryId, commission_rate: rate, is_global: false });
+      }
+
+      setCategoryCommissions(prev => ({ ...prev, [categoryId]: rate }));
+      setMessage({ type: 'success', text: 'Category commission saved!' });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message });
+    }
+    setTimeout(() => setMessage(null), 3000);
+  };
+
+  const handleAddKeyword = async () => {
+    if (!newKeyword.trim() || !adminId) return;
+
+    try {
+      await addBannedKeyword(newKeyword, newSeverity, adminId);
+      setNewKeyword('');
+      loadData();
+      setMessage({ type: 'success', text: 'Keyword added!' });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message });
+    }
+    setTimeout(() => setMessage(null), 3000);
+  };
+
+  const handleRemoveKeyword = async (keywordId: string) => {
+    if (!adminId) return;
+
+    try {
+      await removeBannedKeyword(keywordId, adminId);
+      loadData();
+      setMessage({ type: 'success', text: 'Keyword removed!' });
+    } catch (error: any) {
+      setMessage({ type: 'error', text: error.message });
+    }
+    setTimeout(() => setMessage(null), 3000);
+  };
+
+  const getSeverityBadge = (severity: string) => {
+    const styles: Record<string, string> = {
+      warning: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-200',
+      block: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200',
+      report: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-200'
+    };
+    const labels: Record<string, string> = {
+      warning: 'Peringatan',
+      block: 'Blokir',
+      report: 'Laporan'
+    };
+    return (
+      <span className={`px-2 py-0.5 text-xs rounded-full ${styles[severity]}`}>
+        {labels[severity]}
+      </span>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600 mt-2">
-            Manage your store settings and configurations
-          </p>
-        </div>
+    <div>
+      {message && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`fixed top-4 right-4 z-50 p-4 rounded-lg flex items-center gap-2 ${message.type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
+            }`}
+        >
+          {message.type === 'success' ? <MdCheckCircle size={20} /> : <MdError size={20} />}
+          {message.text}
+        </motion.div>
+      )}
 
-        {/* Tabs */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="flex border-b border-gray-100 overflow-x-auto">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-4 font-medium whitespace-nowrap transition-colors ${
-                    activeTab === tab.id
-                      ? 'border-b-2 border-blue-600 text-blue-600'
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Icon size={20} />
-                  {tab.label}
-                </button>
-              );
-            })}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Commission Settings */}
+        <Card extra="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+              <MdPercent className="text-green-600 dark:text-green-300" size={20} />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-navy-700 dark:text-white">Pengaturan Komisi</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Atur persentase komisi platform</p>
+            </div>
           </div>
 
-          <div className="p-6">
-            {/* General Settings */}
-            {activeTab === 'general' && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-4"
+          {/* Global Commission */}
+          <div className="mb-6 p-4 bg-lightPrimary dark:bg-navy-700 rounded-lg">
+            <label className="block text-sm font-medium text-navy-700 dark:text-white mb-2">
+              Komisi Global (%)
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                min="0"
+                max="100"
+                step="0.5"
+                value={globalCommission}
+                onChange={(e) => setGlobalCommission(parseFloat(e.target.value))}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg dark:bg-navy-800 dark:border-navy-600 dark:text-white"
+              />
+              <button
+                onClick={saveGlobalCommission}
+                className="px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600 flex items-center gap-2"
               >
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Site Name
-                  </label>
-                  <input
-                    type="text"
-                    value={generalSettings.site_name}
-                    onChange={(e) =>
-                      setGeneralSettings({
-                        ...generalSettings,
-                        site_name: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+                <MdSave size={16} />
+                Simpan
+              </button>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              Komisi default untuk semua kategori
+            </p>
+          </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Site Tagline
-                  </label>
-                  <input
-                    type="text"
-                    value={generalSettings.site_tagline}
-                    onChange={(e) =>
-                      setGeneralSettings({
-                        ...generalSettings,
-                        site_tagline: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+          {/* Per-Category Commission */}
+          <div>
+            <h3 className="text-sm font-medium text-navy-700 dark:text-white mb-3">Komisi Per Kategori</h3>
+            <div className="space-y-3 max-h-64 overflow-y-auto">
+              {categories.map(category => (
+                <div key={category.id} className="flex items-center gap-3">
+                  <span className="flex-1 text-sm text-gray-600 dark:text-gray-400">{category.name}</span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      value={categoryCommissions[category.id] || globalCommission}
+                      onChange={(e) => setCategoryCommissions(prev => ({
+                        ...prev,
+                        [category.id]: parseFloat(e.target.value)
+                      }))}
+                      className="w-20 px-2 py-1 text-sm border border-gray-300 rounded dark:bg-navy-800 dark:border-navy-600 dark:text-white"
+                    />
+                    <span className="text-sm text-gray-500">%</span>
+                    <button
+                      onClick={() => saveCategoryCommission(
+                        category.id,
+                        categoryCommissions[category.id] || globalCommission
+                      )}
+                      className="p-1 text-brand-500 hover:bg-brand-100 dark:hover:bg-nav
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Contact Email
-                    </label>
-                    <input
-                      type="email"
-                      value={generalSettings.contact_email}
-                      onChange={(e) =>
-                        setGeneralSettings({
-                          ...generalSettings,
-                          contact_email: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Contact Phone
-                    </label>
-                    <input
-                      type="tel"
-                      value={generalSettings.contact_phone}
-                      onChange={(e) =>
-                        setGeneralSettings({
-                          ...generalSettings,
-                          contact_phone: e.target.value,
-                        })
-                      }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
+y-700 rounded"
+                      title="Simpan"
+                    >
+                      <MdSave size={16} />
+                    </button>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        </Card>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Address
-                  </label>
-                  <textarea
-                    value={generalSettings.address}
-                    onChange={(e) =>
-                      setGeneralSettings({
-                        ...generalSettings,
-                        address: e.target.value,
-                      })
-                    }
-                    rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+        {/* Banned Keywords */}
+        <Card extra="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+              <MdWarning className="text-red-600 dark:text-red-300" size={20} />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-navy-700 dark:text-white">Kata Kunci Terlarang</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Kata kunci yang otomatis ditandai</p>
+            </div>
+          </div>
 
-                <button
-                  onClick={() => handleSave('General')}
-                  disabled={isSaving}
-                  className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
-                  <Save size={20} />
-                  {isSaving ? 'Saving...' : 'Save Changes'}
-                </button>
-              </motion.div>
-            )}
-
-            {/* Shipping Settings */}
-            {activeTab === 'shipping' && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-4"
+          {/* Add New Keyword */}
+          <div className="mb-6 p-4 bg-lightPrimary dark:bg-navy-700 rounded-lg">
+            <label className="block text-sm font-medium text-navy-700 dark:text-white mb-2">
+              Tambah Kata Kunci Baru
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newKeyword}
+                onChange={(e) => setNewKeyword(e.target.value)}
+                placeholder="Masukkan kata kunci..."
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg dark:bg-navy-800 dark:border-navy-600 dark:text-white"
+              />
+              <select
+                value={newSeverity}
+                onChange={(e) => setNewSeverity(e.target.value as any)}
+                className="px-3 py-2 border border-gray-300 rounded-lg text-sm dark:bg-navy-800 dark:border-navy-600 dark:text-white"
               >
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Free Shipping Threshold (IDR)
-                  </label>
-                  <input
-                    type="number"
-                    value={shippingSettings.free_shipping_threshold}
-                    onChange={(e) =>
-                      setShippingSettings({
-                        ...shippingSettings,
-                        free_shipping_threshold: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Orders above this amount get free shipping
-                  </p>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Flat Rate Shipping (IDR)
-                  </label>
-                  <input
-                    type="number"
-                    value={shippingSettings.flat_rate_shipping}
-                    onChange={(e) =>
-                      setShippingSettings({
-                        ...shippingSettings,
-                        flat_rate_shipping: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Estimated Delivery Time
-                  </label>
-                  <input
-                    type="text"
-                    value={shippingSettings.estimated_delivery}
-                    onChange={(e) =>
-                      setShippingSettings({
-                        ...shippingSettings,
-                        estimated_delivery: e.target.value,
-                      })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                <button
-                  onClick={() => handleSave('Shipping')}
-                  disabled={isSaving}
-                  className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-                >
-                  <Save size={20} />
-                  {isSaving ? 'Saving...' : 'Save Changes'}
-                </button>
-              </motion.div>
-            )}
-
-            {/* Payment Settings */}
-            {activeTab === 'payment' && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-4"
+                <option value="warning">⚠️ Peringatan</option>
+                <option value="report">📝 Laporan</option>
+                <option value="block">🚫 Blokir</option>
+              </select>
+              <button
+                onClick={handleAddKeyword}
+                disabled={!newKeyword.trim()}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 flex items-center gap-2"
               >
-                <div className="space-y-3">
-                  <label className="flex items-center gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      checked={paymentSettings.cod_enabled}
-                      onChange={(e) =>
-                        setPaymentSettings({
-                          ...paymentSettings,
-                          cod_enabled: e.target.checked,
-                        })
-                      }
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">
-                        Cash on Delivery (COD)
-                      </span>
-                      <p className="text-xs text-gray-500">
-                        Allow customers to pay when they receive the order
-                      </p>
-                    </div>
-                  </label>
+                <MdAdd size={16} />
+                Tambah
+              </button>
+            </div>
+          </div>
 
-                  <label className="flex items-center gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      checked={paymentSettings.bank_transfer_enabled}
-                      onChange={(e) =>
-                        setPaymentSettings({
-                          ...paymentSettings,
-                          bank_transfer_enabled: e.target.checked,
-                        })
-                      }
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">
-                        Bank Transfer
-                      </span>
-                      <p className="text-xs text-gray-500">
-                        Direct bank transfer payment method
-                      </p>
-                    </div>
-                  </label>
-
-                  <label className="flex items-center gap-3 p-4 border border-gray-300 rounded-lg hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      checked={paymentSettings.ewallet_enabled}
-                      onChange={(e) =>
-                        setPaymentSettings({
-                          ...paymentSettings,
-                          ewallet_enabled: e.target.checked,
-                        })
-                      }
-                      className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
-                    />
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">
-                        E-Wallet (GoPay, OVO, Dana)
-                      </span>
-                      <p className="text-xs text-gray-500">
-                        Digital wallet payment options
-                      </p>
-                    </div>
-                  </label>
-                </div>
-
-                <button
-                  onClick={() => handleSave('Payment')}
-                  disabled={isSaving}
-                  className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+          {/* Keywords List */}
+          <div className="space-y-2 max-h-80 overflow-y-auto">
+            {bannedKeywords.length === 0 ? (
+              <p className="text-center text-gray-500 dark:text-gray-400 py-8">Belum ada kata kunci terlarang</p>
+            ) : (
+              bannedKeywords.map(kw => (
+                <div
+                  key={kw.id}
+                  className="flex items-center justify-between p-3 bg-lightPrimary dark:bg-navy-700 rounded-lg"
                 >
-                  <Save size={20} />
-                  {isSaving ? 'Saving...' : 'Save Changes'}
-                </button>
-              </motion.div>
+                  <div className="flex items-center gap-3">
+                    <span className="font-mono text-sm text-navy-700 dark:text-white">{kw.keyword}</span>
+                    {getSeverityBadge(kw.severity)}
+                  </div>
+                  <button
+                    onClick={() => handleRemoveKeyword(kw.id)}
+                    className="p-1 text-red-500 hover:bg-red-100 dark:hover:bg-red-900 rounded"
+                    title="Hapus"
+                  >
+                    <MdDelete size={16} />
+                  </button>
+                </div>
+              ))
             )}
           </div>
-        </div>
+        </Card>
       </div>
-    </AdminLayout>
+    </div>
   );
 }

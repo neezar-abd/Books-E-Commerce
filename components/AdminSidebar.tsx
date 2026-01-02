@@ -13,7 +13,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  ShieldCheck
 } from 'lucide-react';
 import { useState } from 'react';
 import { authService } from '@/lib/auth';
@@ -21,6 +22,7 @@ import { useRouter } from 'next/navigation';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', href: '/admin/dashboard' },
+  { icon: ShieldCheck, label: 'Moderasi Produk', href: '/admin/moderation' },
   { icon: ShoppingBag, label: 'Orders', href: '/admin/orders' },
   { icon: Package, label: 'Products', href: '/admin/products' },
   { icon: Store, label: 'Stores', href: '/admin/stores' },

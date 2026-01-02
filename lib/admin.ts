@@ -2,20 +2,41 @@ import { supabase } from './supabase';
 import { startOfMonth, endOfMonth, subMonths, format } from 'date-fns';
 
 // Check if current user is admin
+// Check if current user is admin (using server-side API to bypass RLS)
 export async function isAdmin(): Promise<boolean> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
+    console.log('[isAdmin] Getting session...');
 
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single();
+    // Get current session to extract access token
+    const { data: { session } } = await supabase.auth.getSession();
 
-    return profile?.role === 'admin';
+    if (!session?.access_token) {
+      console.log('[isAdmin] No session or access token found');
+      return false;
+    }
+
+    console.log('[isAdmin] Calling server API with token...');
+
+    // Call API with access token in Authorization header
+    const response = await fetch('/api/auth/check-admin', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      console.error('[isAdmin] API response not OK:', response.status);
+      return false;
+    }
+
+    const data = await response.json();
+    console.log('[isAdmin] API response:', data);
+
+    return data.isAdmin === true;
   } catch (error) {
-    console.error('Error checking admin status:', error);
+    console.error('[isAdmin] Error checking admin status:', error);
     return false;
   }
 }
@@ -98,7 +119,6 @@ export async function getRecentOrders(limit: number = 10) {
       .from('orders')
       .select(`
         *,
-        profiles (full_name),
         order_items (*)
       `)
       .order('created_at', { ascending: false })
@@ -121,10 +141,7 @@ export async function getAllOrders(filters?: {
   try {
     let query = supabase
       .from('orders')
-      .select(`
-        *,
-        profiles (full_name, phone)
-      `)
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (filters?.status) {
@@ -212,7 +229,7 @@ export async function updateTrackingNumber(orderId: string, trackingNumber: stri
   try {
     const { data, error } = await supabase
       .from('orders')
-      .update({ 
+      .update({
         tracking_number: trackingNumber,
         updated_at: new Date().toISOString(),
       })
@@ -402,7 +419,7 @@ export async function getRevenueChartData() {
   try {
     const months = [];
     const now = new Date();
-    
+
     // Generate last 6 months
     for (let i = 5; i >= 0; i--) {
       const date = subMonths(now, i);
@@ -424,7 +441,7 @@ export async function getRevenueChartData() {
           .lte('created_at', end);
 
         const revenue = data?.reduce((sum, order) => sum + Number(order.total), 0) || 0;
-        
+
         return {
           month,
           revenue: Math.round(revenue),
@@ -444,7 +461,7 @@ export async function getOrdersChartData() {
   try {
     const months = [];
     const now = new Date();
-    
+
     for (let i = 5; i >= 0; i--) {
       const date = subMonths(now, i);
       months.push({
@@ -551,14 +568,15 @@ export async function exportOrders(format: 'csv' | 'excel' = 'csv') {
       .select(`
         order_number,
         created_at,
+        customer_name,
+        customer_phone,
         status,
         payment_status,
         payment_method,
         subtotal,
         shipping_cost,
         tax,
-        total,
-        profiles (full_name, phone)
+        total
       `)
       .order('created_at', { ascending: false });
 
@@ -568,8 +586,8 @@ export async function exportOrders(format: 'csv' | 'excel' = 'csv') {
     const exportData = data?.map(order => ({
       'Order Number': order.order_number,
       'Date': new Date(order.created_at).toLocaleDateString('id-ID'),
-      'Customer': order.profiles?.[0]?.full_name || 'N/A',
-      'Phone': order.profiles?.[0]?.phone || 'N/A',
+      'Customer': order.customer_name || 'N/A',
+      'Phone': order.customer_phone || 'N/A',
       'Status': order.status,
       'Payment Status': order.payment_status,
       'Payment Method': order.payment_method,

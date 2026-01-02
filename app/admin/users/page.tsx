@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import AdminLayout from '@/components/AdminLayout';
-import ExportButton from '@/components/ExportButton';
-import { getAllUsers, updateUserRole, exportUsers } from '@/lib/admin';
-import { Search, Shield, User, Mail, Phone, Calendar } from 'lucide-react';
+import Widget from '@/components/horizon/widget/Widget';
+import Card from '@/components/horizon/card';
+import { getAllUsers, updateUserRole } from '@/lib/admin';
+import { MdSearch, MdPeople, MdAdminPanelSettings, MdFileDownload, MdPerson } from 'react-icons/md';
 import { motion } from 'framer-motion';
 
 export default function AdminUsers() {
@@ -47,16 +47,15 @@ export default function AdminUsers() {
   };
 
   const handleRoleChange = async (userId: string, newRole: 'user' | 'admin') => {
-    if (!confirm(`Are you sure you want to change this user's role to ${newRole}?`))
-      return;
+    if (!confirm(`Change role to ${newRole}?`)) return;
 
     try {
       await updateUserRole(userId, newRole);
-      alert('User role updated successfully!');
+      alert('Role updated!');
       loadUsers();
     } catch (error) {
-      console.error('Error updating user role:', error);
-      alert('Failed to update user role');
+      console.error('Error:', error);
+      alert('Failed to update role');
     }
   };
 
@@ -68,64 +67,64 @@ export default function AdminUsers() {
     });
   };
 
+  const handleExport = async () => {
+    // TODO: Fix export implementation
+    console.log('Export users');
+  };
+
+  const adminCount = users.filter(u => u.role === 'admin').length;
+  const userCount = users.filter(u => !u.role || u.role === 'user').length;
+
   if (isLoading) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Loading users...</p>
-          </div>
-        </div>
-      </AdminLayout>
+      <div className="flex items-center justify-center h-96">
+        <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Users Management</h1>
-            <p className="text-gray-600 mt-2">Manage user accounts and permissions</p>
-          </div>
-          <ExportButton
-            data={filteredUsers}
-            filename="users"
-          />
-        </div>
+    <div>
+      {/* Stats */}
+      <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2">
+        <Widget icon={<MdPeople className="h-6 w-6" />} title="Total Users" subtitle={users.length} />
+        <Widget icon={<MdAdminPanelSettings className="h-6 w-6" />} title="Superadmins" subtitle={adminCount} />
+      </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="relative">
-            <Search
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
-              size={20}
-            />
+      {/* Filters + Actions */}
+      <Card extra="mt-5 p-4">
+        <div className="flex flex-wrap gap-4 items-center">
+          <div className="relative flex-1 min-w-[200px]">
+            <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
-              placeholder="Search users by name or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Search users by name or phone..."
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg dark:bg-navy-700 dark:border-navy-600 dark:text-white"
             />
           </div>
-
-          <div className="mt-4 text-sm text-gray-600">
-            Total: {filteredUsers.length} users
-          </div>
+          <button
+            onClick={handleExport}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+          >
+            <MdFileDownload /> Export Excel
+          </button>
         </div>
+        <div className="mt-4 text-sm text-brand-500 dark:text-brand-400">
+          Total: {filteredUsers.length} users
+        </div>
+      </Card>
 
-        {/* Users Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredUsers.map((user) => (
-            <motion.div
-              key={user.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
-            >
+      {/* Users Grid */}
+      <div className="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {filteredUsers.map((user) => (
+          <motion.div
+            key={user.id}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+          >
+            <Card extra="p-6">
               {/* User Avatar */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -136,20 +135,19 @@ export default function AdminUsers() {
                       className="w-12 h-12 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                      <User className="text-white" size={24} />
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-bold">
+                      {user.full_name?.charAt(0).toUpperCase() || 'N'}
                     </div>
                   )}
                   <div>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-navy-700 dark:text-white">
                       {user.full_name || 'N/A'}
                     </h3>
                     <span
-                      className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${
-                        user.role === 'admin'
-                          ? 'bg-purple-100 text-purple-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
+                      className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${user.role === 'admin'
+                        ? 'bg-brand-100 text-brand-800 dark:bg-brand-900 dark:text-brand-200'
+                        : 'bg-gray-100 text-gray-800 dark:bg-navy-700 dark:text-gray-300'
+                        }`}
                     >
                       {user.role || 'user'}
                     </span>
@@ -158,51 +156,37 @@ export default function AdminUsers() {
               </div>
 
               {/* User Info */}
-              <div className="space-y-2 mb-4">
-                {user.phone && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Phone size={16} />
-                    {user.phone}
-                  </div>
-                )}
-                {user.date_of_birth && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Calendar size={16} />
-                    {formatDate(user.date_of_birth)}
-                  </div>
-                )}
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Calendar size={16} />
-                  Joined: {formatDate(user.created_at)}
+              <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-400">
+                <div className="flex items-center gap-2">
+                  <MdPerson className="h-4 w-4" />
+                  <span>Joined: {formatDate(user.created_at)}</span>
                 </div>
               </div>
 
               {/* Role Change */}
-              <div className="pt-4 border-t border-gray-100">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="pt-4 border-t border-gray-200 dark:border-navy-700">
+                <label className="block text-sm font-medium text-navy-700 dark:text-white mb-2">
                   User Role
                 </label>
                 <select
                   value={user.role || 'user'}
-                  onChange={(e) =>
-                    handleRoleChange(user.id, e.target.value as 'user' | 'admin')
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                  onChange={(e) => handleRoleChange(user.id, e.target.value as 'user' | 'admin')}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg dark:bg-navy-700 dark:border-navy-600 dark:text-white text-sm"
                 >
                   <option value="user">User</option>
                   <option value="admin">Admin</option>
                 </select>
               </div>
-            </motion.div>
-          ))}
+            </Card>
+          </motion.div>
+        ))}
 
-          {filteredUsers.length === 0 && (
-            <div className="col-span-full text-center py-12 text-gray-500">
-              No users found
-            </div>
-          )}
-        </div>
+        {filteredUsers.length === 0 && (
+          <div className="col-span-full text-center py-12 text-gray-500">
+            No users found
+          </div>
+        )}
       </div>
-    </AdminLayout>
+    </div>
   );
 }

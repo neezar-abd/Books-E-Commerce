@@ -1,78 +1,83 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import AdminLayout from '@/components/AdminLayout';
+import Widget from '@/components/horizon/widget/Widget';
+import Card from '@/components/horizon/card';
+import { supabase } from '@/lib/supabase';
 import {
-  getDashboardStats,
-  getRecentOrders,
-  getRevenueChartData,
-  getOrdersChartData,
-  getTopSellingProducts,
-  getOrderStatusDistribution,
-} from '@/lib/admin';
-import {
-  TrendingUp,
-  ShoppingCart,
-  Users,
-  Package,
-  AlertCircle,
-  DollarSign,
-  BarChart3,
-  PieChart as PieChartIcon,
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { RevenueChart, OrdersChart, TopProductsChart, OrderStatusChart } from '@/components/Charts';
+  MdShoppingCart,
+  MdStore,
+  MdAttachMoney,
+  MdPeople,
+  MdBarChart,
+  MdTrendingUp
+} from 'react-icons/md';
 
 interface DashboardStats {
   totalOrders: number;
-  pendingOrders: number;
-  totalRevenue: number;
+  totalStores: number;
   totalUsers: number;
   totalProducts: number;
-  lowStockProducts: number;
+  totalRevenue: number;
+  pendingModeration: number;
 }
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [recentOrders, setRecentOrders] = useState<any[]>([]);
-  const [revenueData, setRevenueData] = useState<any[]>([]);
-  const [ordersData, setOrdersData] = useState<any[]>([]);
-  const [topProducts, setTopProducts] = useState<any[]>([]);
-  const [statusDistribution, setStatusDistribution] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState<DashboardStats>({
+    totalOrders: 0,
+    totalStores: 0,
+    totalUsers: 0,
+    totalProducts: 0,
+    totalRevenue: 0,
+    pendingModeration: 0
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadDashboardData();
+    loadStats();
   }, []);
 
-  const loadDashboardData = async () => {
+  const loadStats = async () => {
     try {
-      const [
-        statsData,
-        ordersData,
-        revenueChartData,
-        ordersChartData,
-        topProductsData,
-        statusData
-      ] = await Promise.all([
-        getDashboardStats(),
-        getRecentOrders(5),
-        getRevenueChartData(),
-        getOrdersChartData(),
-        getTopSellingProducts(5),
-        getOrderStatusDistribution(),
+      const [orders, stores, users, products] = await Promise.all([
+        supabase.from('orders').select('*', { count: 'exact', head: true }),
+        supabase.from('stores').select('*', { count: 'exact', head: true }),
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+        supabase.from('products').select('*', { count: 'exact', head: true }),
       ]);
-      setStats(statsData);
-      setRecentOrders(ordersData || []);
-      setRevenueData(revenueChartData);
-      setOrdersData(ordersChartData);
-      setTopProducts(topProductsData);
-      setStatusDistribution(statusData);
+
+      // Get total revenue
+      const { data: revenueData } = await supabase
+        .from('orders')
+        .select('total_amount')
+        .eq('payment_status', 'paid');
+
+      const totalRevenue = revenueData?.reduce((sum, order) => sum + (order.total_amount || 0), 0) || 0;
+
+      // Try to get pending moderation count
+      let pendingCount = 0;
+      try {
+        const { count } = await supabase
+          .from('products')
+          .select('*', { count: 'exact', head: true })
+          .eq('moderation_status', 'pending');
+        pendingCount = count || 0;
+      } catch (e) {
+        // Column may not exist yet
+      }
+
+      setStats({
+        totalOrders: orders.count || 0,
+        totalStores: stores.count || 0,
+        totalUsers: users.count || 0,
+        totalProducts: products.count || 0,
+        totalRevenue,
+        pendingModeration: pendingCount
+      });
     } catch (error) {
-      console.error('Error loading dashboard:', error);
+      console.error('Error loading stats:', error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
@@ -84,287 +89,117 @@ export default function AdminDashboard() {
     }).format(amount);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      pending: 'bg-yellow-100 text-yellow-800',
-      processing: 'bg-blue-100 text-blue-800',
-      shipped: 'bg-purple-100 text-purple-800',
-      delivered: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800',
-    };
-    return colors[status] || 'bg-gray-100 text-gray-800';
-  };
-
-  if (isLoading) {
+  if (loading) {
     return (
-      <AdminLayout>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Loading dashboard...</p>
-          </div>
-        </div>
-      </AdminLayout>
+      <div className="flex items-center justify-center h-96">
+        <div className="animate-spin w-12 h-12 border-4 border-brand-500 border-t-transparent rounded-full" />
+      </div>
     );
   }
 
-  const statCards = [
-    {
-      icon: ShoppingCart,
-      label: 'Total Pesanan',
-      value: stats?.totalOrders || 0,
-      bgColor: 'bg-primary/10',
-      textColor: 'text-primary',
-    },
-    {
-      icon: AlertCircle,
-      label: 'Perlu Diproses',
-      value: stats?.pendingOrders || 0,
-      bgColor: 'bg-yellow-50',
-      textColor: 'text-yellow-600',
-    },
-    {
-      icon: DollarSign,
-      label: 'Total Pendapatan',
-      value: formatCurrency(stats?.totalRevenue || 0),
-      bgColor: 'bg-green-50',
-      textColor: 'text-green-600',
-    },
-    {
-      icon: Users,
-      label: 'Total Pengguna',
-      value: stats?.totalUsers || 0,
-      bgColor: 'bg-purple-50',
-      textColor: 'text-purple-600',
-    },
-    {
-      icon: Package,
-      label: 'Total Produk',
-      value: stats?.totalProducts || 0,
-      bgColor: 'bg-primary/10',
-      textColor: 'text-primary',
-    },
-    {
-      icon: TrendingUp,
-      label: 'Stok Menipis',
-      value: stats?.lowStockProducts || 0,
-      bgColor: 'bg-red-50',
-      textColor: 'text-red-600',
-    },
-  ];
-
   return (
-    <AdminLayout>
-      <div className="space-y-8">
-        {/* Header */}
-        <div>
-          <h1 className="text-2xl font-bold text-primary">Dashboard</h1>
-          <p className="text-gray-500 mt-1">
-            Selamat datang! Berikut ringkasan toko Anda hari ini.
-          </p>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {statCards.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-gray-600">{stat.label}</p>
-                  <p className="text-2xl font-bold text-gray-900 mt-2">
-                    {stat.value}
-                  </p>
-                </div>
-                <div className={`${stat.bgColor} p-3 rounded-lg`}>
-                  <stat.icon className={`${stat.textColor}`} size={24} />
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Revenue Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <BarChart3 className="text-blue-600" size={20} />
-              <h2 className="text-lg font-bold text-gray-900">Revenue Trend (Last 6 Months)</h2>
-            </div>
-            {revenueData.length > 0 ? (
-              <RevenueChart data={revenueData} />
-            ) : (
-              <div className="h-[300px] flex items-center justify-center text-gray-500">
-                No data available
-              </div>
-            )}
-          </motion.div>
-
-          {/* Orders Chart */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <ShoppingCart className="text-green-600" size={20} />
-              <h2 className="text-lg font-bold text-gray-900">Orders Trend (Last 6 Months)</h2>
-            </div>
-            {ordersData.length > 0 ? (
-              <OrdersChart data={ordersData} />
-            ) : (
-              <div className="h-[300px] flex items-center justify-center text-gray-500">
-                No data available
-              </div>
-            )}
-          </motion.div>
-
-          {/* Top Products */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <Package className="text-indigo-600" size={20} />
-              <h2 className="text-lg font-bold text-gray-900">Top Selling Products</h2>
-            </div>
-            {topProducts.length > 0 ? (
-              <TopProductsChart data={topProducts} />
-            ) : (
-              <div className="h-[300px] flex items-center justify-center text-gray-500">
-                No data available
-              </div>
-            )}
-          </motion.div>
-
-          {/* Order Status Distribution */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="bg-white rounded-xl shadow-sm border border-gray-100 p-6"
-          >
-            <div className="flex items-center gap-2 mb-4">
-              <PieChartIcon className="text-purple-600" size={20} />
-              <h2 className="text-lg font-bold text-gray-900">Order Status Distribution</h2>
-            </div>
-            {statusDistribution.length > 0 ? (
-              <OrderStatusChart data={statusDistribution} />
-            ) : (
-              <div className="h-[300px] flex items-center justify-center text-gray-500">
-                No data available
-              </div>
-            )}
-          </motion.div>
-        </div>
-
-        {/* Recent Orders */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="p-6 border-b border-gray-100">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
-              <Link
-                href="/admin/orders"
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-              >
-                View All
-              </Link>
-            </div>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Order Number
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Total
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-100">
-                {recentOrders.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                      No orders yet
-                    </td>
-                  </tr>
-                ) : (
-                  recentOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <Link
-                          href={`/admin/orders`}
-                          className="text-blue-600 hover:text-blue-700 font-medium"
-                        >
-                          {order.order_number}
-                        </Link>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {order.profiles?.full_name || 'N/A'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {formatCurrency(order.total)}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                            order.status
-                          )}`}
-                        >
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(order.created_at)}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+    <div>
+      {/* Stats Widgets */}
+      <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-3 3xl:grid-cols-6">
+        <Widget
+          icon={<MdBarChart className="h-7 w-7" />}
+          title="Total Revenue"
+          subtitle={formatCurrency(stats.totalRevenue)}
+        />
+        <Widget
+          icon={<MdShoppingCart className="h-6 w-6" />}
+          title="Total Orders"
+          subtitle={stats.totalOrders.toString()}
+        />
+        <Widget
+          icon={<MdStore className="h-7 w-7" />}
+          title="Total Stores"
+          subtitle={stats.totalStores.toString()}
+        />
+        <Widget
+          icon={<MdPeople className="h-6 w-6" />}
+          title="Total Users"
+          subtitle={stats.totalUsers.toString()}
+        />
+        <Widget
+          icon={<MdTrendingUp className="h-7 w-7" />}
+          title="Total Products"
+          subtitle={stats.totalProducts.toString()}
+        />
+        <Widget
+          icon={<MdAttachMoney className="h-6 w-6" />}
+          title="Pending Review"
+          subtitle={stats.pendingModeration.toString()}
+        />
       </div>
-    </AdminLayout>
+
+      {/* Quick Actions */}
+      <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
+        <Card extra="p-6">
+          <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-4">
+            Quick Actions
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <a
+              href="/admin/moderation"
+              className="flex items-center gap-3 p-4 rounded-xl bg-lightPrimary hover:bg-brand-100 transition-colors text-navy-700 dark:bg-navy-700 dark:text-white"
+            >
+              <MdBarChart className="h-6 w-6 text-brand-500" />
+              <span className="font-medium">Moderasi Produk</span>
+            </a>
+            <a
+              href="/admin/stores"
+              className="flex items-center gap-3 p-4 rounded-xl bg-lightPrimary hover:bg-brand-100 transition-colors text-navy-700 dark:bg-navy-700 dark:text-white"
+            >
+              <MdStore className="h-6 w-6 text-brand-500" />
+              <span className="font-medium">Kelola Toko</span>
+            </a>
+            <a
+              href="/admin/orders"
+              className="flex items-center gap-3 p-4 rounded-xl bg-lightPrimary hover:bg-brand-100 transition-colors text-navy-700 dark:bg-navy-700 dark:text-white"
+            >
+              <MdShoppingCart className="h-6 w-6 text-brand-500" />
+              <span className="font-medium">Lihat Orders</span>
+            </a>
+            <a
+              href="/admin/settings"
+              className="flex items-center gap-3 p-4 rounded-xl bg-lightPrimary hover:bg-brand-100 transition-colors text-navy-700 dark:bg-navy-700 dark:text-white"
+            >
+              <MdTrendingUp className="h-6 w-6 text-brand-500" />
+              <span className="font-medium">Settings</span>
+            </a>
+          </div>
+        </Card>
+
+        <Card extra="p-6">
+          <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-4">
+            System Status
+          </h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600 dark:text-gray-400">Database</span>
+              <span className="flex items-center gap-2 text-green-500">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                Online
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600 dark:text-gray-400">API Server</span>
+              <span className="flex items-center gap-2 text-green-500">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                Running
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-600 dark:text-gray-400">Moderation Queue</span>
+              <span className="flex items-center gap-2 text-yellow-500">
+                <span className="w-2 h-2 bg-yellow-500 rounded-full"></span>
+                {stats.pendingModeration} pending
+              </span>
+            </div>
+          </div>
+        </Card>
+      </div>
+    </div>
   );
 }

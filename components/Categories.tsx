@@ -18,55 +18,67 @@ const Categories: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Temporarily disabled - use fallback categories
-    // const fetchCategories = async () => {
-    //   try {
-    //     const { data, error } = await supabase
-    //       .from('categories')
-    //       .select('*')
-    //       .eq('is_active', true)
-    //       .order('position', { ascending: true });
-
-    //     if (!error && data) {
-    //       setCategories(data);
-    //     }
-    //   } catch (err) {
-    //     console.error('Error fetching categories:', err);
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-
-    // fetchCategories();
-    setLoading(false); // Use fallback
+    fetchCategories();
   }, []);
 
-  // ALL 24 categories with local images
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      
+      // Try to get main categories from database
+      const response = await fetch('/api/categories-main');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data.length > 0) {
+          setCategories(result.data);
+          setLoading(false);
+          return;
+        }
+      }
+      
+      // Fallback: use Supabase
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('position', { ascending: true });
+
+      if (!error && data) {
+        setCategories(data);
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ALL categories with CORRECT IDs from data-kategori-jadi.json
   const fallbackCategories = [
-    { name: 'Buku & Alat Tulis', slug: 'buku-alat-tulis', image: '/gambar/banner/kategori/Buku & Alat Tulis.png' },
-    { name: 'Aksesoris Fashion', slug: 'aksesoris-fashion', image: '/gambar/banner/kategori/aksesoris fashion.png' },
-    { name: 'Fashion Bayi & Anak', slug: 'fashion-bayi-anak', image: '/gambar/banner/kategori/fashion bayi dan anak.png' },
-    { name: 'Fashion Muslim', slug: 'fashion-muslim', image: '/gambar/banner/kategori/fashion muslim.png' },
-    { name: 'Fotografi', slug: 'fotografi', image: '/gambar/banner/kategori/fotografi.png' },
-    { name: 'Handphone & Aksesoris', slug: 'handphone', image: '/gambar/banner/kategori/handphone aksesoris.png' },
-    { name: 'Hobi & Koleksi', slug: 'hobi-koleksi', image: '/gambar/banner/kategori/hobi dan koleksi.png' },
-    { name: 'Ibu & Bayi', slug: 'ibu-bayi', image: '/gambar/banner/kategori/ibu dan bayi.png' },
-    { name: 'Jam Tangan', slug: 'jam-tangan', image: '/gambar/banner/kategori/jam tangan.png' },
-    { name: 'Kesehatan', slug: 'kesehatan', image: '/gambar/banner/kategori/kesehatan.png' },
-    { name: 'Komputer & Aksesoris', slug: 'komputer', image: '/gambar/banner/kategori/komputer aksesoris.png' },
-    { name: 'Makanan & Minuman', slug: 'makanan-minuman', image: '/gambar/banner/kategori/makanan dan minuman.png' },
-    { name: 'Olahraga & Outdoor', slug: 'olahraga-outdoor', image: '/gambar/banner/kategori/olahraga dan outdoor.png' },
-    { name: 'Otomotif', slug: 'otomotif', image: '/gambar/banner/kategori/otomotif.png' },
-    { name: 'Pakaian Pria', slug: 'pakaian-pria', image: '/gambar/banner/kategori/pakaian pria.png' },
-    { name: 'Pakaian Wanita', slug: 'pakaian-wanita', image: '/gambar/banner/kategori/pakaian wanita.png' },
-    { name: 'Perawatan & Kecantikan', slug: 'perawatan-kecantikan', image: '/gambar/banner/kategori/perawatan dan kecantikan.png' },
-    { name: 'Perlengkapan Rumah', slug: 'perlengkapan-rumah', image: '/gambar/banner/kategori/perlengkapan rumah.png' },
-    { name: 'Sepatu Pria', slug: 'sepatu-pria', image: '/gambar/banner/kategori/sepatu pria.png' },
-    { name: 'Sepatu Wanita', slug: 'sepatu-wanita', image: '/gambar/banner/kategori/sepatu wanita.png' },
-    { name: 'Souvenir & Perlengkapan', slug: 'souvenir', image: '/gambar/banner/kategori/souvenir dan perlengkapan.png' },
-    { name: 'Tas Pria', slug: 'tas-pria', image: '/gambar/banner/kategori/tas pria.png' },
-    { name: 'Tas Wanita', slug: 'tas-wanita', image: '/gambar/banner/kategori/tas wanita.png' },
-    { name: 'Voucher', slug: 'voucher', image: '/gambar/banner/kategori/voucher.png' },
+    { name: 'Pakaian Wanita', slug: 'pakaian-wanita', image: '/gambar/banner/kategori/pakaian wanita.png', catId: '100350' },
+    { name: 'Pakaian Pria', slug: 'pakaian-pria', image: '/gambar/banner/kategori/pakaian pria.png', catId: '100047' },
+    { name: 'Ponsel & Aksesoris', slug: 'ponsel-aksesoris', image: '/gambar/banner/kategori/handphone aksesoris.png', catId: '100071' },
+    { name: 'Komputer & Aksesoris', slug: 'komputer-aksesoris', image: '/gambar/banner/kategori/komputer aksesoris.png', catId: '101944' },
+    { name: 'Buku & Alat Tulis', slug: 'buku-alat-tulis', image: '/gambar/banner/kategori/Buku & Alat Tulis.png', catId: '101330' },
+    { name: 'Aksesoris Mode', slug: 'aksesoris-mode', image: '/gambar/banner/kategori/aksesoris fashion.png', catId: '100021' },
+    { name: 'Fashion Bayi & Anak', slug: 'fashion-bayi-anak', image: '/gambar/banner/kategori/fashion bayi dan anak.png', catId: '101016' },
+    { name: 'Mode Muslim', slug: 'mode-muslim', image: '/gambar/banner/kategori/fashion muslim.png', catId: '100492' },
+    { name: 'Kamera & Drone', slug: 'kamera-drone', image: '/gambar/banner/kategori/fotografi.png', catId: '101092' },
+    { name: 'Hobi & Koleksi', slug: 'hobi-koleksi', image: '/gambar/banner/kategori/hobi dan koleksi.png', catId: '101385' },
+    { name: 'Ibu & Bayi', slug: 'ibu-bayi', image: '/gambar/banner/kategori/ibu dan bayi.png', catId: '100945' },
+    { name: 'Jam Tangan', slug: 'jam-tangan', image: '/gambar/banner/kategori/jam tangan.png', catId: '100573' },
+    { name: 'Kesehatan', slug: 'kesehatan', image: '/gambar/banner/kategori/kesehatan.png', catId: '100003' },
+    { name: 'Makanan & Minuman', slug: 'makanan-minuman', image: '/gambar/banner/kategori/makanan dan minuman.png', catId: '100780' },
+    { name: 'Olahraga & Aktivitas Luar Ruangan', slug: 'olahraga-outdoor', image: '/gambar/banner/kategori/olahraga dan outdoor.png', catId: '101816' },
+    { name: 'Sepeda Motor', slug: 'sepeda-motor', image: '/gambar/banner/kategori/otomotif.png', catId: '100755' },
+    { name: 'Perawatan & Kecantikan', slug: 'perawatan-kecantikan', image: '/gambar/banner/kategori/perawatan dan kecantikan.png', catId: '101607' },
+    { name: 'Perlengkapan Rumah', slug: 'perlengkapan-rumah', image: '/gambar/banner/kategori/perlengkapan rumah.png', catId: '101127' },
+    { name: 'Sepatu Pria', slug: 'sepatu-pria', image: '/gambar/banner/kategori/sepatu pria.png', catId: '100255' },
+    { name: 'Sepatu Wanita', slug: 'sepatu-wanita', image: '/gambar/banner/kategori/sepatu wanita.png', catId: '100585' },
+    { name: 'Tas Pria', slug: 'tas-pria', image: '/gambar/banner/kategori/tas pria.png', catId: '100564' },
+    { name: 'Tas Wanita', slug: 'tas-wanita', image: '/gambar/banner/kategori/tas wanita.png', catId: '100089' },
+    { name: 'Koper & Tas Travel', slug: 'koper-tas-travel', image: '/gambar/banner/kategori/souvenir dan perlengkapan.png', catId: '100320' },
+    { name: 'Elektronik', slug: 'elektronik', image: '/gambar/banner/kategori/voucher.png', catId: '100168' },
   ];
 
   const displayCategories = categories.length > 0 ? categories : fallbackCategories;
@@ -94,11 +106,13 @@ const Categories: React.FC = () => {
           <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-3">
             {displayCategories.map((category) => {
               const imagePath = category.image || `/gambar/banner/kategori/${category.name}.png`;
+              const categorySlug = category.slug || category.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+              const categoryId = category.category_data_id || category.catId || category.id;
 
               return (
                 <Link
-                  key={category.slug}
-                  href={`/products?category=${category.slug}`}
+                  key={category.slug || category.name}
+                  href={`/${categorySlug}-cat.${categoryId}`}
                   className="flex flex-col items-center gap-2 p-2 rounded-xl hover:bg-surface transition-all group cursor-pointer"
                 >
                   <div className="w-14 h-14 rounded-xl overflow-hidden bg-white shadow-sm group-hover:scale-105 transition-transform">

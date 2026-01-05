@@ -20,6 +20,8 @@ const AllProducts: React.FC = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000000]);
   const [sortBy, setSortBy] = useState('newest');
   const [categories, setCategories] = useState<any[]>([]);
+  const [subcategories, setSubcategories] = useState<any[]>([]);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20; // 5 columns x 4 rows
 
@@ -41,8 +43,17 @@ const AllProducts: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (selectedCategory !== 'all') {
+      fetchSubcategories(selectedCategory);
+    } else {
+      setSubcategories([]);
+      setSelectedSubcategories([]);
+    }
+  }, [selectedCategory]);
+
+  useEffect(() => {
     applyFilters();
-  }, [products, searchTerm, selectedCategory, priceRange, sortBy]);
+  }, [products, searchTerm, selectedCategory, selectedSubcategories, priceRange, sortBy]);
 
   const fetchProducts = async () => {
     try {
@@ -77,6 +88,38 @@ const AllProducts: React.FC = () => {
       console.error('Error fetching categories:', error);
       setCategories([]);
     }
+  };
+
+  const fetchSubcategories = async (categoryName: string) => {
+    try {
+      const category = categories.find(cat => cat.id === categoryName);
+      if (!category) return;
+
+      const response = await fetch(`/api/categories?kategori=${encodeURIComponent(category.name)}`);
+      const result = await response.json();
+
+      if (result.success) {
+        setSubcategories(result.data);
+      }
+    } catch (error) {
+      console.error('Error fetching subcategories:', error);
+      setSubcategories([]);
+    }
+  };
+
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    setSelectedSubcategories([]);
+  };
+
+  const handleSubcategoryToggle = (subcategoryName: string) => {
+    setSelectedSubcategories(prev => {
+      if (prev.includes(subcategoryName)) {
+        return prev.filter(s => s !== subcategoryName);
+      } else {
+        return [...prev, subcategoryName];
+      }
+    });
   };
 
   const applyFilters = () => {
@@ -128,6 +171,7 @@ const AllProducts: React.FC = () => {
   const resetFilters = () => {
     setSearchTerm('');
     setSelectedCategory('all');
+    setSelectedSubcategories([]);
     setPriceRange([0, 1000000]);
     setSortBy('newest');
   };
@@ -172,7 +216,7 @@ const AllProducts: React.FC = () => {
                       name="category"
                       value="all"
                       checked={selectedCategory === 'all'}
-                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      onChange={(e) => handleCategoryChange(e.target.value)}
                       className="text-primary focus:ring-primary"
                     />
                     <span>Semua</span>
@@ -184,7 +228,7 @@ const AllProducts: React.FC = () => {
                         name="category"
                         value={category.id}
                         checked={selectedCategory === category.id}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        onChange={(e) => handleCategoryChange(e.target.value)}
                         className="text-primary focus:ring-primary"
                       />
                       <span>{category.name}</span>
@@ -192,6 +236,41 @@ const AllProducts: React.FC = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Subcategories Filter - Only show when category is selected */}
+              {subcategories.length > 0 && (
+                <div className="mb-6 pb-6 border-b">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-bold text-primary">Sub Kategori</h3>
+                    {selectedSubcategories.length > 0 && (
+                      <button
+                        onClick={() => setSelectedSubcategories([])}
+                        className="text-xs text-primary hover:underline"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-2 max-h-60 overflow-y-auto">
+                    {subcategories.map((subcat, index) => (
+                      <label
+                        key={index}
+                        className="flex items-center gap-2 cursor-pointer text-sm hover:text-primary group"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedSubcategories.includes(subcat.name)}
+                          onChange={() => handleSubcategoryToggle(subcat.name)}
+                          className="text-primary focus:ring-primary rounded"
+                        />
+                        <span className="group-hover:translate-x-1 transition-transform text-xs">
+                          {subcat.name}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Price Range Filter */}
               <div>
@@ -223,7 +302,7 @@ const AllProducts: React.FC = () => {
               </div>
 
               {/* Reset Button */}
-              {(selectedCategory !== 'all' || priceRange[0] > 0 || priceRange[1] < 1000000) && (
+              {(selectedCategory !== 'all' || selectedSubcategories.length > 0 || priceRange[0] > 0 || priceRange[1] < 1000000) && (
                 <button
                   onClick={resetFilters}
                   className="w-full mt-4 px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white transition-all text-sm"

@@ -56,7 +56,7 @@ const Categories: React.FC = () => {
   };
 
   // ALL categories with CORRECT IDs from data-kategori-jadi.json
-  const fallbackCategories = [
+  const fallbackCategories: Category[] = [
     { name: 'Pakaian Wanita', slug: 'pakaian-wanita', image: '/gambar/banner/kategori/pakaian wanita.png', catId: '100350' },
     { name: 'Pakaian Pria', slug: 'pakaian-pria', image: '/gambar/banner/kategori/pakaian pria.png', catId: '100047' },
     { name: 'Ponsel & Aksesoris', slug: 'ponsel-aksesoris', image: '/gambar/banner/kategori/handphone aksesoris.png', catId: '100071' },

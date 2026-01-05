@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Play, Database, FileJson, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 export default function SyncCategoriesPage() {
@@ -52,7 +52,7 @@ export default function SyncCategoriesPage() {
     }
   };
 
-  useState(() => {
+  useEffect(() => {
     fetchCounts();
   }, []);
 

@@ -6,11 +6,13 @@ import { supabase } from '@/lib/supabase';
 import Image from 'next/image';
 
 interface Category {
-  id: string;
+  id?: string;
   name: string;
   slug: string;
-  icon: string;
+  icon?: string;
   image?: string;
+  category_data_id?: number;
+  catId?: string;
 }
 
 const Categories: React.FC = () => {

@@ -37,6 +37,7 @@ export default function CategoryPage() {
   const [selectedProvinceId, setSelectedProvinceId] = useState<string | null>(null);
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
+  const [showAllSubcategories, setShowAllSubcategories] = useState(false);
 
   useEffect(() => {
     if (categoryId) {
@@ -240,58 +241,63 @@ export default function CategoryPage() {
                     Semua Produk
                   </Link>
 
-                  {subcategories.map((subcat, index) => {
-                    const subSubcats = getSubSubcategories(subcat.name);
-                    const hasChildren = subSubcats.length > 0;
-                    const isExpanded = expandedSub === subcat.name;
-                    const isSelected = selectedSub === subcat.name;
+                  {subcategories
+                    .slice(0, showAllSubcategories ? subcategories.length : 7)
+                    .map((subcat, index) => {
+                      const subSubcats = getSubSubcategories(subcat.name);
+                      const hasChildren = subSubcats.length > 0;
+                      const isExpanded = expandedSub === subcat.name;
+                      const isSelected = selectedSub === subcat.name;
 
-                    return (
-                      <div key={index}>
-                        <div className="flex items-center">
-                          <Link
-                            href={`/${fullSlug}?sub=${encodeURIComponent(subcat.name)}`}
-                            className={`flex-1 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${isSelected ? 'text-primary font-medium bg-orange-50' : 'text-gray-700'
-                              }`}
-                          >
-                            {subcat.name}
-                          </Link>
-                          {hasChildren && (
-                            <button
-                              onClick={() => setExpandedSub(isExpanded ? null : subcat.name)}
-                              className="px-3 py-2.5 hover:bg-gray-50"
+                      return (
+                        <div key={index}>
+                          <div className="flex items-center">
+                            <Link
+                              href={`/${fullSlug}?sub=${encodeURIComponent(subcat.name)}`}
+                              className={`flex-1 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${isSelected ? 'text-primary font-medium bg-orange-50' : 'text-gray-700'
+                                }`}
                             >
-                              <ChevronDown
-                                className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-                              />
-                            </button>
+                              {subcat.name}
+                            </Link>
+                            {hasChildren && (
+                              <button
+                                onClick={() => setExpandedSub(isExpanded ? null : subcat.name)}
+                                className="px-3 py-2.5 hover:bg-gray-50"
+                              >
+                                <ChevronDown
+                                  className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                                />
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Sub-subcategories */}
+                          {hasChildren && isExpanded && (
+                            <div className="bg-gray-50 border-t">
+                              {subSubcats.map((subSubcat, idx) => (
+                                <Link
+                                  key={idx}
+                                  href={`/${fullSlug}?sub=${encodeURIComponent(subcat.name)}&sub2=${encodeURIComponent(subSubcat)}`}
+                                  className={`block px-8 py-2 text-xs hover:text-primary hover:bg-white transition-colors ${selectedSub2 === subSubcat ? 'text-primary font-medium' : 'text-gray-600'
+                                    }`}
+                                >
+                                  {subSubcat}
+                                </Link>
+                              ))}
+                            </div>
                           )}
                         </div>
+                      );
+                    })}
 
-                        {/* Sub-subcategories */}
-                        {hasChildren && isExpanded && (
-                          <div className="bg-gray-50 border-t">
-                            {subSubcats.map((subSubcat, idx) => (
-                              <Link
-                                key={idx}
-                                href={`/${fullSlug}?sub=${encodeURIComponent(subcat.name)}&sub2=${encodeURIComponent(subSubcat)}`}
-                                className={`block px-8 py-2 text-xs hover:text-primary hover:bg-white transition-colors ${selectedSub2 === subSubcat ? 'text-primary font-medium' : 'text-gray-600'
-                                  }`}
-                              >
-                                {subSubcat}
-                              </Link>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-
-                  {/* "Lainnya" option if more categories */}
-                  {subcategories.length > 15 && (
-                    <button className="w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between">
-                      <span>Lainnya</span>
-                      <ChevronDown className="w-4 h-4" />
+                  {/* "Lainnya" toggle if more categories */}
+                  {subcategories.length > 7 && (
+                    <button
+                      onClick={() => setShowAllSubcategories(!showAllSubcategories)}
+                      className="w-full px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between"
+                    >
+                      <span>{showAllSubcategories ? 'Lebih Sedikit' : 'Lainnya'}</span>
+                      <ChevronDown className={`w-4 h-4 transition-transform ${showAllSubcategories ? 'rotate-180' : ''}`} />
                     </button>
                   )}
                 </div>

@@ -78,7 +78,7 @@ const ProductSection: React.FC = () => {
                 key={tab}
                 variants={staggerItem}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab
+                className={`px-4 py-2 text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab
                   ? 'bg-primary text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-50'
                   }`}
@@ -93,10 +93,10 @@ const ProductSection: React.FC = () => {
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg p-3 animate-pulse">
-                <div className="aspect-square bg-gray-200 rounded-lg mb-2" />
-                <div className="h-4 bg-gray-200 rounded mb-2" />
-                <div className="h-4 bg-gray-200 rounded w-2/3" />
+              <div key={i} className="bg-white p-3 animate-pulse">
+                <div className="aspect-square bg-gray-200 mb-2" />
+                <div className="h-4 bg-gray-200 mb-2" />
+                <div className="h-4 bg-gray-200 w-2/3" />
               </div>
             ))}
           </div>
@@ -118,7 +118,7 @@ const ProductSection: React.FC = () => {
           <div className="text-center mt-6">
             <Link
               href="/products"
-              className="inline-block px-6 py-2.5 bg-white text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition-all font-medium text-sm"
+              className="inline-block px-6 py-2.5 bg-white text-primary border border-primary hover:bg-primary hover:text-white transition-all font-medium text-sm"
             >
               Lihat Semua Produk
             </Link>

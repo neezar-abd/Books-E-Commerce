@@ -76,91 +76,124 @@ export default function AdminStores() {
     };
 
     const handleVerify = async (storeId: string) => {
-        if (!adminId) return;
+        if (!adminId) {
+            showMessage('error', 'Admin ID not found. Please refresh and try again.');
+            return;
+        }
         try {
             await verifyStore(storeId, adminId);
-            showMessage('success', 'Store verified!');
+            showMessage('success', 'Store verified successfully!');
             loadData();
         } catch (err: any) {
-            showMessage('error', err.message);
+            showMessage('error', err.message || 'Failed to verify store');
         }
     };
 
     const handleReject = async () => {
-        if (!adminId || !actionModal.store || !actionReason.trim()) return;
+        if (!adminId || !actionModal.store || !actionReason.trim()) {
+            showMessage('error', 'Please provide a reason');
+            return;
+        }
         try {
             await rejectStore(actionModal.store.id, adminId, actionReason);
-            showMessage('success', 'Store rejected!');
+            showMessage('success', 'Store rejected');
             setActionModal({ show: false, store: null, action: null });
             setActionReason('');
             loadData();
         } catch (err: any) {
-            showMessage('error', err.message);
+            showMessage('error', err.message || 'Failed to reject store');
         }
     };
 
     const handleSuspend = async () => {
-        if (!adminId || !actionModal.store || !actionReason.trim()) return;
+        if (!adminId || !actionModal.store || !actionReason.trim()) {
+            showMessage('error', 'Please provide a reason');
+            return;
+        }
         try {
             await suspendStore(actionModal.store.id, adminId, actionReason);
-            showMessage('success', 'Store suspended!');
+            showMessage('success', 'Store suspended');
             setActionModal({ show: false, store: null, action: null });
             setActionReason('');
             loadData();
         } catch (err: any) {
-            showMessage('error', err.message);
+            showMessage('error', err.message || 'Failed to suspend store');
         }
     };
 
     const handleUnsuspend = async (storeId: string) => {
-        if (!adminId) return;
+        if (!adminId) {
+            showMessage('error', 'Admin ID not found');
+            return;
+        }
         try {
             await unsuspendStore(storeId, adminId);
-            showMessage('success', 'Store unsuspended!');
+            showMessage('success', 'Store unsuspended');
             loadData();
         } catch (err: any) {
-            showMessage('error', err.message);
+            showMessage('error', err.message || 'Failed to unsuspend store');
         }
     };
 
     const getStatusBadge = (status: VerificationStatus) => {
-        const styles: Record<VerificationStatus, string> = {
-            pending: 'bg-yellow-100 text-yellow-800',
-            verified: 'bg-green-100 text-green-800',
-            rejected: 'bg-red-100 text-red-800',
-            suspended: 'bg-gray-800 text-white'
+        const statusConfig = {
+            pending: { bg: 'bg-yellow-100 text-yellow-600', icon: MdPending, text: 'Pending' },
+            verified: { bg: 'bg-green-100 text-green-600', icon: MdVerified, text: 'Verified' },
+            rejected: { bg: 'bg-red-100 text-red-600', icon: MdClose, text: 'Rejected' },
+            suspended: { bg: 'bg-gray-800 text-white', icon: MdBlock, text: 'Suspended' },
         };
-        return <span className={`px-2 py-1 text-xs font-medium rounded-full ${styles[status]}`}>{status}</span>;
+        const config = statusConfig[status];
+        const Icon = config.icon;
+        return (
+            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${config.bg}`}>
+                <Icon className="w-3 h-3" /> {config.text}
+            </span>
+        );
     };
 
     return (
-        <div>
-            {/* Message Toast */}
+        <div className="mt-3 w-full">
+            {/* Notification */}
             {message && (
-                <div className={`fixed top-4 right-4 z-50 px-4 py-2 rounded-lg text-white ${message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
-                    }`}>
+                <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg ${message.type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                    } text-white font-medium`}>
                     {message.text}
                 </div>
             )}
 
             {/* Stats Widgets */}
-            <div className="mt-3 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-4">
-                <Widget icon={<MdPending className="h-6 w-6" />} title="Pending" subtitle={stats?.pendingStores || 0} />
-                <Widget icon={<MdVerified className="h-6 w-6" />} title="Verified" subtitle={stats?.verifiedStores || 0} />
-                <Widget icon={<MdBlock className="h-6 w-6" />} title="Suspended" subtitle={stats?.suspendedStores || 0} />
-                <Widget icon={<MdStore className="h-6 w-6" />} title="Total Stores" subtitle={stats?.totalStores || 0} />
+            <div className="mb-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+                <Widget
+                    icon={<MdPending className="h-7 w-7" />}
+                    title="Pending"
+                    subtitle={String(stats?.pendingStores ?? 0)}
+                />
+                <Widget
+                    icon={<MdVerified className="h-7 w-7" />}
+                    title="Verified"
+                    subtitle={String(stats?.verifiedStores ?? 0)}
+                />
+                <Widget
+                    icon={<MdBlock className="h-7 w-7" />}
+                    title="Suspended"
+                    subtitle={String(stats?.suspendedStores ?? 0)}
+                />
+                <Widget
+                    icon={<MdStore className="h-7 w-7" />}
+                    title="Total Stores"
+                    subtitle={String(stats?.totalStores ?? 0)}
+                />
             </div>
 
-            {/* Filters */}
-            <Card extra="mt-5 p-4">
-                <div className="flex flex-wrap gap-4 items-center">
-                    <div className="relative flex-1 min-w-[200px]">
-                        <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            {/* Search & Filter */}
+            <Card extra="p-4 mb-5">
+                <div className="flex flex-col md:flex-row gap-3">
+                    <div className="relative flex-1">
+                        <MdSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                         <input
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyDown={(e) => e.key === 'Enter' && loadData()}
                             placeholder="Search stores..."
                             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg dark:bg-navy-700 dark:border-navy-600 dark:text-white"
                         />
@@ -173,88 +206,134 @@ export default function AdminStores() {
                         <option value="all">All Status</option>
                         <option value="pending">Pending</option>
                         <option value="verified">Verified</option>
+                        <option value="rejected">Rejected</option>
                         <option value="suspended">Suspended</option>
                     </select>
-                    <button onClick={loadData} className="px-4 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600">
+                    <button
+                        onClick={() => loadData()}
+                        className="px-6 py-2 bg-brand-500 text-white rounded-lg hover:bg-brand-600"
+                    >
                         Filter
                     </button>
                 </div>
             </Card>
 
-            {/* Stores Grid */}
-            <div className="mt-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {isLoading ? (
-                    <div className="col-span-full flex items-center justify-center py-16">
-                        <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
-                    </div>
-                ) : stores.length === 0 ? (
-                    <div className="col-span-full text-center py-16 text-gray-500">
-                        No stores found
-                    </div>
-                ) : (
-                    stores.map(store => (
-                        <Card key={store.id} extra={`p-4 ${store.verification_status === 'suspended' ? 'opacity-60' : ''}`}>
-                            <div className="flex items-start gap-4">
-                                <div className="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
-                                    {store.logo ? (
-                                        <img src={store.logo} alt={store.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                            <MdStore className="h-6 w-6" />
+            {/* Table View (Compact) */}
+            <Card extra="p-0 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead className="bg-gray-50 dark:bg-navy-800 border-b border-gray-200 dark:border-navy-700">
+                            <tr>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Store</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Owner</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Created</th>
+                                <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200 dark:divide-navy-700">
+                            {isLoading ? (
+                                <tr>
+                                    <td colSpan={5} className="px-4 py-12 text-center">
+                                        <div className="flex items-center justify-center">
+                                            <div className="w-10 h-10 border-4 border-brand-500 border-t-transparent rounded-full animate-spin" />
                                         </div>
-                                    )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-semibold text-navy-700 dark:text-white truncate">{store.name}</h3>
-                                    <p className="text-sm text-gray-500">{store.owner?.email || 'N/A'}</p>
-                                    <div className="mt-1">{getStatusBadge(store.verification_status)}</div>
-                                </div>
-                            </div>
+                                    </td>
+                                </tr>
+                            ) : stores.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="px-4 py-12 text-center text-gray-500">
+                                        No stores found
+                                    </td>
+                                </tr>
+                            ) : (
+                                stores.map(store => (
+                                    <tr key={store.id} className={`hover:bg-gray-50 dark:hover:bg-navy-800 ${store.verification_status === 'suspended' ? 'opacity-60' : ''}`}>
+                                        {/* Store Info */}
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
+                                                    {store.logo ? (
+                                                        <img src={store.logo} alt={store.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                                            <MdStore className="h-5 w-5" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="font-medium text-navy-700 dark:text-white">{store.name}</div>
+                                                    {store.description && <div className="text-xs text-gray-500 truncate max-w-xs">{store.description}</div>}
+                                                </div>
+                                            </div>
+                                        </td>
 
-                            {store.suspension_reason && (
-                                <div className="mt-3 p-2 bg-red-50 rounded-lg text-sm text-red-600 dark:bg-red-900/20">
-                                    ⚠️ {store.suspension_reason}
-                                </div>
+                                        {/* Owner */}
+                                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                                            {store.owner?.email || 'N/A'}
+                                        </td>
+
+                                        {/* Status */}
+                                        <td className="px-4 py-3">
+                                            {getStatusBadge(store.verification_status)}
+                                            {store.suspension_reason && (
+                                                <div className="mt-1 text-xs text-red-600">⚠️ {store.suspension_reason}</div>
+                                            )}
+                                        </td>
+
+                                        {/* Created Date */}
+                                        <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400">
+                                            {new Date(store.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                        </td>
+
+                                        {/* Actions */}
+                                        <td className="px-4 py-3">
+                                            <div className="flex items-center justify-center gap-2">
+                                                {store.verification_status === 'pending' && (
+                                                    <>
+                                                        <button
+                                                            onClick={() => handleVerify(store.id)}
+                                                            className="px-3 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-md text-sm font-medium flex items-center gap-1"
+                                                            title="Verify Store"
+                                                        >
+                                                            <MdCheck /> Verify
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setActionModal({ show: true, store, action: 'reject' })}
+                                                            className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-md text-sm font-medium flex items-center gap-1"
+                                                            title="Reject Store"
+                                                        >
+                                                            <MdClose /> Reject
+                                                        </button>
+                                                    </>
+                                                )}
+                                                {store.verification_status === 'verified' && (
+                                                    <button
+                                                        onClick={() => setActionModal({ show: true, store, action: 'suspend' })}
+                                                        className="px-3 py-1.5 bg-gray-800 hover:bg-gray-900 text-white rounded-md text-sm font-medium flex items-center gap-1"
+                                                        title="Suspend Store"
+                                                    >
+                                                        <MdPause /> Suspend
+                                                    </button>
+                                                )}
+                                                {store.verification_status === 'suspended' && (
+                                                    <button
+                                                        onClick={() => handleUnsuspend(store.id)}
+                                                        className="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm font-medium flex items-center gap-1"
+                                                        title="Unsuspend Store"
+                                                    >
+                                                        <MdPlayArrow /> Unsuspend
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
                             )}
-
-                            <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-navy-700">
-                                {store.verification_status === 'pending' && (
-                                    <>
-                                        <button
-                                            onClick={() => handleVerify(store.id)}
-                                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-100 text-green-600 rounded-lg text-sm hover:bg-green-200"
-                                        >
-                                            <MdCheck /> Verify
-                                        </button>
-                                        <button
-                                            onClick={() => setActionModal({ show: true, store, action: 'reject' })}
-                                            className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-100 text-red-600 rounded-lg text-sm hover:bg-red-200"
-                                        >
-                                            <MdClose /> Reject
-                                        </button>
-                                    </>
-                                )}
-                                {store.verification_status === 'verified' && (
-                                    <button
-                                        onClick={() => setActionModal({ show: true, store, action: 'suspend' })}
-                                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-gray-800 text-white rounded-lg text-sm hover:bg-gray-900"
-                                    >
-                                        <MdPause /> Suspend
-                                    </button>
-                                )}
-                                {store.verification_status === 'suspended' && (
-                                    <button
-                                        onClick={() => handleUnsuspend(store.id)}
-                                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
-                                    >
-                                        <MdPlayArrow /> Unsuspend
-                                    </button>
-                                )}
-                            </div>
-                        </Card>
-                    ))
-                )}
-            </div>
+                        </tbody>
+                    </table>
+                </div>
+            </Card>
 
             {/* Action Modal */}
             {actionModal.show && actionModal.store && (
@@ -279,12 +358,16 @@ export default function AdminStores() {
                         <div className="flex gap-3">
                             <button
                                 onClick={actionModal.action === 'reject' ? handleReject : handleSuspend}
-                                className="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                                disabled={!actionReason.trim()}
+                                className="flex-1 py-2 px-4 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 Confirm
                             </button>
                             <button
-                                onClick={() => setActionModal({ show: false, store: null, action: null })}
+                                onClick={() => {
+                                    setActionModal({ show: false, store: null, action: null });
+                                    setActionReason('');
+                                }}
                                 className="flex-1 py-2 px-4 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 dark:bg-navy-700 dark:text-white"
                             >
                                 Cancel

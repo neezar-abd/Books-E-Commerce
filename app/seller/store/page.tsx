@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Store, Save, Loader2, CheckCircle, AlertCircle, ChevronDown } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { regionsService, Province, City } from '@/lib/regions';
 import ImageUpload from '@/components/ImageUpload';
+import LocationSelector from '@/components/LocationSelector';
 
 interface StoreData {
     id: string;
@@ -14,8 +14,10 @@ interface StoreData {
     description: string;
     logo: string;
     banner: string;
-    city: string;
-    province: string;
+    province_id: string | null;
+    city_id: string | null;
+    full_address: string;
+    postal_code: string;
     address: string;
     phone: string;
     email: string;
@@ -26,49 +28,11 @@ export default function SellerStore() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
-    // Province/City state
-    const [provinces, setProvinces] = useState<Province[]>([]);
-    const [cities, setCities] = useState<City[]>([]);
-    const [selectedProvinceId, setSelectedProvinceId] = useState<number | null>(null);
+    const [location, setLocation] = useState<any>(null);
 
     useEffect(() => {
         fetchStore();
-        loadProvinces();
     }, []);
-
-    // Load provinces on mount
-    const loadProvinces = async () => {
-        const data = await regionsService.getProvinces();
-        setProvinces(data);
-    };
-
-    // Load cities when province changes
-    useEffect(() => {
-        if (selectedProvinceId) {
-            loadCities(selectedProvinceId);
-        } else {
-            setCities([]);
-        }
-    }, [selectedProvinceId]);
-
-    const loadCities = async (provinceId: number) => {
-        const data = await regionsService.getCitiesByProvince(provinceId);
-        setCities(data);
-    };
-
-    const handleProvinceChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const provinceId = parseInt(e.target.value);
-        const province = provinces.find(p => p.id === provinceId);
-        setSelectedProvinceId(provinceId || null);
-        setStore(prev => prev ? { ...prev, province: province?.name || '', city: '' } : null);
-    };
-
-    const handleCityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const cityId = parseInt(e.target.value);
-        const city = cities.find(c => c.id === cityId);
-        setStore(prev => prev ? { ...prev, city: city?.name || '' } : null);
-    };
 
     const fetchStore = async () => {
         try {
@@ -118,8 +82,10 @@ export default function SellerStore() {
                 .update({
                     name: store.name,
                     description: store.description,
-                    city: store.city,
-                    province: store.province,
+                    province_id: store.province_id,
+                    city_id: store.city_id,
+                    full_address: store.full_address,
+                    postal_code: store.postal_code,
                     address: store.address,
                     phone: store.phone,
                     email: store.email,
@@ -237,53 +203,41 @@ export default function SellerStore() {
                     />
                 </div>
 
-                {/* Location */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Provinsi</label>
-                        <div className="relative">
-                            <select
-                                value={selectedProvinceId || ''}
-                                onChange={handleProvinceChange}
-                                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20 appearance-none bg-white cursor-pointer"
-                            >
-                                <option value="">Pilih Provinsi</option>
-                                {provinces.map(province => (
-                                    <option key={province.id} value={province.id}>
-                                        {province.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Kota/Kabupaten</label>
-                        <div className="relative">
-                            <select
-                                value={cities.find(c => c.name === store.city)?.id || ''}
-                                onChange={handleCityChange}
-                                disabled={!selectedProvinceId}
-                                className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20 appearance-none bg-white cursor-pointer disabled:bg-gray-100 disabled:cursor-not-allowed"
-                            >
-                                <option value="">{selectedProvinceId ? 'Pilih Kota/Kabupaten' : 'Pilih provinsi dulu'}</option>
-                                {cities.map(city => (
-                                    <option key={city.id} value={city.id}>
-                                        {city.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={20} />
-                        </div>
-                    </div>
+                {/* Location - New LocationSelector Component */}
+                <div className="mb-6">
+                    <LocationSelector
+                        value={location}
+                        onChange={(loc) => {
+                            setLocation(loc);
+                            setStore(prev => prev ? {
+                                ...prev,
+                                province_id: loc.provinceId,
+                                city_id: loc.cityId
+                            } : null);
+                        }}
+                        required
+                    />
                 </div>
 
                 <div className="mb-6">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Alamat Lengkap</label>
                     <textarea
-                        value={store.address || ''}
-                        onChange={(e) => setStore({ ...store, address: e.target.value })}
+                        value={store.full_address || ''}
+                        onChange={(e) => setStore({ ...store, full_address: e.target.value })}
                         rows={2}
+                        placeholder="Jl. Contoh No. 123, RT 001/RW 002"
+                        className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20"
+                    />
+                </div>
+
+                <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Kode Pos</label>
+                    <input
+                        type="text"
+                        value={store.postal_code || ''}
+                        onChange={(e) => setStore({ ...store, postal_code: e.target.value })}
+                        placeholder="40123"
+                        maxLength={5}
                         className="w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary/20"
                     />
                 </div>

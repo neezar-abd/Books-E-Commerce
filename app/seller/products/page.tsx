@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Plus, Search, Package, Save, X, Loader2, Image as ImageIcon, CheckCircle2, Upload } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -25,6 +26,7 @@ interface Product {
 }
 
 export default function SellerProducts() {
+    const router = useRouter();
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<any[]>([]);
     const [storeId, setStoreId] = useState<string | null>(null);
@@ -214,7 +216,7 @@ export default function SellerProducts() {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                 <h1 className="text-2xl font-bold text-primary">Produk Saya</h1>
                 <button
-                    onClick={() => setShowForm(true)}
+                    onClick={() => router.push('/seller/products/new')}
                     className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-xl font-medium hover:bg-primary/90"
                 >
                     <Plus size={18} />
@@ -275,7 +277,7 @@ export default function SellerProducts() {
                             <Package size={48} className="mx-auto mb-4 text-gray-300" />
                             <p className="text-gray-500 mb-4">Belum ada produk</p>
                             <button
-                                onClick={() => setShowForm(true)}
+                                onClick={() => router.push('/seller/products/new')}
                                 className="bg-primary text-white px-6 py-2 rounded-xl font-medium"
                             >
                                 Tambah Produk

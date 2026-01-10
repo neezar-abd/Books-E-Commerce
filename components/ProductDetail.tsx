@@ -1,27 +1,40 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Star, Heart, ShoppingCart, Share2, ChevronLeft, ChevronRight, Check, Truck, Shield, RotateCcw, Loader2, Store } from 'lucide-react';
+import { Star, Heart, ShoppingCart, Share2, Check, Truck, Shield, RotateCcw, Loader2, Store, Package, MapPin, Calendar } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { formatRupiah } from '@/lib/utils';
 import { cartService } from '@/lib/cart';
 import { supabase } from '@/lib/supabase';
 import { browsingHistory } from '@/lib/browsing-history';
+import { getProductVariants, getProductCombinations, ProductVariant, VariantCombination } from '@/lib/product-variants';
+import { getProductShipping, ShippingOption } from '@/lib/shipping';
 
 interface Product {
   id: string;
   title: string;
   brand?: string;
   sku?: string;
-  weight?: number;
+  weight_grams?: number;
+  length_cm?: number;
+  width_cm?: number;
+  height_cm?: number;
   condition?: string;
+  origin_country?: string;
+  warranty_type?: string;
+  warranty_period?: string;
+  gtin?: string;
+  min_purchase?: number;
+  max_purchase?: number;
+  video_url?: string;
   price: number;
   original_price?: number;
+  stock: number;
   rating?: number;
   description: string;
   image: string;
-  stock: number;
+  images?: string[];
   category_id?: string;
   store_id?: string;
   stores?: {
@@ -32,57 +45,135 @@ interface Product {
   };
 }
 
+// Custom interface for transformed combinations
+interface TransformedCombination {
+  id: string;
+  product_id: string;
+  combination: Record<string, string>;
+  price: number;
+  stock: number;
+  sku: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+// Using types from imports
+
 const ProductDetail: React.FC = () => {
   const params = useParams();
   const router = useRouter();
+
+  // Product State
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Variants State
+  const [variants, setVariants] = useState<ProductVariant[]>([]);
+  const [combinations, setCombinations] = useState<TransformedCombination[]>([]);
+  const [selectedVariants, setSelectedVariants] = useState<Record<string, string>>({});
+  const [selectedCombination, setSelectedCombination] = useState<TransformedCombination | null>(null);
+
+  // Shipping State
+  const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
+  const [selectedShipping, setSelectedShipping] = useState<ShippingOption | null>(null);
+
+  // UI State
   const [quantity, setQuantity] = useState(1);
-  const [selectedFormat, setSelectedFormat] = useState('Hardcover');
   const [activeTab, setActiveTab] = useState('deskripsi');
   const [isAddingToCart, setIsAddingToCart] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const productId = params?.id as string;
-        if (!productId) {
-          setError('Product ID not found');
-          return;
-        }
-
-        const { data, error: fetchError } = await supabase
-          .from('products')
-          .select('*, stores(name, slug, city, is_verified)')
-          .eq('id', productId)
-          .single();
-
-        if (fetchError) throw fetchError;
-        if (!data) {
-          setError('Produk tidak ditemukan');
-          return;
-        }
-
-        setProduct(data);
-
-        // Track product view in browsing history
-        if (data.id && data.category_id) {
-          browsingHistory.addProduct(data.id, data.category_id);
-        }
-      } catch (err: any) {
-        console.error('Error fetching product:', err);
-        setError('Gagal memuat produk');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProduct();
+    fetchProductData();
   }, [params?.id]);
+
+  // Update selected combination when variants change
+  useEffect(() => {
+    if (combinations.length > 0 && Object.keys(selectedVariants).length > 0) {
+      const matching = combinations.find(c =>
+        JSON.stringify(c.combination) === JSON.stringify(selectedVariants)
+      );
+      setSelectedCombination(matching || null);
+    }
+  }, [selectedVariants, combinations]);
+
+  const fetchProductData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const productId = params?.id as string;
+      if (!productId) {
+        setError('Product ID not found');
+        return;
+      }
+
+      // Fetch product
+      const { data: productData, error: fetchError } = await supabase
+        .from('products')
+        .select('*, stores(name, slug, city, is_verified)')
+        .eq('id', productId)
+        .single();
+
+      if (fetchError) throw fetchError;
+      if (!productData) {
+        setError('Produk tidak ditemukan');
+        return;
+      }
+
+      setProduct(productData);
+
+      // Track browsing history
+      if (productData.id && productData.category_id) {
+        browsingHistory.addProduct(productData.id, productData.category_id);
+      }
+
+      // Fetch variants
+      const variantsData = await getProductVariants(productId);
+      setVariants(variantsData);
+
+      // Fetch combinations
+      const combinationsData = await getProductCombinations(productId);
+      // Transform combination format
+      const transformedCombinations = combinationsData.map(c => ({
+        ...c,
+        combination: c.combination.reduce((acc, item) => ({
+          ...acc,
+          [item.type]: item.value
+        }), {} as Record<string, string>)
+      }));
+      setCombinations(transformedCombinations);
+
+      // Initialize selected variants if combinations exist
+      if (transformedCombinations.length > 0) {
+        const firstCombo = transformedCombinations[0];
+        setSelectedVariants(firstCombo.combination);
+        setSelectedCombination(firstCombo);
+      }
+
+      // Fetch shipping options
+      const shippingData = await getProductShipping(productId);
+      setShippingOptions(shippingData);
+      if (shippingData.length > 0) {
+        setSelectedShipping(shippingData[0]);
+      }
+
+    } catch (err: any) {
+      console.error('Error fetching product:', err);
+      setError('Gagal memuat produk');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVariantSelect = (type: string, value: string) => {
+    setSelectedVariants(prev => ({
+      ...prev,
+      [type]: value
+    }));
+  };
 
   const handleAddToCart = async () => {
     if (!product) return;
@@ -96,6 +187,40 @@ const ProductDetail: React.FC = () => {
     } finally {
       setIsAddingToCart(false);
     }
+  };
+
+  const getVariantTypes = (): string[] => {
+    return Array.from(new Set(variants.map(v => v.variant_type)));
+  };
+
+  const getVariantValues = (type: string): ProductVariant[] => {
+    return variants.filter(v => v.variant_type === type);
+  };
+
+  const getDisplayPrice = (): number => {
+    if (selectedCombination) {
+      return selectedCombination.price;
+    }
+    return product?.price || 0;
+  };
+
+  const getDisplayStock = (): number => {
+    if (selectedCombination) {
+      return selectedCombination.stock;
+    }
+    return product?.stock || 0;
+  };
+
+  const getShippingCost = (): number => {
+    if (!selectedShipping || !product?.weight_grams) return 0;
+
+    // Calculate shipping cost
+    let price = selectedShipping.base_price;
+    if (selectedShipping.per_kg_price) {
+      const kg = product.weight_grams / 1000;
+      price += selectedShipping.per_kg_price * kg;
+    }
+    return Math.round(price);
   };
 
   if (loading) {
@@ -126,14 +251,16 @@ const ProductDetail: React.FC = () => {
   }
 
   const discount = product.original_price
-    ? Math.round(((product.original_price - product.price) / product.original_price) * 100)
+    ? Math.round(((product.original_price - getDisplayPrice()) / product.original_price) * 100)
     : 0;
 
-  const images = product.image
-    ? [product.image]
-    : ['https://images.unsplash.com/photo-1543002588-bfa74002ed7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'];
+  const allImages = product.images && product.images.length > 0
+    ? product.images
+    : [product.image];
 
-  const formats = ['Hardcover', 'Paperback', 'eBook'];
+  const displayStock = getDisplayStock();
+  const minPurchase = product.min_purchase || 1;
+  const maxPurchase = product.max_purchase || displayStock;
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">
@@ -151,11 +278,12 @@ const ProductDetail: React.FC = () => {
         {/* Main Product Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
 
-          {/* Left: Image */}
+          {/* Left: Images & Video */}
           <div className="space-y-4">
+            {/* Main Image */}
             <div className="relative bg-surface rounded-3xl overflow-hidden">
               <img
-                src={images[0]}
+                src={allImages[currentImageIndex]}
                 alt={product.title}
                 className="w-full h-[500px] object-cover"
               />
@@ -166,7 +294,48 @@ const ProductDetail: React.FC = () => {
                   -{discount}%
                 </div>
               )}
+
+              {/* Image Navigation */}
+              {allImages.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                  {allImages.map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setCurrentImageIndex(idx)}
+                      className={`w-2 h-2 rounded-full ${idx === currentImageIndex ? 'bg-primary' : 'bg-white/50'}`}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* Thumbnail Gallery */}
+            {allImages.length > 1 && (
+              <div className="grid grid-cols-5 gap-3">
+                {allImages.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`aspect-square rounded-lg overflow-hidden border-2 ${idx === currentImageIndex ? 'border-primary' : 'border-gray-200'
+                      }`}
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Video */}
+            {product.video_url && (
+              <div className="rounded-3xl overflow-hidden">
+                <video
+                  src={product.video_url}
+                  controls
+                  className="w-full"
+                  poster={product.image}
+                />
+              </div>
+            )}
           </div>
 
           {/* Right: Product Info */}
@@ -205,60 +374,79 @@ const ProductDetail: React.FC = () => {
 
             {/* Price */}
             <div className="flex items-center gap-4">
-              <span className="text-4xl font-bold text-primary">{formatRupiah(product.price)}</span>
+              <span className="text-4xl font-bold text-primary">{formatRupiah(getDisplayPrice())}</span>
               {product.original_price && (
                 <span className="text-2xl text-gray-400 line-through">{formatRupiah(product.original_price)}</span>
               )}
             </div>
 
-            {/* Description */}
-            <p className="text-gray-600 leading-relaxed">{product.description || 'Tidak ada deskripsi.'}</p>
+            {/* Condition */}
+            {product.condition && (
+              <div className="flex items-center gap-2">
+                <Package size={16} className="text-gray-500" />
+                <span className="text-sm text-gray-600">
+                  Kondisi: <span className="font-medium text-primary capitalize">{product.condition}</span>
+                </span>
+              </div>
+            )}
 
-            {/* Format Selector */}
-            <div>
-              <label className="text-sm font-semibold text-primary mb-3 block">Format:</label>
-              <div className="flex gap-3">
-                {formats.map((format) => (
-                  <button
-                    key={format}
-                    onClick={() => setSelectedFormat(format)}
-                    className={`px-6 py-3 rounded-full border-2 font-medium transition-all ${selectedFormat === format
-                      ? 'border-primary bg-primary text-white'
-                      : 'border-gray-300 text-gray-700 hover:border-primary'
-                      }`}
-                  >
-                    {format}
-                  </button>
+            {/* Variants */}
+            {getVariantTypes().length > 0 && (
+              <div className="space-y-4">
+                {getVariantTypes().map(type => (
+                  <div key={type}>
+                    <label className="text-sm font-semibold text-primary mb-3 block">
+                      Pilih {type}:
+                    </label>
+                    <div className="flex flex-wrap gap-3">
+                      {getVariantValues(type).map((variant) => (
+                        <button
+                          key={variant.id}
+                          onClick={() => handleVariantSelect(type, variant.variant_value)}
+                          className={`px-6 py-3 rounded-full border-2 font-medium transition-all ${selectedVariants[type] === variant.variant_value
+                            ? 'border-primary bg-primary text-white'
+                            : 'border-gray-300 text-gray-700 hover:border-primary'
+                            }`}
+                        >
+                          {variant.variant_value}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
-            </div>
+            )}
 
             {/* Quantity Selector */}
             <div className="flex items-center gap-6">
               <label className="text-sm font-semibold text-primary">Jumlah:</label>
               <div className="flex items-center border-2 border-gray-300 rounded-full overflow-hidden">
                 <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  onClick={() => setQuantity(Math.max(minPurchase, quantity - 1))}
                   className="w-12 h-12 flex items-center justify-center hover:bg-surface transition-colors"
                 >
                   -
                 </button>
                 <span className="w-16 text-center font-bold">{quantity}</span>
                 <button
-                  onClick={() => setQuantity(Math.min(product.stock || 99, quantity + 1))}
+                  onClick={() => setQuantity(Math.min(maxPurchase, quantity + 1))}
                   className="w-12 h-12 flex items-center justify-center hover:bg-surface transition-colors"
                 >
                   +
                 </button>
               </div>
-              <span className="text-sm text-gray-500">Stok: {product.stock || 0}</span>
+              <span className="text-sm text-gray-500">
+                Stok: {displayStock}
+                {minPurchase > 1 && <span className="ml-2">(Min: {minPurchase})</span>}
+                {maxPurchase < displayStock && <span className="ml-2">(Max: {maxPurchase})</span>}
+              </span>
             </div>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={handleAddToCart}
-                disabled={isAddingToCart || product.stock === 0}
+                disabled={isAddingToCart || displayStock === 0}
                 className="flex-1 bg-primary text-white py-4 rounded-full font-bold hover:bg-opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <ShoppingCart size={20} />
@@ -273,7 +461,7 @@ const ProductDetail: React.FC = () => {
             </div>
 
             {/* Stock Info */}
-            {product.stock > 0 ? (
+            {displayStock > 0 ? (
               <div className="flex items-center gap-2 text-green-600">
                 <Check size={18} />
                 <span className="font-medium">Stok Tersedia - Siap Dikirim</span>
@@ -284,13 +472,41 @@ const ProductDetail: React.FC = () => {
               </div>
             )}
 
-            {/* Product Meta */}
-            <div className="border-t border-gray-200 pt-6 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">ID Produk:</span>
-                <span className="font-medium text-primary text-sm">{product.id}</span>
+            {/* Shipping */}
+            {shippingOptions.length > 0 && (
+              <div className="border-t border-gray-200 pt-6">
+                <h3 className="font-semibold text-primary mb-3">Estimasi Pengiriman</h3>
+                <div className="space-y-2">
+                  {shippingOptions.map(option => (
+                    <button
+                      key={option.id}
+                      onClick={() => setSelectedShipping(option)}
+                      className={`w-full text-left p-3 border-2 rounded-lg transition-colors ${selectedShipping?.id === option.id
+                        ? 'border-primary bg-primary/5'
+                        : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium text-primary">{option.courier_name} - {option.service_type}</div>
+                          <div className="text-xs text-gray-500">{option.estimated_days}</div>
+                        </div>
+                        <div className="text-sm font-medium text-primary">
+                          {formatRupiah((() => {
+                            let price = option.base_price;
+                            if (option.per_kg_price && product.weight_grams) {
+                              const kg = product.weight_grams / 1000;
+                              price += option.per_kg_price * kg;
+                            }
+                            return Math.round(price);
+                          })())}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Features */}
             <div className="grid grid-cols-3 gap-4 pt-6">
@@ -317,7 +533,10 @@ const ProductDetail: React.FC = () => {
         <div className="max-w-6xl mx-auto">
           {/* Tab Headers */}
           <div className="flex border-b border-gray-200 mb-8">
-            {[{ key: 'deskripsi', label: 'Deskripsi' }, { key: 'detail', label: 'Informasi Tambahan' }].map((tab) => (
+            {[
+              { key: 'deskripsi', label: 'Deskripsi' },
+              { key: 'spesifikasi', label: 'Spesifikasi Lengkap' }
+            ].map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
@@ -342,9 +561,9 @@ const ProductDetail: React.FC = () => {
               </div>
             )}
 
-            {activeTab === 'detail' && (
+            {activeTab === 'spesifikasi' && (
               <div>
-                <h3 className="text-2xl font-bold text-primary mb-6">Informasi Tambahan</h3>
+                <h3 className="text-2xl font-bold text-primary mb-6">Spesifikasi Lengkap</h3>
                 <table className="w-full">
                   <tbody className="divide-y divide-gray-200">
                     {product.brand && (
@@ -356,13 +575,41 @@ const ProductDetail: React.FC = () => {
                     {product.condition && (
                       <tr>
                         <td className="py-4 text-gray-600 font-medium">Kondisi</td>
-                        <td className="py-4 text-primary font-medium">{product.condition}</td>
+                        <td className="py-4 text-primary font-medium capitalize">{product.condition}</td>
                       </tr>
                     )}
-                    {product.weight && (
+                    {product.origin_country && (
+                      <tr>
+                        <td className="py-4 text-gray-600 font-medium">Negara Asal</td>
+                        <td className="py-4 text-primary font-medium">{product.origin_country}</td>
+                      </tr>
+                    )}
+                    {product.weight_grams && (
                       <tr>
                         <td className="py-4 text-gray-600 font-medium">Berat</td>
-                        <td className="py-4 text-primary font-medium">{product.weight} gram</td>
+                        <td className="py-4 text-primary font-medium">{product.weight_grams} gram</td>
+                      </tr>
+                    )}
+                    {(product.length_cm || product.width_cm || product.height_cm) && (
+                      <tr>
+                        <td className="py-4 text-gray-600 font-medium">Dimensi</td>
+                        <td className="py-4 text-primary font-medium">
+                          {product.length_cm} cm × {product.width_cm} cm × {product.height_cm} cm
+                        </td>
+                      </tr>
+                    )}
+                    {product.warranty_type && (
+                      <tr>
+                        <td className="py-4 text-gray-600 font-medium">Garansi</td>
+                        <td className="py-4 text-primary font-medium">
+                          {product.warranty_type} - {product.warranty_period}
+                        </td>
+                      </tr>
+                    )}
+                    {product.gtin && (
+                      <tr>
+                        <td className="py-4 text-gray-600 font-medium">GTIN / Barcode</td>
+                        <td className="py-4 text-primary font-medium">{product.gtin}</td>
                       </tr>
                     )}
                     {product.sku && (
@@ -373,7 +620,7 @@ const ProductDetail: React.FC = () => {
                     )}
                     <tr>
                       <td className="py-4 text-gray-600 font-medium">Stok</td>
-                      <td className="py-4 text-primary font-medium">{product.stock} unit</td>
+                      <td className="py-4 text-primary font-medium">{displayStock} unit</td>
                     </tr>
                     {product.stores && (
                       <tr>

@@ -7,6 +7,7 @@ import { ChevronRight, ChevronDown } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
+import LocationFilter from '@/components/LocationFilter';
 import { supabase } from '@/lib/supabase';
 import kategoriData from '@/data-kategori-jadi.json';
 
@@ -28,13 +29,13 @@ interface SubCategory {
 export default function CategoryPage() {
   const params = useParams();
   const searchParams = useSearchParams();
-  
+
   // Parse slug: "pakaian-pria-cat.100047"
   const fullSlug = params.slug as string;
   const parts = fullSlug?.split('-cat.') || [];
   const categorySlug = parts[0] || '';
   const categoryId = parts[1] || '';
-  
+
   const selectedSub = searchParams.get('sub');
   const selectedSub2 = searchParams.get('sub2');
 
@@ -44,6 +45,9 @@ export default function CategoryPage() {
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedSub, setExpandedSub] = useState<string | null>(null);
+  const [selectedProvinceId, setSelectedProvinceId] = useState<string | null>(null);
+  const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
+  const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
 
   useEffect(() => {
     if (categoryId) {
@@ -54,7 +58,7 @@ export default function CategoryPage() {
 
   const loadCategoryData = async () => {
     if (!categoryId) return;
-    
+
     try {
       // Get category from database
       const response = await fetch(`/api/sync-categories?id=${categoryId}`);
@@ -79,31 +83,11 @@ export default function CategoryPage() {
           ).map(name => ({ name: name as string }));
 
           setSubcategories(uniqueSub1);
-        }
-      } else {
-        // Fallback to JSON if not found in database
-        const items = (kategoriData as KategoriItem[]).filter(
-          item => item['id kategori']?.toString() === categoryId
-        );
-
-        if (items.length > 0) {
-          const mainCategory = items[0].kategori;
-          setCategoryName(mainCategory);
-
-          const subcats = Array.from(
-            new Set(
-              (kategoriData as KategoriItem[])
-                .filter(item => item.kategori === mainCategory && item['kategori-1'])
-                .map(item => item['kategori-1']!)
-            )
-          ).map(name => ({ name }));
-
-          setSubcategories(subcats);
+          return;
         }
       }
-    } catch (error) {
-      console.error('Error loading category:', error);
-      // Fallback to JSON on error
+
+      // Fallback to JSON if API fails
       const items = (kategoriData as KategoriItem[]).filter(
         item => item['id kategori']?.toString() === categoryId
       );
@@ -122,6 +106,8 @@ export default function CategoryPage() {
 
         setSubcategories(subcats);
       }
+    } catch (error) {
+      console.error('Error loading category:', error);
     }
   };
 
@@ -151,6 +137,7 @@ export default function CategoryPage() {
 
       if (error) throw error;
       setProducts(data || []);
+      setFilteredProducts(data || []);
     } catch (error) {
       console.error('Error fetching products:', error);
     } finally {
@@ -158,21 +145,39 @@ export default function CategoryPage() {
     }
   };
 
+  // Apply location filter
+  useEffect(() => {
+    let filtered = [...products];
+    if (selectedProvinceId) {
+      filtered = filtered.filter(p => p.province_id === selectedProvinceId);
+    }
+    if (selectedCityId) {
+      filtered = filtered.filter(p => p.city_id === selectedCityId);
+    }
+    setFilteredProducts(filtered);
+  }, [products, selectedProvinceId, selectedCityId]);
+
+  const handleLocationChange = (provinceId: string | null, cityId: string | null) => {
+    setSelectedProvinceId(provinceId);
+    setSelectedCityId(cityId);
+  };
+
   const getSubSubcategories = (subcatName: string) => {
     // Return cached if available
     if (subSubcategories[subcatName]) {
       return subSubcategories[subcatName];
     }
-    
+
     // Fetch asynchronously when not cached
     fetchSubSubcategories(subcatName);
-    
+
     // Return empty while loading
     return [];
   };
 
   const fetchSubSubcategories = async (subcatName: string) => {
     try {
+      // Try API first
       const response = await fetch(
         `/api/sync-categories?main=${encodeURIComponent(categoryName)}&sub1=${encodeURIComponent(subcatName)}`
       );
@@ -191,7 +196,27 @@ export default function CategoryPage() {
           ...prev,
           [subcatName]: uniqueSub2
         }));
+        return;
       }
+
+      // Fallback to JSON
+      const uniqueSub2 = Array.from(
+        new Set(
+          (kategoriData as KategoriItem[])
+            .filter(item =>
+              item.kategori === categoryName &&
+              item['kategori-1'] === subcatName &&
+              item['kategori-2'] &&
+              item['kategori-2'] !== '-'
+            )
+            .map(item => item['kategori-2']!)
+        )
+      ) as string[];
+
+      setSubSubcategories(prev => ({
+        ...prev,
+        [subcatName]: uniqueSub2
+      }));
     } catch (error) {
       console.error('Error fetching sub-subcategories:', error);
     }
@@ -200,8 +225,8 @@ export default function CategoryPage() {
   return (
     <div className="min-h-screen font-sans text-primary bg-surface">
       <Header />
-      
-      <main className="pt-6">
+
+      <main className="pt-6 pb-8">
         <div className="container mx-auto px-4 max-w-[1400px]">
           {/* Breadcrumb */}
           <div className="mb-4">
@@ -229,7 +254,7 @@ export default function CategoryPage() {
           <div className="flex gap-4">
             {/* Sidebar - Shopee Style */}
             <aside className="hidden lg:block w-56 flex-shrink-0">
-              <div className="bg-white rounded-lg overflow-hidden shadow-sm">
+              <div className="bg-white overflow-hidden shadow-sm">
                 {/* Main Category Header */}
                 <div className="p-4 border-b">
                   <div className="flex items-center gap-2">
@@ -242,9 +267,8 @@ export default function CategoryPage() {
                 <div className="divide-y">
                   <Link
                     href={`/${fullSlug}`}
-                    className={`block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
-                      !selectedSub ? 'text-primary font-medium bg-orange-50' : 'text-gray-700'
-                    }`}
+                    className={`block px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${!selectedSub ? 'text-primary font-medium bg-orange-50' : 'text-gray-700'
+                      }`}
                   >
                     Semua Produk
                   </Link>
@@ -260,9 +284,8 @@ export default function CategoryPage() {
                         <div className="flex items-center">
                           <Link
                             href={`/${fullSlug}?sub=${encodeURIComponent(subcat.name)}`}
-                            className={`flex-1 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${
-                              isSelected ? 'text-primary font-medium bg-orange-50' : 'text-gray-700'
-                            }`}
+                            className={`flex-1 px-4 py-2.5 text-sm hover:bg-gray-50 transition-colors ${isSelected ? 'text-primary font-medium bg-orange-50' : 'text-gray-700'
+                              }`}
                           >
                             {subcat.name}
                           </Link>
@@ -271,7 +294,7 @@ export default function CategoryPage() {
                               onClick={() => setExpandedSub(isExpanded ? null : subcat.name)}
                               className="px-3 py-2.5 hover:bg-gray-50"
                             >
-                              <ChevronDown 
+                              <ChevronDown
                                 className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
                               />
                             </button>
@@ -285,9 +308,8 @@ export default function CategoryPage() {
                               <Link
                                 key={idx}
                                 href={`/${fullSlug}?sub=${encodeURIComponent(subcat.name)}&sub2=${encodeURIComponent(subSubcat)}`}
-                                className={`block px-8 py-2 text-xs hover:text-primary hover:bg-white transition-colors ${
-                                  selectedSub2 === subSubcat ? 'text-primary font-medium' : 'text-gray-600'
-                                }`}
+                                className={`block px-8 py-2 text-xs hover:text-primary hover:bg-white transition-colors ${selectedSub2 === subSubcat ? 'text-primary font-medium' : 'text-gray-600'
+                                  }`}
                               >
                                 {subSubcat}
                               </Link>
@@ -309,20 +331,30 @@ export default function CategoryPage() {
               </div>
 
               {/* Filters */}
-              <div className="bg-white rounded-lg overflow-hidden shadow-sm mt-4 p-4">
+              <div className="bg-white overflow-hidden shadow-sm mt-4 p-4">
                 <h3 className="font-bold text-sm mb-3 pb-2 border-b">Filter</h3>
-                
-                <div className="space-y-3 text-sm">
+
+                <div className="space-y-4 text-sm">
+                  {/* Location Filter */}
                   <div>
-                    <p className="text-gray-600 mb-2">Harga</p>
+                    <p className="text-gray-600 font-medium mb-2">Lokasi Penjual</p>
+                    <LocationFilter
+                      onFilterChange={handleLocationChange}
+                      className="border-0 shadow-none"
+                    />
+                  </div>
+
+                  {/* Price Filter */}
+                  <div>
+                    <p className="text-gray-600 font-medium mb-2">Harga</p>
                     <div className="flex gap-2">
-                      <input 
-                        type="number" 
+                      <input
+                        type="number"
                         placeholder="Min"
                         className="w-full px-2 py-1 border rounded text-xs"
                       />
-                      <input 
-                        type="number" 
+                      <input
+                        type="number"
                         placeholder="Max"
                         className="w-full px-2 py-1 border rounded text-xs"
                       />
@@ -335,10 +367,13 @@ export default function CategoryPage() {
             {/* Main Content */}
             <div className="flex-1">
               {/* Sort Bar */}
-              <div className="bg-white rounded-lg p-4 mb-4 shadow-sm">
+              <div className="bg-white p-4 mb-4 shadow-sm">
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <div className="text-sm text-gray-600">
-                    <span className="font-medium text-primary">{products.length}</span> Produk
+                    <span className="font-medium text-primary">{filteredProducts.length}</span> Produk
+                    {(selectedProvinceId || selectedCityId) && (
+                      <span className="text-orange-500 ml-2">(filtered by location)</span>
+                    )}
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <span className="text-gray-600">Urutkan:</span>
@@ -353,33 +388,32 @@ export default function CategoryPage() {
               {loading ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
                   {[...Array(20)].map((_, i) => (
-                    <div key={i} className="bg-white rounded-lg aspect-square animate-pulse" />
+                    <div key={i} className="bg-white aspect-square animate-pulse" />
                   ))}
                 </div>
-              ) : products.length > 0 ? (
+              ) : filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-                  {products.map((product) => (
+                  {filteredProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-20 bg-white rounded-lg">
+                <div className="text-center py-20 bg-white">
                   <p className="text-gray-500">Tidak ada produk ditemukan</p>
                 </div>
               )}
 
               {/* Pagination */}
-              {products.length > 0 && (
+              {filteredProducts.length > 0 && (
                 <div className="mt-6 flex justify-center">
                   <div className="flex gap-1">
                     {[1, 2, 3, 4, 5].map((page) => (
                       <button
                         key={page}
-                        className={`w-10 h-10 rounded ${
-                          page === 1 
-                            ? 'bg-primary text-white' 
-                            : 'bg-white hover:bg-gray-50 text-gray-700'
-                        }`}
+                        className={`w-10 h-10 ${page === 1
+                          ? 'bg-primary text-white'
+                          : 'bg-white hover:bg-gray-50 text-gray-700'
+                          }`}
                       >
                         {page}
                       </button>

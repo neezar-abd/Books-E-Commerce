@@ -70,7 +70,7 @@ const Header: React.FC = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
@@ -138,7 +138,7 @@ const Header: React.FC = () => {
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 top-full mt-2 w-48 bg-white shadow-lg rounded-xl border border-gray-100 py-2 z-[200] text-primary text-sm">
+                  <div className="absolute right-0 top-full mt-2 w-48 bg-white shadow-lg border border-gray-100 py-2 z-[200] text-primary text-sm">
                     <Link
                       href="/my-account"
                       className="block px-4 py-2 hover:bg-surface transition-colors"
@@ -200,7 +200,7 @@ const Header: React.FC = () => {
         <div className="container-80 flex items-center gap-6">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="bg-secondary rounded-full p-1.5">
+            <div className="bg-secondary p-1.5">
               <BookOpen size={24} className="text-primary" fill="currentColor" />
             </div>
             <span className="text-2xl font-bold text-white tracking-tight hidden md:inline">
@@ -209,18 +209,18 @@ const Header: React.FC = () => {
           </Link>
 
           {/* Search Bar - Prominent */}
-          <form onSubmit={handleSearch} className="flex-1 max-w-3xl">
+          <form onSubmit={handleSearch} className="flex-1 max-w-5xl">
             <div className="relative flex">
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Cari produk di Zaree..."
-                className="w-full py-2.5 px-4 rounded-l-lg bg-white text-primary placeholder-gray-400 focus:outline-none"
+                className="w-full py-2.5 px-4 bg-white text-primary placeholder-gray-400 focus:outline-none"
               />
               <button
                 type="submit"
-                className="bg-secondary hover:bg-secondary/90 text-primary px-6 rounded-r-lg flex items-center justify-center transition-colors"
+                className="bg-secondary hover:bg-secondary/90 text-primary px-6 flex items-center justify-center transition-colors"
               >
                 <Search size={20} />
               </button>
@@ -231,7 +231,7 @@ const Header: React.FC = () => {
           <Link href="/cart" className="relative text-white hover:text-secondary transition-colors flex-shrink-0">
             <ShoppingCart size={28} />
             {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-white text-primary text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold border-2 border-primary">
+              <span className="absolute -top-2 -right-2 bg-white text-primary text-[10px] w-5 h-5 flex items-center justify-center font-bold border-2 border-primary">
                 {cartCount > 99 ? '99+' : cartCount}
               </span>
             )}
@@ -245,7 +245,7 @@ const Header: React.FC = () => {
 
         {/* Search suggestions (if needed) */}
         <div className="container-80 mt-2 hidden lg:block">
-          <div className="flex items-center gap-3 text-white/80 text-xs overflow-x-auto no-scrollbar">
+          <div className="flex items-center justify-center gap-3 text-white/80 text-xs overflow-x-auto no-scrollbar">
             {['Elektronik', 'Fashion Pria', 'Fashion Wanita', 'Kesehatan', 'Rumah Tangga', 'Makanan'].map((tag) => (
               <Link
                 key={tag}
@@ -256,31 +256,6 @@ const Header: React.FC = () => {
               </Link>
             ))}
           </div>
-        </div>
-      </div>
-
-      {/* Navigation Row */}
-      <div className="bg-white border-b border-gray-100 hidden lg:block">
-        <div className="container-80">
-          <nav className="flex items-center gap-8 py-3 text-sm font-medium text-primary">
-            {[
-              { label: 'Beranda', href: '/' },
-              { label: 'Semua Produk', href: '/products' },
-              { label: 'Kategori', href: '/#categories' },
-              { label: 'Flash Sale', href: '/#flash-sale' },
-              { label: 'Bestseller', href: '/#bestsellers' },
-              { label: 'Promo', href: '/#promo' },
-              { label: 'Kontak', href: '/contact' },
-            ].map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="hover:text-secondary transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
         </div>
       </div>
 
@@ -299,7 +274,7 @@ const Header: React.FC = () => {
               <Link
                 key={link.label}
                 href={link.href}
-                className="block py-3 px-4 text-primary font-medium hover:bg-surface rounded-lg transition-colors"
+                className="block py-3 px-4 text-primary font-medium hover:bg-surface transition-colors"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {link.label}

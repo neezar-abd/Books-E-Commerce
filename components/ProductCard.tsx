@@ -42,7 +42,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
 
     return (
         <Link href={`/product/${product.id}`} className="group block h-full">
-            <div className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col">
+            <div className="bg-white overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 h-full flex flex-col">
                 <div className="relative aspect-square overflow-hidden bg-gray-100">
                     <img
                         src={product.image || '/images/placeholder-product.png'}
@@ -57,7 +57,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
                     {/* Discount Badge */}
                     {product.discount && (
                         <div className="absolute top-2 left-2 z-10">
-                            <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
+                            <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5">
                                 -{product.discount}%
                             </span>
                         </div>
@@ -65,7 +65,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
 
                     {/* Promo Badge */}
                     <div className="absolute top-2 right-2 z-10">
-                        <span className="bg-secondary text-primary text-[9px] font-bold px-1.5 py-0.5 rounded">
+                        <span className="bg-secondary text-primary text-[9px] font-bold px-1.5 py-0.5">
                             PROMO
                         </span>
                     </div>
@@ -109,7 +109,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
                             <Store size={10} />
                             <span className="truncate font-medium">{product.stores.name}</span>
                             {product.stores.is_verified && (
-                                <span className="text-[8px] bg-blue-100 text-blue-600 px-1 rounded">✓</span>
+                                <span className="text-[8px] bg-blue-100 text-blue-600 px-1">✓</span>
                             )}
                         </div>
                     )}

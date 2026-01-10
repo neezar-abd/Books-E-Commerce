@@ -59,7 +59,24 @@ scripts/clear-*.js
 scripts/import-*.js
 scripts/debug-*.js
 scripts/quick-*.js
+
+# Debug output files
 *-mapping-result.txt
 *-analysis.txt
-kategori.xlsx
+*-output.txt
+*-output.log
+*-check.txt
+*-debug.txt
+brand-*.txt
+brands-*.txt
+category-*.txt
+db-*.txt
+excel-*.txt
+excel-structure.json
+import-log.txt
+mapping-dictionary.txt
 sheet*.txt
+dev.log
+dev-output.log
+build-output.txt
+kategori.xlsx

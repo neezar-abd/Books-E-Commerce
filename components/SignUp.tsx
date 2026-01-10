@@ -241,6 +241,7 @@ const SignUp: React.FC = () => {
             {/* Google Sign Up */}
             <button
               type="button"
+              onClick={handleGoogleSignUp}
               className="w-full border-2 border-gray-200 py-4 rounded-full font-bold text-primary hover:border-primary transition-all flex items-center justify-center gap-3"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">

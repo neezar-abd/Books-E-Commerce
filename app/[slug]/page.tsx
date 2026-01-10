@@ -9,17 +9,6 @@ import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import LocationFilter from '@/components/LocationFilter';
 import { supabase } from '@/lib/supabase';
-import kategoriData from '@/data-kategori-jadi.json';
-
-interface KategoriItem {
-  kategori: string;
-  'kategori-1'?: string;
-  'kategori-2'?: string;
-  'kategori-3'?: string;
-  'kategori-4'?: string;
-  'id kategori': number;
-  'gbr-1'?: string;
-}
 
 interface SubCategory {
   name: string;
@@ -87,27 +76,14 @@ export default function CategoryPage() {
         }
       }
 
-      // Fallback to JSON if API fails
-      const items = (kategoriData as KategoriItem[]).filter(
-        item => item['id kategori']?.toString() === categoryId
-      );
-
-      if (items.length > 0) {
-        const mainCategory = items[0].kategori;
-        setCategoryName(mainCategory);
-
-        const subcats = Array.from(
-          new Set(
-            (kategoriData as KategoriItem[])
-              .filter(item => item.kategori === mainCategory && item['kategori-1'])
-              .map(item => item['kategori-1']!)
-          )
-        ).map(name => ({ name }));
-
-        setSubcategories(subcats);
-      }
+      // If API fails, show empty state
+      console.log('Category not found in database');
+      setCategoryName('Kategori Tidak Ditemukan');
+      setSubcategories([]);
     } catch (error) {
       console.error('Error loading category:', error);
+      setCategoryName('Kategori Tidak Ditemukan');
+      setSubcategories([]);
     }
   };
 

@@ -1,19 +1,17 @@
 import { NextResponse } from 'next/server';
-import kategoriData from '@/data-kategori-jadi.json';
+import { createClient } from '@supabase/supabase-js';
 
-// Interface untuk kategori data
-interface KategoriItem {
-  kategori: string;
-  'kategori-1'?: string;
-  'kategori-2'?: string;
-  'kategori-3'?: string;
-  'kategori-4'?: string;
-  'id kategori': number;
-  'gbr-1'?: string;
-  'gbr-2'?: string;
-  'gbr-3'?: string;
-  '4'?: string;
-}
+// Server-side Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  }
+);
 
 export async function GET(request: Request) {
   try {
@@ -24,41 +22,50 @@ export async function GET(request: Request) {
 
     // Get category by ID
     if (categoryId) {
-      const item = (kategoriData as KategoriItem[]).find(
-        (i) => i['id kategori'].toString() === categoryId
-      );
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('category_data_id', parseInt(categoryId))
+        .single();
 
-      if (item) {
+      if (error) throw error;
+
+      if (data) {
         return NextResponse.json({
           success: true,
           data: {
-            id: item['id kategori'],
-            name: item.kategori,
-            subcategory1: item['kategori-1'],
-            subcategory2: item['kategori-2'],
-            subcategory3: item['kategori-3'],
-            image: item['gbr-1'],
+            id: data.category_data_id,
+            name: data.main_category,
+            subcategory1: data.sub1,
+            subcategory2: data.sub2,
+            subcategory3: data.sub3,
+            image: data.image,
           },
         });
       }
     }
 
-    // Jika tidak ada parameter, return semua kategori utama
+    // Return all main categories
     if (!kategori) {
-      const allCategories = Array.from(
-        new Set(
-          (kategoriData as KategoriItem[]).map((item) => item.kategori)
-        )
-      ).map((cat) => {
-        const item = (kategoriData as KategoriItem[]).find(
-          (i) => i.kategori === cat
-        );
-        return {
-          name: cat,
-          image: item?.['gbr-1'] || '',
-          id: item?.['id kategori'],
-        };
-      });
+      const { data, error } = await supabase
+        .from('categories')
+        .select('main_category, image, category_data_id')
+        .order('category_data_id');
+
+      if (error) throw error;
+
+      // Get unique main categories
+      const uniqueCategories = Array.from(
+        new Map(
+          data.map(item => [item.main_category, item])
+        ).values()
+      );
+
+      const allCategories = uniqueCategories.map(cat => ({
+        name: cat.main_category,
+        image: cat.image || '',
+        id: cat.category_data_id,
+      }));
 
       return NextResponse.json({
         success: true,
@@ -66,65 +73,66 @@ export async function GET(request: Request) {
       });
     }
 
-    // Jika ada parameter kategori, return subkategori level 1
+    // Return subcategories level 1
     if (kategori && !subkategori1) {
-      const subcategories = Array.from(
-        new Set(
-          (kategoriData as KategoriItem[])
-            .filter((item) => item.kategori === kategori && item['kategori-1'])
-            .map((item) => item['kategori-1'])
-        )
-      ).map((subcat) => {
-        const item = (kategoriData as KategoriItem[]).find(
-          (i) => i.kategori === kategori && i['kategori-1'] === subcat
-        );
-        return {
-          name: subcat,
-          image: item?.['gbr-1'] || '',
-          kategori: kategori,
-          id: item?.['id kategori'],
-        };
-      });
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('main_category', kategori)
+        .not('sub1', 'is', null);
+
+      if (error) throw error;
+
+      // Get unique sub1 values
+      const uniqueSub1 = Array.from(
+        new Map(
+          data.map(item => [item.sub1, item])
+        ).values()
+      );
+
+      const subcategories = uniqueSub1.map(item => ({
+        name: item.sub1,
+        image: item.image || '',
+        kategori: kategori,
+        id: item.category_data_id,
+      })).filter(s => s.name);
 
       return NextResponse.json({
         success: true,
-        data: subcategories.filter((s) => s.name),
+        data: subcategories,
       });
     }
 
-    // Jika ada kategori dan subkategori1, return subkategori level 2
+    // Return subcategories level 2
     if (kategori && subkategori1) {
-      const subcategories = Array.from(
-        new Set(
-          (kategoriData as KategoriItem[])
-            .filter(
-              (item) =>
-                item.kategori === kategori &&
-                item['kategori-1'] === subkategori1 &&
-                item['kategori-2'] &&
-                item['kategori-2'] !== '-'
-            )
-            .map((item) => item['kategori-2'])
-        )
-      ).map((subcat) => {
-        const item = (kategoriData as KategoriItem[]).find(
-          (i) =>
-            i.kategori === kategori &&
-            i['kategori-1'] === subkategori1 &&
-            i['kategori-2'] === subcat
-        );
-        return {
-          name: subcat,
-          image: item?.['gbr-1'] || '',
-          kategori: kategori,
-          subkategori1: subkategori1,
-          id: item?.['id kategori'],
-        };
-      });
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('main_category', kategori)
+        .eq('sub1', subkategori1)
+        .not('sub2', 'is', null);
+
+      if (error) throw error;
+
+      // Get unique sub2 values and filter out '-'
+      const uniqueSub2 = Array.from(
+        new Map(
+          data.filter(item => item.sub2 && item.sub2 !== '-')
+            .map(item => [item.sub2, item])
+        ).values()
+      );
+
+      const subcategories = uniqueSub2.map(item => ({
+        name: item.sub2,
+        image: item.image || '',
+        kategori: kategori,
+        subkategori1: subkategori1,
+        id: item.category_data_id,
+      })).filter(s => s.name);
 
       return NextResponse.json({
         success: true,
-        data: subcategories.filter((s) => s.name),
+        data: subcategories,
       });
     }
 

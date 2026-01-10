@@ -50,3 +50,16 @@ lerna-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Import/Debug Scripts (temporary)
+scripts/check-*.js
+scripts/check-*.sql
+scripts/analyze-*.js
+scripts/clear-*.js
+scripts/import-*.js
+scripts/debug-*.js
+scripts/quick-*.js
+*-mapping-result.txt
+*-analysis.txt
+kategori.xlsx
+sheet*.txt

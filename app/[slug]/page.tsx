@@ -8,6 +8,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import LocationFilter from '@/components/LocationFilter';
+import BrandFilter from '@/components/BrandFilter';
 import { supabase } from '@/lib/supabase';
 
 interface SubCategory {
@@ -38,13 +39,14 @@ export default function CategoryPage() {
   const [selectedCityId, setSelectedCityId] = useState<string | null>(null);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [showAllSubcategories, setShowAllSubcategories] = useState(false);
+  const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
 
   useEffect(() => {
     if (categoryId) {
       loadCategoryData();
       fetchProducts();
     }
-  }, [categoryId, selectedSub, selectedSub2]);
+  }, [categoryId, selectedSub, selectedSub2, selectedBrand]);
 
   const loadCategoryData = async () => {
     if (!categoryId) return;
@@ -122,17 +124,25 @@ export default function CategoryPage() {
     }
   };
 
-  // Apply location filter
+  // Apply location and brand filters
   useEffect(() => {
     let filtered = [...products];
+
+    // Location filter
     if (selectedProvinceId) {
       filtered = filtered.filter(p => p.province_id === selectedProvinceId);
     }
     if (selectedCityId) {
       filtered = filtered.filter(p => p.city_id === selectedCityId);
     }
+
+    // Brand filter
+    if (selectedBrand) {
+      filtered = filtered.filter(p => p.brand && p.brand.toLowerCase() === selectedBrand.toLowerCase());
+    }
+
     setFilteredProducts(filtered);
-  }, [products, selectedProvinceId, selectedCityId]);
+  }, [products, selectedProvinceId, selectedCityId, selectedBrand]);
 
   const handleLocationChange = (provinceId: string | null, cityId: string | null) => {
     setSelectedProvinceId(provinceId);
@@ -316,6 +326,15 @@ export default function CategoryPage() {
                       className="border-0 shadow-none"
                     />
                   </div>
+
+                  {/* Brand Filter */}
+                  <BrandFilter
+                    category={categoryName}
+                    subcategory={selectedSub || undefined}
+                    selectedBrand={selectedBrand}
+                    onFilterChange={setSelectedBrand}
+                    className="border-0 shadow-none"
+                  />
 
                   {/* Price Filter */}
                   <div>

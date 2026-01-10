@@ -175,26 +175,17 @@ export default function CategoryPage() {
         return;
       }
 
-      // Fallback to JSON
-      const uniqueSub2 = Array.from(
-        new Set(
-          (kategoriData as KategoriItem[])
-            .filter(item =>
-              item.kategori === categoryName &&
-              item['kategori-1'] === subcatName &&
-              item['kategori-2'] &&
-              item['kategori-2'] !== '-'
-            )
-            .map(item => item['kategori-2']!)
-        )
-      ) as string[];
-
+      // If API fails, set empty array
       setSubSubcategories(prev => ({
         ...prev,
-        [subcatName]: uniqueSub2
+        [subcatName]: []
       }));
     } catch (error) {
       console.error('Error fetching sub-subcategories:', error);
+      setSubSubcategories(prev => ({
+        ...prev,
+        [subcatName]: []
+      }));
     }
   };
 

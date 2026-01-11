@@ -32,6 +32,7 @@ interface Product {
   original_price?: number;
   stock: number;
   rating?: number;
+  total_sold?: number;
   description: string;
   image: string;
   images?: string[];
@@ -339,54 +340,92 @@ const ProductDetail: React.FC = () => {
           </div>
 
           {/* Right: Product Info */}
-          <div className="space-y-6">
-            {/* Store Info */}
-            {product.stores && (
-              <Link
-                href={`/store/${product.stores.slug}`}
-                className="inline-flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <Store size={16} className="text-primary" />
-                <span className="text-sm font-medium text-primary">{product.stores.name}</span>
-                {product.stores.is_verified && (
-                  <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">✓ Verified</span>
-                )}
-              </Link>
-            )}
-
-            {/* Title & Brand */}
+          <div className="space-y-4">
+            {/* Title */}
             <div>
-              <h1 className="text-4xl font-bold text-primary mb-2">{product.title}</h1>
+              <h1 className="text-2xl font-bold text-primary leading-tight">{product.title}</h1>
+            </div>
+
+            {/* Rating, Sold & Brand */}
+            <div className="flex items-center gap-4 text-sm">
+              <div className="flex items-center gap-1">
+                <Star size={14} className="fill-secondary text-secondary" />
+                <span className="font-bold text-primary">{product.rating || '4.9'}</span>
+              </div>
+              <span className="text-gray-300">|</span>
+              <div className="text-gray-600">
+                <span className="font-semibold text-primary">{product.total_sold || 0}</span> Terjual
+              </div>
               {product.brand && (
-                <p className="text-lg text-muted">Brand: <span className="font-semibold text-primary">{product.brand}</span></p>
+                <>
+                  <span className="text-gray-300">|</span>
+                  <div className="text-gray-600">
+                    Brand: <span className="font-semibold text-primary">{product.brand}</span>
+                  </div>
+                </>
               )}
             </div>
 
-            {/* Rating */}
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={18} className={i < Math.floor(product.rating || 4.5) ? "fill-secondary text-secondary" : "text-gray-300"} />
-                ))}
-                <span className="ml-2 font-bold text-primary">{product.rating || '4.5'}</span>
+            {/* Price Section - More Prominent */}
+            <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="flex items-baseline gap-3">
+                <span className="text-3xl font-bold text-primary">{formatRupiah(getDisplayPrice())}</span>
+                {product.original_price && discount > 0 && (
+                  <>
+                    <span className="text-lg text-gray-400 line-through">{formatRupiah(product.original_price)}</span>
+                    <span className="bg-secondary text-primary text-sm font-bold px-2 py-1 rounded">-{discount}%</span>
+                  </>
+                )}
               </div>
             </div>
 
-            {/* Price */}
-            <div className="flex items-center gap-4">
-              <span className="text-4xl font-bold text-primary">{formatRupiah(getDisplayPrice())}</span>
-              {product.original_price && (
-                <span className="text-2xl text-gray-400 line-through">{formatRupiah(product.original_price)}</span>
-              )}
+            {/* Store Info */}
+            {product.stores && (
+              <div className="border border-gray-200 rounded-lg p-3">
+                <Link
+                  href={`/store/${product.stores.slug}`}
+                  className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+                >
+                  <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                    <Store size={20} className="text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-primary">{product.stores.name}</span>
+                      {product.stores.is_verified && (
+                        <span className="text-[10px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">✓</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-gray-500">
+                      <MapPin size={12} />
+                      <span>{product.stores.city}</span>
+                    </div>
+                  </div>
+                </Link>
+              </div>
+            )}
+
+            {/* Shipping Info - Compact */}
+            <div className="border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center gap-2 text-sm">
+                <Truck size={16} className="text-gray-500" />
+                <span className="text-gray-600">Pengiriman</span>
+              </div>
+              <div className="mt-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <MapPin size={14} className="text-gray-400" />
+                  <span className="text-gray-600">Estimasi tiba</span>
+                  <span className="font-semibold text-primary">2-4 hari</span>
+                </div>
+              </div>
             </div>
 
             {/* Condition */}
             {product.condition && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 text-sm">
                 <Package size={16} className="text-gray-500" />
-                <span className="text-sm text-gray-600">
-                  Kondisi: <span className="font-medium text-primary capitalize">{product.condition}</span>
-                </span>
+                <span className="text-gray-600">Kondisi:</span>
+                <span className="font-semibold text-primary capitalize">{product.condition}</span>
               </div>
             )}
 
@@ -418,45 +457,40 @@ const ProductDetail: React.FC = () => {
             )}
 
             {/* Quantity Selector */}
-            <div className="flex items-center gap-6">
-              <label className="text-sm font-semibold text-primary">Jumlah:</label>
-              <div className="flex items-center border-2 border-gray-300 rounded-full overflow-hidden">
+            <div className="border border-gray-200 rounded-lg p-3">
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-sm font-semibold text-primary">Kuantitas</label>
+                <span className="text-xs text-gray-500">Stok: {displayStock}</span>
+              </div>
+              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden w-32">
                 <button
                   onClick={() => setQuantity(Math.max(minPurchase, quantity - 1))}
-                  className="w-12 h-12 flex items-center justify-center hover:bg-surface transition-colors"
+                  className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors text-lg"
                 >
                   -
                 </button>
-                <span className="w-16 text-center font-bold">{quantity}</span>
+                <span className="flex-1 text-center font-semibold">{quantity}</span>
                 <button
                   onClick={() => setQuantity(Math.min(maxPurchase, quantity + 1))}
-                  className="w-12 h-12 flex items-center justify-center hover:bg-surface transition-colors"
+                  className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors text-lg"
                 >
                   +
                 </button>
               </div>
-              <span className="text-sm text-gray-500">
-                Stok: {displayStock}
-                {minPurchase > 1 && <span className="ml-2">(Min: {minPurchase})</span>}
-                {maxPurchase < displayStock && <span className="ml-2">(Max: {maxPurchase})</span>}
-              </span>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex gap-3">
               <button
                 onClick={handleAddToCart}
                 disabled={isAddingToCart || displayStock === 0}
-                className="flex-1 bg-primary text-white py-4 rounded-full font-bold hover:bg-opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 border-2 border-primary text-primary py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2 disabled:opacity-50"
               >
-                <ShoppingCart size={20} />
-                {isAddingToCart ? 'Menambahkan...' : 'Tambah ke Keranjang'}
+                <ShoppingCart size={18} />
+                {isAddingToCart ? 'Menambahkan...' : 'Keranjang'}
               </button>
-              <button className="flex-1 bg-secondary text-primary py-4 rounded-full font-bold hover:bg-opacity-90 transition-all">
+              <button className="flex-1 bg-primary text-white py-3 rounded-lg font-semibold hover:bg-opacity-90 transition-all">
                 Beli Sekarang
-              </button>
-              <button className="w-14 h-14 border-2 border-gray-300 rounded-full flex items-center justify-center hover:border-primary hover:text-primary transition-all flex-shrink-0">
-                <Heart size={20} />
               </button>
             </div>
 

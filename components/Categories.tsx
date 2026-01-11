@@ -83,7 +83,7 @@ const Categories: React.FC = () => {
         <section className="py-6 bg-white" id="categories">
             <div className="container-80">
                 <div className="mb-4">
-                    <h2 className="text-lg font-bold text-primary">KATEGORI</h2>
+                    <h2 className="text-2xl font-bold text-primary">Kategori</h2>
                 </div>
 
                 {loading ? (

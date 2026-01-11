@@ -45,12 +45,9 @@ const RecommendedProducts: React.FC = () => {
             <div className="container-80">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                        <Sparkles className="text-secondary" size={28} />
-                        <h2 className="text-2xl font-bold text-primary">
-                            {title}
-                        </h2>
-                    </div>
+                    <h2 className="text-2xl font-bold text-primary">
+                        {title}
+                    </h2>
                     <Link
                         href="/products"
                         className="text-secondary hover:text-primary transition-colors flex items-center gap-2 font-medium"

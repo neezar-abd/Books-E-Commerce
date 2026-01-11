@@ -1,0 +1,130 @@
+﻿[dotenv@17.2.3] injecting env (8) from .env.local -- tip: ΓÜÖ∩╕Å  override existing env vars with { override: true }
+≡ƒÜÇ Starting bulk product upload...
+
+≡ƒùæ∩╕Å  Deleting all existing products...
+Γ£à All products deleted successfully!
+≡ƒôü Reading CSV file: D:\Dokumen\lumina-books (1)\produk-elektronik-test.csv
+≡ƒôè Found 984 rows in CSV
+
+≡ƒöä Uploading 984 products to database...
+node.exe : Γ¥î Error 
+uploading batch 1: {
+At C:\Program 
+Files\nodejs\npx.ps1:29 
+char:3
++   & $NODE_EXE $NPX_CLI_JS 
+$args
++   ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~
+    + CategoryInfo          
+    : NotSpecified: (Γ¥î E  
+  rror uploading batch 1:   
+  {:String) [], RemoteEx    
+ception
+    + FullyQualifiedErrorId 
+    : NativeCommandError
+ 
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find 
+the 'weight' column of 
+'products' in the schema 
+cache"
+}
+Γ¥î Error uploading batch 
+2: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find 
+the 'weight' column of 
+'products' in the schema 
+cache"
+}
+Γ¥î Error uploading batch 
+3: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find 
+the 'weight' column of 
+'products' in the schema 
+cache"
+}
+Γ¥î Error uploading batch 
+4: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find 
+the 'weight' column of 
+'products' in the schema 
+cache"
+}
+Γ¥î Error uploading batch 
+5: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find 
+the 'weight' column of 
+'products' in the schema 
+cache"
+}
+Γ¥î Error uploading batch 
+6: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find 
+the 'weight' column of 
+'products' in the schema 
+cache"
+}
+Γ¥î Error uploading batch 
+7: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find 
+the 'weight' column of 
+'products' in the schema 
+cache"
+}
+Γ¥î Error uploading batch 
+8: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find 
+the 'weight' column of 
+'products' in the schema 
+cache"
+}
+Γ¥î Error uploading batch 
+9: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find 
+the 'weight' column of 
+'products' in the schema 
+cache"
+}
+Γ¥î Error uploading batch 
+10: {
+  code: 'PGRST204',
+  details: null,
+  hint: null,
+  message: "Could not find 
+the 'weight' column of 
+'products' in the schema 
+cache"
+}
+
+≡ƒôè Upload Summary:
+Γ£à Successfully uploaded: 0 products
+Γ¥î Failed: 984 products
+
+Γ£à Bulk upload completed successfully!

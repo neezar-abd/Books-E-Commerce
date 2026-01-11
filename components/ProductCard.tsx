@@ -74,7 +74,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
                 {/* Content */}
                 <div className="p-3 flex flex-col flex-1">
                     {/* Title */}
-                    <h3 className="text-sm text-primary font-medium leading-tight mb-2 line-clamp-2 min-h-[40px] group-hover:text-secondary transition-colors">
+                    <h3 className="text-sm text-primary font-medium leading-tight mb-2 line-clamp-2 overflow-hidden group-hover:text-orange-600 transition-colors" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                         {product.title}
                     </h3>
 

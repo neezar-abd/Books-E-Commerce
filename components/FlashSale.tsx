@@ -32,7 +32,7 @@ const FlashSale: React.FC = () => {
                   <div className="bg-[#F5F5F5] rounded-3xl p-12 flex flex-col justify-center relative overflow-hidden h-full">
                      <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-3xl"></div>
 
-                     <h2 className="text-4xl font-bold text-primary mb-2">Produk <span className="text-secondary">Terlaris!</span></h2>
+                     <h2 className="text-2xl font-bold text-primary mb-2">Produk <span className="text-secondary">Terlaris!</span></h2>
                      <p className="text-gray-500 mb-8">Diskon 25% semua Hardcover - Penawaran Terbatas!</p>
 
                      <div className="flex items-center gap-4 mb-8">

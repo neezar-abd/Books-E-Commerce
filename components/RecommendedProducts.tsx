@@ -47,7 +47,7 @@ const RecommendedProducts: React.FC = () => {
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-3">
                         <Sparkles className="text-secondary" size={28} />
-                        <h2 className="text-2xl md:text-3xl font-bold text-primary">
+                        <h2 className="text-2xl font-bold text-primary">
                             {title}
                         </h2>
                     </div>

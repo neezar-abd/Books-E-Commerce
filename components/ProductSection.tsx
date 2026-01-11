@@ -64,7 +64,7 @@ const ProductSection: React.FC = () => {
 
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-primary">REKOMENDASI</h2>
+          <h2 className="text-2xl font-bold text-primary">Rekomendasi</h2>
           <Link href="/products" className="text-sm text-secondary hover:underline">
             Lihat Semua
           </Link>

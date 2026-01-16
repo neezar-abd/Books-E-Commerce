@@ -15,6 +15,7 @@ interface ProductCardProps {
         discount?: number;
         rating?: number;
         stock?: number;
+        total_sold?: number;
         store_id?: string;
         stores?: {
             name: string;
@@ -27,9 +28,6 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
-    // Generate consistent random values based on product id
-    const idCode = product.id?.toString().charCodeAt?.(0) || 0;
-    const soldCount = (idCode * 127 + 500) % 9000 + 100;
     const deliveryDays = (index % 3) + 2;
 
     // Use store city if available, otherwise fallback
@@ -92,12 +90,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
 
                     {/* Rating & Sold */}
                     <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
-                        <div className="flex items-center gap-0.5">
-                            <Star size={12} fill="#F5BE30" className="text-secondary" />
-                            <span>{product.rating || '4.9'}</span>
-                        </div>
-                        <span className="text-gray-300">|</span>
-                        <span>{formatSold(soldCount)} Terjual</span>
+                        {(product.rating && product.rating > 0) ? (
+                            <>
+                                <div className="flex items-center gap-0.5">
+                                    <Star size={12} fill="#F5BE30" className="text-secondary" />
+                                    <span>{product.rating}</span>
+                                </div>
+                                <span className="text-gray-300">|</span>
+                            </>
+                        ) : null}
+                        {(product as any).total_sold && (product as any).total_sold > 0 ? (
+                            <span>{formatSold((product as any).total_sold)} Terjual</span>
+                        ) : (
+                            <span className="text-gray-400">Produk Baru</span>
+                        )}
                     </div>
 
                     {/* Spacer */}

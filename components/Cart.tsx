@@ -42,7 +42,7 @@ const Cart: React.FC = () => {
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         router.push('/sign-in?redirect=/cart');
         return;
@@ -75,7 +75,7 @@ const Cart: React.FC = () => {
 
       const newQuantity = Math.max(1, item.quantity + delta);
       await cartService.updateQuantity(id, newQuantity);
-      
+
       setCartItems(items =>
         items.map(i => i.id === id ? { ...i, quantity: newQuantity } : i)
       );
@@ -97,7 +97,7 @@ const Cart: React.FC = () => {
 
       await cartService.removeFromCart(id);
       setCartItems(items => items.filter(i => i.id !== id));
-      
+
       // Notify header to update count
       window.dispatchEvent(new Event('cartUpdated'));
     } catch (error) {
@@ -146,8 +146,8 @@ const Cart: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">
-      <div className="container mx-auto px-4 lg:px-8">
-        
+      <div className="container-80">
+
         {/* Breadcrumb */}
         <div className="text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-primary">Beranda</Link>
@@ -159,10 +159,10 @@ const Cart: React.FC = () => {
         <h1 className="text-4xl font-bold text-primary mb-8">Keranjang Belanja</h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
+
           {/* Cart Items */}
           <div className="lg:col-span-2">
-            
+
             {/* Table Header - Hidden on mobile */}
             <div className="hidden sm:grid bg-secondary rounded-t-2xl px-6 py-4 grid-cols-12 gap-4 font-bold text-primary">
               <div className="col-span-5">Produk</div>
@@ -183,7 +183,7 @@ const Cart: React.FC = () => {
               ) : (
                 cartItems.map(item => (
                   <div key={item.id} className="p-4 sm:p-6 grid grid-cols-1 sm:grid-cols-12 gap-4 items-start sm:items-center">
-                    
+
                     {/* Remove Button & Product Info */}
                     <div className="sm:col-span-5 flex items-start gap-3">
                       <button
@@ -269,7 +269,7 @@ const Cart: React.FC = () => {
           <div className="lg:col-span-1">
             <div className="bg-white border-2 border-gray-200 rounded-3xl p-6 sticky top-24">
               <h2 className="text-2xl font-bold text-primary mb-6">Ringkasan Pesanan</h2>
-              
+
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Items</span>

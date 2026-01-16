@@ -89,7 +89,7 @@ function SearchContent() {
 
     return (
         <main className="pt-6 pb-8">
-            <div className="container mx-auto px-4 max-w-[1400px]">
+            <div className="container-80">
                 {/* Breadcrumb */}
                 <div className="mb-4">
                     <div className="flex items-center gap-2 text-sm text-gray-600">

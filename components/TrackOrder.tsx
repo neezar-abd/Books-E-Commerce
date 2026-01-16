@@ -18,7 +18,7 @@ interface OrderData {
 const TrackOrder: React.FC = () => {
   const searchParams = useSearchParams();
   const orderId = searchParams?.get('order_id');
-  
+
   const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -121,8 +121,8 @@ const TrackOrder: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">
-      <div className="container mx-auto px-4 lg:px-8">
-        
+      <div className="container-80">
+
         {/* Breadcrumb */}
         <div className="text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-primary">Beranda</Link>
@@ -152,11 +152,10 @@ const TrackOrder: React.FC = () => {
                 return (
                   <div key={step.id} className="flex flex-col items-center text-center">
                     <div
-                      className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 relative z-10 transition-all ${
-                        step.status === 'completed'
+                      className={`w-20 h-20 rounded-full flex items-center justify-center mb-4 relative z-10 transition-all ${step.status === 'completed'
                           ? 'bg-secondary'
                           : 'bg-gray-200'
-                      }`}
+                        }`}
                     >
                       <Icon size={32} className={step.status === 'completed' ? 'text-primary' : 'text-gray-400'} />
                       {step.status === 'completed' && (
@@ -180,7 +179,7 @@ const TrackOrder: React.FC = () => {
         {/* Products */}
         <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
           <h2 className="text-2xl font-bold text-primary mb-6">Produk</h2>
-          
+
           <div className="space-y-6">
             {products && products.length > 0 ? (
               products.map((product: any) => (

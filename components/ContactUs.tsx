@@ -7,7 +7,7 @@ import Link from 'next/link';
 const ContactUs: React.FC = () => {
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">
-      <div className="container mx-auto px-4 lg:px-8">
+      <div className="container-80">
 
         {/* Breadcrumb */}
         <div className="text-sm text-gray-500 mb-6">

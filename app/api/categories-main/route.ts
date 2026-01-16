@@ -25,14 +25,14 @@ export async function GET() {
 
     // Group by main_category and get first occurrence
     const mainCategories = new Map();
-    
+
     data?.forEach((item: any) => {
       if (!mainCategories.has(item.main_category)) {
         const slug = item.main_category
           .toLowerCase()
           .replace(/[^a-z0-9]+/g, '-')
           .replace(/^-|-$/g, '');
-          
+
         mainCategories.set(item.main_category, {
           id: item.category_data_id,
           name: item.main_category,
@@ -51,7 +51,7 @@ export async function GET() {
       data: categories,
     });
   } catch (error: any) {
-    console.error('Error fetching main categories:', error);
+    console.warn('Categories API - table might not exist:', error.message);
     return NextResponse.json(
       {
         success: false,

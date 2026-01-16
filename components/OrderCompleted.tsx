@@ -104,8 +104,8 @@ const OrderCompleted: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white pt-24 pb-16">
-      <div className="container mx-auto px-4 lg:px-8">
-        
+      <div className="container-80">
+
         {/* Breadcrumb */}
         <div className="text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-primary">Beranda</Link>
@@ -144,7 +144,7 @@ const OrderCompleted: React.FC = () => {
             <p className="font-bold text-primary">{order.shipping_address.recipient_name}</p>
           </div>
           <div className="flex items-end">
-            <button 
+            <button
               onClick={handleDownloadInvoice}
               className="w-full bg-primary text-white py-3 px-6 rounded-full font-bold hover:bg-opacity-90 transition-all"
             >
@@ -156,7 +156,7 @@ const OrderCompleted: React.FC = () => {
         {/* Order Details */}
         <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 mb-8">
           <h3 className="text-2xl font-bold text-primary mb-6">Detail Pesanan</h3>
-          
+
           {/* Products Header */}
           <div className="flex justify-between items-center pb-4 border-b-2 border-gray-200 mb-4">
             <span className="font-bold text-primary">Produk</span>

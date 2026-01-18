@@ -13,6 +13,47 @@ const supabaseAdmin = createClient(
     }
 );
 
+// Helper function to upload base64 image to Supabase Storage
+async function uploadBase64Image(base64Image: string, folder: string = 'products'): Promise<string> {
+    try {
+        const matches = base64Image.match(/^data:image\/([a-zA-Z]*);base64,(.*)$/);
+        if (!matches || matches.length !== 3) {
+            throw new Error('Invalid base64 image format');
+        }
+
+        const fileType = matches[1];
+        const base64Data = matches[2];
+
+        // Convert base64 to buffer
+        const buffer = Buffer.from(base64Data, 'base64');
+
+        // Generate unique filename
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileType}`;
+        const filePath = `${folder}/${fileName}`;
+
+        // Upload to Supabase Storage
+        const { data, error } = await supabaseAdmin.storage
+            .from('product-images')
+            .upload(filePath, buffer, {
+                contentType: `image/${fileType}`,
+                cacheControl: '3600',
+                upsert: false,
+            });
+
+        if (error) throw error;
+
+        // Get public URL
+        const { data: urlData } = supabaseAdmin.storage
+            .from('product-images')
+            .getPublicUrl(filePath);
+
+        return urlData.publicUrl;
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        throw error;
+    }
+}
+
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
@@ -65,21 +106,41 @@ export async function POST(request: NextRequest) {
         }
 
         // Validate and truncate fields to prevent varchar overflow
-        // NOTE: For production, upload images to storage (Supabase Storage/Cloudinary) first
-        // then save the URL here. Base64 images are too long for varchar columns.
+        // Upload images to Supabase Storage
+        let uploadedImageUrl: string | null = null;
+        let uploadedImageUrls: string[] = [];
 
-        // Use placeholder for images temporarily
-        const imageUrl = image && image.startsWith('data:')
-            ? 'https://via.placeholder.com/400x400?text=Product+Image' // Placeholder for base64
-            : image?.substring(0, 500) || null;
+        try {
+            // Upload main image if it's base64
+            if (image && image.startsWith('data:')) {
+                console.log('Uploading main image to storage...');
+                uploadedImageUrl = await uploadBase64Image(image, 'products');
+                console.log('Main image uploaded:', uploadedImageUrl);
+            } else {
+                uploadedImageUrl = image?.substring(0, 500) || null;
+            }
 
-        const imageUrls = images && images.length > 0
-            ? images.map((img: string) =>
-                img.startsWith('data:')
-                    ? 'https://via.placeholder.com/400x400?text=Product+Image'
-                    : img.substring(0, 500)
-            )
-            : [imageUrl];
+            // Upload all images if they're base64
+            if (images && images.length > 0) {
+                console.log('Uploading', images.length, 'images to storage...');
+                const uploadPromises = images.map(async (img: string) => {
+                    if (img.startsWith('data:')) {
+                        return await uploadBase64Image(img, 'products');
+                    }
+                    return img.substring(0, 500);
+                });
+                uploadedImageUrls = await Promise.all(uploadPromises);
+                console.log('All images uploaded:', uploadedImageUrls.length);
+            } else {
+                uploadedImageUrls = uploadedImageUrl ? [uploadedImageUrl] : [];
+            }
+        } catch (uploadError: any) {
+            console.error('Image upload error:', uploadError);
+            return NextResponse.json(
+                { error: 'Failed to upload images', details: uploadError.message },
+                { status: 500 }
+            );
+        }
 
         const cleanedData = {
             title: title.substring(0, 255),
@@ -88,8 +149,8 @@ export async function POST(request: NextRequest) {
             price,
             stock,
             original_price: price,
-            images: imageUrls,
-            image: imageUrl,
+            images: uploadedImageUrls,
+            image: uploadedImageUrl,
             video_url: video_url ? video_url.substring(0, 500) : null,
             brand: brand ? brand.substring(0, 100) : null,
             condition: condition || 'new',
